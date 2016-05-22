@@ -14,7 +14,7 @@ model {
                     exportedHeaders {
                         srcDirs = ['include']
                     }
-                    lib project: ":Toast-Internals", library: "toast_internals", linkage: "shared"
+                    lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
                 }
             }
         }

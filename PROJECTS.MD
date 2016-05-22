@@ -2,7 +2,7 @@ The Toast C++ Library is split into multiple projects in order to achieve its go
 brief outline to how each component of the core library interfaces with one another.
 
 # Overview
-The Toast C++ Library is a culmination of 5 Main Components, `Toast-Internals`, `Toast-Core`, `Toast-Launcher`, `Toast-Bootstrap` and `Toast-Module`.
+The Toast C++ Library is a culmination of 5 Main Components, `Toast-Core`, `Toast-Launcher`, `Toast-Bootstrap` and `Toast-Module`.
 
 The Toast C++ Library is designed with large differences to the Toast Java Library, and is designed for more advanced design and
 construction of Embedded Robot Code. In Toast C++, each module is started as a new process on the system, and communicates with 
@@ -22,14 +22,10 @@ for words commonly used in this document are listed below.
 | Shared Memory Pool | The 'Shared Memory Pool' is a block of shared memory that the Toast Internal Core and all Modules have access to. This is one big memory pool used for communication between all modules and processes |
 | Specific Memory Pool | The 'Specific Memory Pool', also referred to as the 'Private Memory Pool' is a block of shared memory allocated between the Toast Internal Core (parent process) and a single Module process. This is used for module-specific information |
 
-# Toast-Internals
-Toast-Internals is the common library exposed to all other components. It contains common, 'helper' functions being used for things
-like dynamic loading and any other common utilities. This Library is standalone and has no dependencies.
-
 # Toast-Core
 The Toast-Core is used by the Bootstrap and Module, but not by the Internals or Launcher. The purpose of this library is to provide
 the common utilities, structures and definitions for use between the Modules and Bootstrap of Toast. This library is standalone and
-has no dependencies, apart from Toast-Internals.
+has no dependencies.
 
 # Toast-Launcher
 The Toast-Launcher has 2 main uses. The first is to provide the initial, launchable wrapper around the `Toast-Bootstrap` library which
