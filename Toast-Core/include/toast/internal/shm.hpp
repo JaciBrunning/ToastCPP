@@ -7,6 +7,8 @@
 
 // The Toast Shared Memory Internals
 
+#define TOAST_PRIVATE_MEMPOOL_SIZE 256
+
 #ifdef OS_WIN
     #include <windows.h>
     #include <conio.h>

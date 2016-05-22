@@ -1,5 +1,8 @@
 #include "toast/library.hpp"
+#include <string>
 
-CAPI void init_toast_module() {
+using namespace std;
+
+CAPI void init_toast_module(string module_name, string private_mempool_id) {
     
 }

@@ -18,7 +18,7 @@ void Loader::initialize() {
 }
 
 void Loader::search_modules() {
-    vector<string> module_files = Filesystem::ls(Filesystem::path("modules"));
+    vector<string> module_files = Filesystem::ls_local(Filesystem::path("modules"));
     for (auto module : module_files) {
         if (ends_with(module, OS_LIB)) {
             Loader::ModuleAdapter *adapter = new Loader::ModuleAdapter();
@@ -33,27 +33,23 @@ void Loader::create_subprocesses() {
     for (auto module : __modules) {
         Loader::create_module_process(module);
     }
-    sleep_ms(1000);
 }
 
 static void create_process_thread(Loader::ModuleAdapter *adapter) {
-    create_specific_mempool(adapter);
+    create_private_mempool(adapter);
     string mempool_handle = adapter->given_unq;
     string file = adapter->file;
     
-    cout << "Part 1 " << endl;
     char out[] = {0x7A};
-    // memcpy(adapter->specific_mempool, out, 1);
-    adapter->specific_mempool[0] = 0x7A;    // Verification Byte
-    cout << "Part 2" << endl;
+    adapter->private_mempool[0] = 0x7A;    // Verification Byte
     
     #ifdef OS_WIN
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
 
-        ZeroMemory( &si, sizeof(si) );
+        ZeroMemory(&si, sizeof(si));
         si.cb = sizeof(si);
-        ZeroMemory( &pi, sizeof(pi) );
+        ZeroMemory(&pi, sizeof(pi));
         
         if (CreateProcess(NULL, 
             (char *)("toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle).c_str(), 
@@ -92,12 +88,12 @@ string Loader::super_horrible_hash_func(string original) {
     return result;
 }
 
-void Loader::create_specific_mempool(Loader::ModuleAdapter *adapter) {
-    adapter->specific_mempool_handle = Internal::SHM::create_shm_file(adapter->given_unq, TOAST_SPECIFIC_MEMPOOL_SIZE);
-    adapter->specific_mempool = Internal::SHM::map_shm_file(adapter->specific_mempool_handle, TOAST_SPECIFIC_MEMPOOL_SIZE);
+void Loader::create_private_mempool(Loader::ModuleAdapter *adapter) {
+    adapter->private_mempool_handle = Internal::SHM::create_shm_file(adapter->given_unq, TOAST_PRIVATE_MEMPOOL_SIZE);
+    adapter->private_mempool = Internal::SHM::map_shm_file(adapter->private_mempool_handle, TOAST_PRIVATE_MEMPOOL_SIZE);
 }
 
-void Loader::free_specific_mempool(Loader::ModuleAdapter *adapter) {
-    Internal::SHM::unmap_shm_file(adapter->specific_mempool, TOAST_SPECIFIC_MEMPOOL_SIZE);
-    Internal::SHM::close_shm_file(adapter->given_unq, adapter->specific_mempool_handle);
+void Loader::free_private_mempool(Loader::ModuleAdapter *adapter) {
+    Internal::SHM::unmap_shm_file(adapter->private_mempool, TOAST_PRIVATE_MEMPOOL_SIZE);
+    Internal::SHM::close_shm_file(adapter->given_unq, adapter->private_mempool_handle);
 }

@@ -17,9 +17,6 @@
     #include <unistd.h>
 #endif
 
-#define TOAST_SPECIFIC_MEMPOOL_SIZE 256
-
-
 namespace Toast {
     namespace Bootstrap {
         namespace Loader {
@@ -29,8 +26,8 @@ namespace Toast {
                 std::string file;
                 std::string given_unq;
                 
-                SHM_HANDLE specific_mempool_handle;
-                char *specific_mempool;
+                SHM_HANDLE private_mempool_handle;
+                char *private_mempool;
             };
             
             void initialize();
@@ -41,8 +38,8 @@ namespace Toast {
             void create_module_process(ModuleAdapter *adapter);
             std::string super_horrible_hash_func(std::string original);
             
-            void create_specific_mempool(ModuleAdapter *adapter);
-            void free_specific_mempool(ModuleAdapter *adapter);
+            void create_private_mempool(ModuleAdapter *adapter);
+            void free_private_mempool(ModuleAdapter *adapter);
         }
     }
 }

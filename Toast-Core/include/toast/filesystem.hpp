@@ -14,6 +14,7 @@ namespace Toast {
         API void rmdir(std::string path);
         API void mkdir(std::string path);
         API std::vector<std::string> ls(std::string path);
+        API std::vector<std::string> ls_local(std::string path);
         
         API void initialize();
     }

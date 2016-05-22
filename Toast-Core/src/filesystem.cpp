@@ -82,6 +82,20 @@ vector<string> Filesystem::ls(string path) {
     return v;
 }
 
+vector<string> Filesystem::ls_local(string path) {
+    DIR *dir;
+    struct dirent *ent;
+    vector<string> v;
+    if ((dir = opendir(path.c_str())) != NULL) {
+        while ((ent = readdir (dir)) != NULL) {
+            if (strcmp(ent->d_name, ".") != 0 && strcmp(ent->d_name, "..") != 0)
+                v.push_back(ent->d_name);
+        }
+        closedir (dir);
+    };
+    return v;
+}
+
 bool initialized(false);
 
 void Filesystem::initialize() {
