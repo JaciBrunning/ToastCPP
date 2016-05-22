@@ -12,7 +12,7 @@ SHM_HANDLE SHM::create_shm_file(string name, int size) {
             PAGE_READWRITE,
             0,
             size,
-            ("Local\\" + name).c_str()
+            ("Local\\TOAST_" + name).c_str()
         );
     #else
         char *file = (char *)("/TOAST_" + name).c_str();

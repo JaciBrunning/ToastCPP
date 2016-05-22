@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
         SHM_HANDLE handle = SHM::open_shm_file(string(argv[3]));
         char *shared = SHM::map_shm_file(handle, 256);
         char single = shared[0];
-        printf("%02X", single);
+        printf("%02X\n", single);
     }
     return 0;
 }
