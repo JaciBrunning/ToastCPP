@@ -43,10 +43,11 @@ static void create_process_thread(string file) {
         }
     #else
         char *args[] {
+            (char *)("./toast_launcher"),
             (char *)("__TOAST_MODULE_LD_FILE"),
-            (char *)file.c_str()
+            (char *)file.c_str(), NULL
         };
-        execv("toast_launcher", args);
+        execv("./toast_launcher", args);
     #endif
 }
 
