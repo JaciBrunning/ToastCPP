@@ -15,7 +15,7 @@ SHM_HANDLE SHM::create_shm_file(string name, int size) {
             ("Local\\" + name).c_str()
         );
     #else
-        char *file = (char *)Filesystem::path("internal/volatile/" + name + ".shm").c_str();
+        char *file = (char *)("/TOAST_" + name).c_str();
         return shm_open(
             file,
             O_RDWR | O_CREAT,
@@ -29,10 +29,10 @@ SHM_HANDLE SHM::open_shm_file(string name) {
         return OpenFileMapping(
             FILE_MAP_ALL_ACCESS,
             FALSE,
-            ("Local\\" + name).c_str()
+            ("Local\\TOAST_" + name).c_str()
         );
     #else
-        char *file = (char *)Filesystem::path("internal/volatile/" + name + ".shm").c_str();
+        char *file = (char *)("/TOAST_" + name).c_str();
         return shm_open(
             file,
             O_RDWR | O_CREAT,
@@ -47,6 +47,7 @@ char *SHM::map_shm_file(SHM_HANDLE handle, int size) {
             (LPTSTR) MapViewOfFile(handle, FILE_MAP_ALL_ACCESS, 0, 0, size)
         ));
     #else
+        ftruncate(handle, size);
         return (char *) mmap(NULL, size, PROT_READ|PROT_WRITE, MAP_SHARED, handle, 0);
     #endif
 }
@@ -63,7 +64,7 @@ void SHM::close_shm_file(string name, SHM_HANDLE handle) {
     #ifdef OS_WIN
         CloseHandle(handle);
     #else
-        char *file = (char *)Filesystem::path("internal/volatile/" + name + ".shm").c_str();
+        char *file = (char *)("/TOAST_" + name).c_str();
         shm_unlink(file);
     #endif
 }
