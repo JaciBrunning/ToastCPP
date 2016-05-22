@@ -1,0 +1,21 @@
+apply plugin: 'cpp'
+
+model {
+    components {
+        toast_internals(NativeLibrarySpec) {
+            component_spec(it, project)
+            
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include']
+                    }
+                }
+            }
+        }
+    }
+}

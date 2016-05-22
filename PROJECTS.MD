@@ -29,7 +29,7 @@ like dynamic loading and any other common utilities. This Library is standalone 
 # Toast-Core
 The Toast-Core is used by the Bootstrap and Module, but not by the Internals or Launcher. The purpose of this library is to provide
 the common utilities, structures and definitions for use between the Modules and Bootstrap of Toast. This library is standalone and
-has no dependencies.
+has no dependencies, apart from Toast-Internals.
 
 # Toast-Launcher
 The Toast-Launcher has 2 main uses. The first is to provide the initial, launchable wrapper around the `Toast-Bootstrap` library which

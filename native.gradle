@@ -1,0 +1,204 @@
+ext.isArm = hasProperty("arm")
+ext.isRoboRIO = hasProperty("roborio")
+def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
+
+ext.cross64 = hasProperty("cross64")
+ext.is32 = {
+    def os_arch = System.properties["os.arch"]
+    return os_arch.matches("^(x8632|x86|i[3-6]86|ia32|x32)\$")
+}
+
+ext.shouldBuild64 = (is32() ? cross64 : true) && !isArm
+
+println("ARM? ${isArm} ROBORIO? ${isRoboRIO}")
+println("32? ${is32()} Cross-64? ${cross64}")
+println("Building 64? ${shouldBuild64}")
+
+allprojects {
+    plugins.withType(CppPlugin).whenPluginAdded {
+        model {
+            platforms {
+                if (isArm) {
+                    arm {
+                        architecture 'arm'
+                        operatingSystem 'linux'
+                    }
+                } else {
+                    x86 {
+                        architecture 'x86'
+                    }
+                    if (shouldBuild64) {
+                        x64 {
+                            architecture 'x86_64'
+                        }
+                    }
+                }
+            }
+            
+            toolChains {
+                visualCpp(VisualCpp) { }
+                gcc(Gcc) {
+                    target("arm") {
+                        cppCompiler.executable = compilerPrefix + cppCompiler.executable
+                        linker.executable = compilerPrefix + linker.executable
+                        assembler.executable = compilerPrefix + assembler.executable
+                        
+                        cppCompiler.withArguments {args ->
+                            args << '-fPIC'
+                            args.remove("-m32")
+                        }
+                        
+                        linker.withArguments { args ->
+                            args << '-shared'
+                            args.remove('-m32')
+                        }
+                        
+                        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
+                    }
+                }
+                
+                macGcc(Clang) {
+                    target("arm") {
+                        cppCompiler.executable = compilerPrefix + "g++"
+                        linker.executable = compilerPrefix + "g++"
+                        assembler.executable = compilerPrefix + "g++"
+                        
+                        cppCompiler.withArguments {args ->
+                            args << '-fPIC'
+                            args.remove("-m32")
+                        }
+                        
+                        linker.withArguments { args ->
+                            args << '-shared'
+                            args.remove('-m32')
+                        }
+                        
+                        staticLibArchiver.executable = compilerPrefix + "ar"
+                    }
+                }
+            }
+        }
+    }
+}
+
+ext.component_spec = { comp, project -> 
+    comp.binaries.all {
+        
+        if (toolChain in VisualCpp) {
+            cppCompiler.args "/Zi", "/FS"
+            linker.args "/DEBUG"
+        } else {
+            cppCompiler.args "--std=c++11", "-g"
+            if (toolChain in Gcc) {
+                linker.args "-ldl"
+            }
+            linker.args "-Wl,-rpath,.,-rpath,./toast/modules,-rpath,./toast/libs"
+        }
+        
+        if (isRoboRIO) {
+            cppCompiler.define "ROBORIO"
+        }
+        project.ext.binaries << it
+    }
+    
+    if (isArm) {
+        comp.targetPlatform 'arm'
+    } else {
+        comp.targetPlatform 'x86'
+        if (shouldBuild64) {
+            comp.targetPlatform 'x64'
+        }
+    }
+}
+
+
+ext.export_directory = new File(rootProject.projectDir, "export")
+
+ext.non_specific_os = { os ->
+    if (os.isWindows()) {
+        return "windows"
+    } else if (os.isMacOsX()) {
+        return "mac"
+    } else if (os.isLinux()) {
+        return "linux"
+    }
+    return "unknown"
+}
+
+ext.exportPath = { binary -> 
+    def path = new File(ext.export_directory.absolutePath + "/" +
+        non_specific_os(binary.targetPlatform.operatingSystem) + "/" +
+        binary.targetPlatform.architecture.name.replace("86-64", "64") + "/")
+    
+    return path;
+}
+
+ext.copySharedBinary = { binary ->
+    def path = exportPath(binary)
+    
+    project.copy {
+        from binary.sharedLibraryFile
+        into path
+    }
+}
+
+ext.copyExecBinary = { binary ->
+    def path = exportPath(binary)
+    
+    project.copy {
+        from binary.executable.file
+        into path
+    }
+}
+
+ext.test_path = {
+    new File(rootProject.projectDir, "export/test")
+}
+
+allprojects {
+    task copyBinary() {
+        doLast {
+            if (!project.ext.has("ignore_copy")) {
+                binaries.forEach { binary ->
+                    if (binary in SharedLibraryBinarySpec)
+                        rootProject.ext.copySharedBinary(binary)
+                    else if (binary in NativeExecutableBinarySpec)
+                        rootProject.ext.copyExecBinary(binary)
+                }
+            }
+        }
+    }
+    
+    task copyTest() {
+        doLast {
+            if (!project.ext.has("ignore_test")) {
+                binaries.forEach { binary ->
+                    if (!binary.targetPlatform.architecture.name.equals("x86-64") && !(binary.targetPlatform.architecture.name.equals("x86") && is32())) return;
+                    def binaryFile = null
+                    
+                    if (binary in SharedLibraryBinarySpec) {
+                        binaryFile = binary.sharedLibraryFile
+                    } else if (binary in NativeExecutableBinarySpec) {
+                        binaryFile = binary.executable.file
+                    }
+                    
+                    if (binaryFile == null) return;
+                    
+                    if (!project.ext.has("test_path")) {
+                        project.ext.test_path = test_path()
+                    }
+                    
+                    project.copy {
+                        from binaryFile
+                        into project.ext.test_path
+                    }
+                }
+            }
+        }
+    }
+    
+    plugins.withType(CppPlugin).whenPluginAdded {
+        build.finalizedBy copyBinary
+        build.finalizedBy copyTest
+    }
+}

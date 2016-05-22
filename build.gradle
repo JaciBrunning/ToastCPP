@@ -1,0 +1,20 @@
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.12'
+}
+
+def build_directory = rootProject.buildDir
+allprojects {
+    def path = project.path.substring(1).replaceAll(":", "/")
+    if (project == rootProject) path = project.name
+    project.buildDir = new File(build_directory, path);
+    
+    project.ext.binaries = []
+}
+
+apply from: 'native.gradle'

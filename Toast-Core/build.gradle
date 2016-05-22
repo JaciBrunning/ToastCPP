@@ -1,0 +1,22 @@
+apply plugin: 'cpp'
+
+model {
+    components {
+        toast_core(NativeLibrarySpec) {
+            component_spec(it, project)
+            
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include']
+                    }
+                    lib project: ":Toast-Internals", library: "toast_internals", linkage: "shared"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,69 @@
+{
+    "version": "0.1.0",
+    "command": "./gradlew",
+    "windows": {
+        "command": "gradlew"
+    },
+    "isShellCommand": true,
+    "showOutput": "always",
+    "tasks": [
+        {
+            "taskName": "build",
+            "args": [],
+            "isBuildCommand": true,
+            "isWatching": false,
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": [
+                        {   // WIN
+                            "regexp": "^(.*)\\((\\d+)\\)\\s?:\\s+(warning|(fatal\\s)?error)\\s?(.*)",
+                            "file": 1,
+                            "line": 2,
+                            "severity": 3,
+                            "message": 5
+                        }
+                    ]
+                },
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": [
+                        {   // UNIX
+                            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|(fatal\\s)?error):\\s+(.*)",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "severity": 4,
+                            "message": 5
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "taskName": "roborio",
+            "suppressTaskName": true,
+            "args": ["build", "-Parm", "-Proborio"],
+            "isBuildCommand": true,
+            "isWatching": false,
+            "problemMatcher": [
+                {
+                    "owner": "cpp",
+                    "fileLocation": ["absolute"],
+                    "pattern": [
+                        {   // UNIX
+                            "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|(fatal\\s)?error):\\s+(.*)",
+                            "file": 1,
+                            "line": 2,
+                            "column": 3,
+                            "severity": 4,
+                            "message": 5
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
