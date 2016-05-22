@@ -1,6 +1,7 @@
 #include "toast/environment.hpp"
 #include "toast/internal/loader.hpp"
 #include "toast/util.hpp"
+#include "toast/internal/shm.hpp"
 
 #include <string>
 #include <iostream>
@@ -24,7 +25,11 @@ int main(int argc, char *argv[]) {
         SYMBOL sym = Loader::get_symbol(dyn, "init_toast_bootstrap");
         reinterpret_cast<void (*)(int, char*[])>(sym)(argc, argv);
     } else {
-        cout << "Module! " << argv[2] << endl;
+        cout << "Module! " << argv[2] << " " << argv[3] << endl;
+        SHM_HANDLE handle = SHM::open_shm_file(string(argv[3]));
+        char *shared = SHM::map_shm_file(handle, 256);
+        char single = shared[0];
+        printf("%02X", single);
     }
     return 0;
 }

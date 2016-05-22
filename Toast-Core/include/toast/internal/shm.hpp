@@ -28,11 +28,11 @@
 namespace Toast {
     namespace Internal {
         namespace SHM {
-            SHM_HANDLE create_shm_file(std::string name, int size);
-            SHM_HANDLE open_shm_file(std::string name);
-            void *map_shm_file(SHM_HANDLE handle, int size);
-            void unmap_shm_file(void *addr, int size);
-            void close_shm_file(std::string name, SHM_HANDLE handle);
+            API SHM_HANDLE create_shm_file(std::string name, int size);
+            API SHM_HANDLE open_shm_file(std::string name);
+            API char *map_shm_file(SHM_HANDLE handle, int size);
+            API void unmap_shm_file(void *addr, int size);
+            API void close_shm_file(std::string name, SHM_HANDLE handle);
         }
     }
 }
