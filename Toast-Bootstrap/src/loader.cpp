@@ -58,14 +58,7 @@ static void create_process(Loader::ModuleAdapter *adapter) {
             CloseHandle(pi.hThread);
         }
     #else
-        char *args[] {
-            (char *)("./toast_launcher"),
-            (char *)("__TOAST_MODULE_LD_FILE"),
-            (char *)file.c_str(), 
-            (char *)mempool_handle.c_str(), 
-            NULL
-        };
-        execv("./toast_launcher", args);
+        system(("./toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle).c_str());
     #endif
 }
 
