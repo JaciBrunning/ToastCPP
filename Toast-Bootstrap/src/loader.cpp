@@ -33,15 +33,14 @@ void Loader::create_subprocesses() {
     for (auto module : __modules) {
         Loader::create_module_process(module);
     }
+    sleep_ms(1000);
 }
 
-static void create_process_thread(Loader::ModuleAdapter *adapter) {
-    create_private_mempool(adapter);
+static void create_process(Loader::ModuleAdapter *adapter) {
     string mempool_handle = adapter->given_unq;
     string file = adapter->file;
     
-    char out[] = {0x7A};
-    adapter->private_mempool[0] = 0x7A;    // Verification Byte
+    adapter->private_mempool[0] = PMP_VERIFY;    // Verification Byte
     
     #ifdef OS_WIN
         STARTUPINFO si;
@@ -68,6 +67,18 @@ static void create_process_thread(Loader::ModuleAdapter *adapter) {
         };
         execv("./toast_launcher", args);
     #endif
+}
+
+static void create_process_thread(Loader::ModuleAdapter *adapter) {
+    create_private_mempool(adapter);
+    do {
+        create_process(adapter);
+        char name[50];
+        memcpy(name, &adapter->private_mempool[10], 50);
+        cout << "Name: " << name << endl;
+        memcpy(name, &adapter->private_mempool[60], 50);
+        cout << "Unique: " << name << endl;
+    } while (adapter->private_mempool[1] == 0x01);
 }
 
 void Loader::create_module_process(Loader::ModuleAdapter *adapter) {

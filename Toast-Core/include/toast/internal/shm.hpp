@@ -9,6 +9,16 @@
 
 #define TOAST_PRIVATE_MEMPOOL_SIZE 256
 
+// Private Memory Pool Init/Error Flags
+#define PMP_VERIFY  0x7A
+#define PMP_VALID   0x7B
+#define PMP_LOAD_COMPLETE 0x7C
+#define PMP_INVALID 0x80
+
+#define PMP_LOAD_ERR 0x8A
+#define PMP_INFO_ERR 0x8B
+#define PMP_INIT_ERR 0x8C
+
 #ifdef OS_WIN
     #include <windows.h>
     #include <conio.h>

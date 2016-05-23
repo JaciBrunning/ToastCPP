@@ -1,6 +1,7 @@
 #pragma once
 
 #include "toast/environment.hpp"
+#include "toast/filesystem.hpp"
 #include <string>
 
 #ifdef OS_WIN

@@ -27,12 +27,26 @@ string Loader::Platform::win_dlerror() {
 }
 #endif
 
+#ifdef OS_WIN
+    static std::wstring s2ws(const std::string& s) {
+        int len;
+        int slength = (int)s.length() + 1;
+        len = MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, 0, 0); 
+        wchar_t* buf = new wchar_t[len];
+        MultiByteToWideChar(CP_ACP, 0, s.c_str(), slength, buf, len);
+        std::wstring r(buf);
+        delete[] buf;
+        return r;
+    }
+#endif
+
 void Loader::initialize() {
     #ifdef OS_WIN
         // Windows doesn't support -rpath
-        AddDllDirectory(L".");
-        AddDllDirectory(L"./toast/modules");
-        AddDllDirectory(L"./toast/libs");
+        SetDefaultDllDirectories(LOAD_LIBRARY_SEARCH_DEFAULT_DIRS);
+        AddDllDirectory(s2ws(Toast::Filesystem::absolute("")).c_str());
+        AddDllDirectory(s2ws(Toast::Filesystem::absolute("toast/modules")).c_str());
+        AddDllDirectory(s2ws(Toast::Filesystem::absolute("toast/libs")).c_str());
     #endif
 }
 
