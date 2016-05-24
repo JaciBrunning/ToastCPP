@@ -7,7 +7,7 @@
 
 // The Toast Shared Memory Internals
 
-#define TOAST_PRIVATE_MEMPOOL_SIZE 256
+#define TOAST_PRIVATE_MEMPOOL_SIZE 128
 
 // Private Memory Pool Init/Error Flags
 #define PMP_VERIFY  0x7A
