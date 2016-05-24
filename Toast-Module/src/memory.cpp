@@ -72,3 +72,31 @@ char *Memory::private_block() {
 char *Memory::shared_block() {
     return Memory::Internal::get_shared_block();
 }
+
+Memory::Bridge::Bridge(string name, int size) {
+    _name = name;
+    _size = size;
+}
+
+void Memory::Bridge::create() {
+    _handle = Toast::Internal::SHM::create_shm_file(_name, _size);
+    _block = Toast::Internal::SHM::map_shm_file(_handle, _size);
+}
+
+void Memory::Bridge::open() {
+    _handle = Toast::Internal::SHM::open_shm_file(_name);
+    _block = Toast::Internal::SHM::map_shm_file(_handle, _size);
+}
+
+char *Memory::Bridge::get() {
+    return _block;
+}
+
+void Memory::Bridge::destroy() {
+    Toast::Internal::SHM::unmap_shm_file(_block, _size);
+    Toast::Internal::SHM::close_shm_file(_name, _handle);
+}
+
+void Memory::Bridge::zero() {
+    memset(_block, 0, _size);
+}

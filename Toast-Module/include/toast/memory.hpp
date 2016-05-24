@@ -26,5 +26,20 @@ namespace Toast {
         
         API char *private_block();
         API char *shared_block();
+        
+        class Bridge {
+            public:
+                Bridge(std::string name, int size);
+                void create();
+                void open();
+                char *get();
+                void destroy();
+                void zero();
+            private:
+                SHM_HANDLE _handle;
+                std::string _name;
+                int _size;
+                char *_block;
+        };
     }
 }
