@@ -7,7 +7,22 @@
 
 // The Toast Shared Memory Internals
 
+// 128 Bytes. We only really need about 53 Bytes, but we have extra
+// space for future use. In cases where this runs out, the last
+// 16 Bytes are reserved for pointer(s) to a dedicated memory pool
+// that contains the full information. For the most part, this
+// expansion requires a specified protocol that may or may not
+// be currently implemented.
 #define TOAST_PRIVATE_MEMPOOL_SIZE 128
+
+// 1 Megabyte. We don't actually need nearly this much, but we have
+// places that are unallocated for future use, in case WPILib or 
+// Toast itself adds functionality that requires Module <--> Bootstrap
+// talk. The advantage of this is that modules that were built with
+// older versions of Toast don't require a rebuild, as this value
+// is unlikely to ever need expansion.
+#define TOAST_SHARED_MEMPOOL_SIZE (1024 * 1024)
+#define TOAST_SHARED_MEMPOOL_NAME "shared_public"
 
 // Private Memory Pool Init/Error Flags
 #define PMP_VERIFY  0x7A

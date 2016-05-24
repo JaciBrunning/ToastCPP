@@ -7,12 +7,18 @@ static string __mempool_id;
 static SHM_HANDLE __shm_handle;
 static char *__private_block;
 
+static SHM_HANDLE __shm_handle_shared;
+static char *__shared_block;
+
 // -- MODULE INTERNALS -- //
 
 int Memory::Internal::initialize(string private_mempool_id) {
     __mempool_id = private_mempool_id;
     __shm_handle = Toast::Internal::SHM::open_shm_file(private_mempool_id);
     __private_block = Toast::Internal::SHM::map_shm_file(__shm_handle, TOAST_PRIVATE_MEMPOOL_SIZE);
+    
+    __shm_handle_shared = Toast::Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, TOAST_SHARED_MEMPOOL_SIZE);
+    __shared_block = Toast::Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
     
     if (__private_block[0] == PMP_VERIFY) {
         __private_block[0] = PMP_VALID;             // Valid Block
@@ -53,4 +59,16 @@ string Memory::Internal::private_mempool_id() {
 
 char *Memory::Internal::get_private_block() {
     return __private_block;
+}
+
+char *Memory::Internal::get_shared_block() {
+    return __shared_block;
+}
+
+char *Memory::private_block() {
+    return Memory::Internal::get_private_block();
+}
+
+char *Memory::shared_block() {
+    return Memory::Internal::get_shared_block();
 }

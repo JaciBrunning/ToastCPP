@@ -20,6 +20,11 @@ namespace Toast {
             
             std::string private_mempool_id();
             char *get_private_block();
-        }
+            
+            char *get_shared_block();
+        };
+        
+        API char *private_block();
+        API char *shared_block();
     }
 }

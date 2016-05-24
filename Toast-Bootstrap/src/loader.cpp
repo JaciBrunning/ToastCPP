@@ -12,6 +12,10 @@ using namespace std;
 
 static vector<Loader::ModuleAdapter *> __modules;
 
+static SHM_HANDLE __shm_handle_shared;
+static char *__shared_block;
+
+
 string Loader::ModuleAdapter::get_name() {
     if (!name_cache.empty()) return name_cache;
     if (private_mempool[2] != 0x01) return NULL;
@@ -22,6 +26,7 @@ string Loader::ModuleAdapter::get_name() {
 }
 
 void Loader::initialize() {
+    Loader::create_shared_mempool();
     Loader::search_modules();
     Loader::create_subprocesses();
 }
@@ -95,6 +100,16 @@ string Loader::super_horrible_hash_func(string original) {
     stream << hex << h;
     string result(stream.str());
     return result;
+}
+
+void Loader::create_shared_mempool() {
+    __shm_handle_shared = Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, TOAST_SHARED_MEMPOOL_SIZE);
+    __shared_block = Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
+}
+
+void Loader::free_shared_mempool() {
+    Internal::SHM::unmap_shm_file(__shared_block, TOAST_SHARED_MEMPOOL_SIZE);
+    Internal::SHM::close_shm_file(TOAST_SHARED_MEMPOOL_NAME, __shm_handle_shared);
 }
 
 void Loader::create_private_mempool(Loader::ModuleAdapter *adapter) {

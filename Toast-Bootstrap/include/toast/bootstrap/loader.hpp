@@ -51,6 +51,8 @@ namespace Toast {
             void create_module_process(ModuleAdapter *adapter);
             std::string super_horrible_hash_func(std::string original);
             
+            void create_shared_mempool();
+            void free_shared_mempool();
             void create_private_mempool(ModuleAdapter *adapter);
             void free_private_mempool(ModuleAdapter *adapter);
         }
