@@ -43,7 +43,7 @@ void Memory::Internal::set_restart(bool restartable) {
 
 void Memory::Internal::bind_info(Toast::ModuleInfo *info) {
     memcpy(&__private_block[10], info->name, 50);
-    memcpy(&__private_block[60], info->unique, 50);
+    __private_block[2] = 0x01;                      // Information has been Set
     Memory::Internal::set_restart(info->restartable);
 }
 

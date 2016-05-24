@@ -28,6 +28,19 @@ namespace Toast {
                 
                 SHM_HANDLE private_mempool_handle;
                 char *private_mempool;
+                
+                void clear() {
+                    name_cache.clear();
+                    memset(private_mempool, 0, TOAST_PRIVATE_MEMPOOL_SIZE);
+                }
+                
+                void dirty() {
+                    name_cache.clear();
+                }
+                
+                std::string get_name();
+            private:
+                std::string name_cache;
             };
             
             void initialize();

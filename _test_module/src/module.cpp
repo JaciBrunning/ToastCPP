@@ -12,4 +12,4 @@ class MyModule : public Module {
         }
 };
 
-MODULE_CLASS("MyTestModule", "abcd_2425_v", true, MyModule);
+MODULE_CLASS("MyTestModule", true, MyModule);

@@ -12,6 +12,15 @@ using namespace std;
 
 static vector<Loader::ModuleAdapter *> __modules;
 
+string Loader::ModuleAdapter::get_name() {
+    if (!name_cache.empty()) return name_cache;
+    if (private_mempool[2] != 0x01) return NULL;
+    char name[50];
+    memcpy(name, &private_mempool[10], 50);
+    name_cache = string(name);
+    return name_cache;
+}
+
 void Loader::initialize() {
     Loader::search_modules();
     Loader::create_subprocesses();
@@ -65,12 +74,8 @@ static void create_process(Loader::ModuleAdapter *adapter) {
 static void create_process_thread(Loader::ModuleAdapter *adapter) {
     create_private_mempool(adapter);
     do {
+        adapter->clear();
         create_process(adapter);
-        char name[50];
-        memcpy(name, &adapter->private_mempool[10], 50);
-        cout << "Name: " << name << endl;
-        memcpy(name, &adapter->private_mempool[60], 50);
-        cout << "Unique: " << name << endl;
     } while (adapter->private_mempool[1] == 0x01);
 }
 
