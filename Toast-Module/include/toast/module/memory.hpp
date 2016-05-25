@@ -9,7 +9,7 @@
 
 namespace Toast {
     namespace Memory {
-        namespace Internal {
+        namespace Module {
             int initialize(std::string private_mempool_id);
             void finalize_load();
             
@@ -20,26 +20,8 @@ namespace Toast {
             
             std::string private_mempool_id();
             char *get_private_block();
-            
-            char *get_shared_block();
         };
         
         API char *private_block();
-        API char *shared_block();
-        
-        class Bridge {
-            public:
-                Bridge(std::string name, int size);
-                void create();
-                void open();
-                char *get();
-                void destroy();
-                void zero();
-            private:
-                SHM_HANDLE _handle;
-                std::string _name;
-                int _size;
-                char *_block;
-        };
     }
 }

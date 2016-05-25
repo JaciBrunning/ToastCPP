@@ -1,5 +1,6 @@
 #include "toast/logger.hpp"
 #include "toast/filesystem.hpp"
+#include "toast/memory.hpp"
 
 #include <string.h>
 
@@ -81,7 +82,7 @@ void Log::log(string name, string msg, Log::Level level) {
 }
 
 void Log::log_raw(string msg, bool error, bool debug) {
-    if (!debug || _debug) {         // TODO: _debug should be set from the shared mempool
+    if (!debug || _debug || Memory::Shared::get_debug()) {
         if (error) {
             cerr << msg << endl;
         } else {
