@@ -90,7 +90,7 @@ ext.component_spec = { comp, project ->
         } else {
             cppCompiler.args "--std=c++11", "-g"
             if (toolChain in Gcc) {
-                linker.args "-ldl", "-lrt"
+                linker.args "-ldl", "-lrt", "-lm"
             }
             linker.args "-Wl,-rpath,.,-rpath,./toast/modules,-rpath,./toast/libs"
         }

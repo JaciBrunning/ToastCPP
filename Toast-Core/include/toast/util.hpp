@@ -1,13 +1,16 @@
 #pragma once
 
+#include "toast/environment.hpp"
 #include "toast/library.hpp"
 
-#ifdef WIN32
+#ifdef OS_WIN
     #include <windows.h>
 #elif _POSIX_C_SOURCE >= 199309L
-    #include <time.h>   // for nanosleep
+    #include <sys/time.h>
+    #include <time.h>
 #else
-    #include <unistd.h> // for usleep
+    #include <sys/time.h>
+    #include <unistd.h>
 #endif
 
 // A collection of utilities that don't need to be in Toast's namespace
@@ -30,5 +33,18 @@ API inline void sleep_ms(int milliseconds) {
     nanosleep(&ts, NULL);
 #else
     usleep(milliseconds * 1000);
+#endif
+}
+
+// Get the current system time since UNIX epoch in Milliseconds
+API inline long current_time_millis() {
+#ifdef WIN32
+    SYSTEMTIME time;
+    GetSystemTime(&time);
+    return (long)((time.wSecond * 1000) + time.wMilliseconds);
+#else
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 #endif
 }
