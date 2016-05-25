@@ -150,6 +150,10 @@ void Logger::raw(string msg, bool error, bool debug) {
     Log::log_raw(msg, error, debug);
 }
 
+void Logger::raw(string msg) {
+    Logger::raw(msg, false, false);
+}
+
 void Logger::operator<<(string msg) {
     Logger::info(msg);
 }

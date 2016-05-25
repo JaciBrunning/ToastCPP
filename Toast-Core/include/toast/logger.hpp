@@ -46,6 +46,7 @@ namespace Toast {
         API void error(std::string msg);
         API void severe(std::string msg);
         API void raw(std::string msg, bool error, bool debug);
+        API void raw(std::string msg);
         
         API void operator<<(std::string msg);
         API void set_name(std::string name);
