@@ -48,6 +48,8 @@ namespace Toast {
         API void raw(std::string msg, bool error, bool debug);
         
         API void operator<<(std::string msg);
+        API void set_name(std::string name);
+        API std::string get_name();
     
     private:
         std::string name;

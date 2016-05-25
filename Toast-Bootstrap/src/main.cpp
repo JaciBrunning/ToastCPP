@@ -6,7 +6,7 @@
 
 using namespace Toast;
 
-Logger __bootstrap_logger("Toast-Bootstrap");
+Logger _b_log("Toast-Bootstrap");
 
 void init_toast_bootstrap(int argc, char *argv[]) {
     Filesystem::initialize();
@@ -14,5 +14,6 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     
     Log::initialize("Bootstrap");
     
+    _b_log << "Initializing Logger";
     Bootstrap::Loader::initialize();
 }

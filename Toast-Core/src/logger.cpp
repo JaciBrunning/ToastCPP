@@ -153,3 +153,11 @@ void Logger::raw(string msg, bool error, bool debug) {
 void Logger::operator<<(string msg) {
     Logger::info(msg);
 }
+
+void Logger::set_name(string n) {
+    name = n;
+}
+
+string Logger::get_name() {
+    return name;
+}

@@ -8,8 +8,7 @@ using namespace std;
 class MyModule : public Module {
     public:
         virtual void construct() {
-            cout << "Test Module Constructed" << endl;
         }
 };
 
-MODULE_CLASS("MyTestModule", true, MyModule);
+MODULE_CLASS("MyTestModule", false, MyModule);

@@ -1,6 +1,7 @@
 #include "toast/bootstrap/loader.hpp"
 #include "toast/filesystem.hpp"
 #include "toast/util.hpp"
+#include "toast/logger.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -11,10 +12,11 @@ using namespace Toast::Bootstrap;
 using namespace std;
 
 static vector<Loader::ModuleAdapter *> __modules;
+static Logger _log("Bootstrap-Loader");
 
 string Loader::ModuleAdapter::get_name() {
     if (!name_cache.empty()) return name_cache;
-    if (private_mempool[2] != 0x01) return NULL;
+    if (private_mempool[2] != 0x01) return file;
     char name[50];
     memcpy(name, &private_mempool[10], 50);
     name_cache = string(name);
@@ -34,6 +36,9 @@ void Loader::search_modules() {
             adapter->file = module;
             adapter->given_unq = Loader::super_horrible_hash_func(adapter->file);
             __modules.push_back(adapter);
+            _log.debug("Discovered Module File: " + module);
+        } else {
+            _log.warn("Module File " + module + " does not have a valid file extension! Are you sure this is the correct download for your platform? Valid File Extension: " + OS_LIB);
         }
     }
 }
@@ -42,7 +47,7 @@ void Loader::create_subprocesses() {
     for (auto module : __modules) {
         Loader::create_module_process(module);
     }
-    sleep_ms(1000);
+    sleep_ms(100);
 }
 
 static void create_process(Loader::ModuleAdapter *adapter) {
@@ -51,6 +56,7 @@ static void create_process(Loader::ModuleAdapter *adapter) {
     
     adapter->private_mempool[0] = PMP_VERIFY;    // Verification Byte
     
+    _log.debug("Launching Process for Module: " + adapter->file);
     #ifdef OS_WIN
         STARTUPINFO si;
         PROCESS_INFORMATION pi;
@@ -72,14 +78,17 @@ static void create_process(Loader::ModuleAdapter *adapter) {
 }
 
 static void create_process_thread(Loader::ModuleAdapter *adapter) {
+    _log.debug("Creating Private Mempool for " + adapter->file + " (id: " + adapter->given_unq + ")");
     create_private_mempool(adapter);
     do {
         adapter->clear();
         create_process(adapter);
+        _log.warn("Module " + adapter->get_name() + " has exited or crashed! " + (adapter->private_mempool[1] == 0x01 ? "Restarting..." : "Not Restarting..."));
     } while (adapter->private_mempool[1] == 0x01);
 }
 
 void Loader::create_module_process(Loader::ModuleAdapter *adapter) {
+    _log.debug("Creating Module Process Thread for " + adapter->file);
     thread t(create_process_thread, adapter);
     t.detach();
 }
