@@ -10,6 +10,9 @@
     #include <time.h>
 #else
     #include <sys/time.h>
+#endif
+
+#ifndef OS_WIN
     #include <sys/types.h>
     #include <unistd.h>
     #include <signal.h>
