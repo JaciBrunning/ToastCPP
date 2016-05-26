@@ -1,3 +1,4 @@
+#include "toast/net/socket.hpp"
 #include "toast/bootstrap.hpp"
 #include "toast/bootstrap/loader.hpp"
 #include "toast/memory.hpp"
@@ -11,6 +12,7 @@ using namespace Toast;
 Logger _b_log("Toast-Bootstrap");
 
 void init_toast_bootstrap(int argc, char *argv[]) {
+    Net::Socket::socket_init();
     Filesystem::initialize();
     Memory::initialize_bootstrap();
     

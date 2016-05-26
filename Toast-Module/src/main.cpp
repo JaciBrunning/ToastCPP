@@ -1,3 +1,4 @@
+#include "toast/net/socket.hpp"
 #include "toast/library.hpp"
 #include "toast/module/memory.hpp"
 #include "toast/environment.hpp"
@@ -15,6 +16,7 @@ static Logger _logger("Module");
 
 CAPI void init_toast_module(string module_name, string private_mempool_id) {
     if (Memory::Module::initialize(private_mempool_id) != 0) return;
+    Net::Socket::socket_init();
     Log::initialize(module_name);
     _logger.set_name("Module-" + module_name);
     _logger.debug("Loading Module...");

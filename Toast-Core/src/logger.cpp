@@ -95,14 +95,14 @@ void Log::log_raw(string msg, bool error, bool debug) {
     
     int now = (int)current_time_millis();
     
-    Transport::intToBytes(now, buffer, 0x01);
+    Net::Transport::intToBytes(now, buffer, 0x01);
     //memcpy(&buffer[0x05], );           TODO MatchTime here
     //                                   TODO RobotState here
     char flags = 0x00;
     if (error) flags = flags | 1;
     if (debug) flags = flags | (1 << 1);
     
-    Transport::intToBytes(msg.length(), buffer, 0x1A);
+    Net::Transport::intToBytes(msg.length(), buffer, 0x1A);
     memcpy(&buffer[0x1E], msg.c_str(), msg.length());
     
     if (file_out.is_open()) {

@@ -1,7 +1,7 @@
-#include "toast/transport.hpp"
+#include "toast/net/transport.hpp"
 #include <string.h>
 
-using namespace Toast;
+using namespace Toast::Net;
 
 void Transport::intToBytes(int n, char *bytes, int a) {
     bytes[a+0] = (n >> 24) & 0xFF;
