@@ -13,6 +13,8 @@ static bool _debug;
 // 512 KB ought to be enough
 static char buffer[1024 * 512];
 
+static string _log_file;
+
 ofstream file_out;
 
 Log::Level _INFO      = {"INFO", false, false};
@@ -53,11 +55,20 @@ const string timeFormat() {
     return buf;
 }
 
+void backup_last_log() {
+    string destination = Filesystem::path("log/last/" + _process_name + ".tlog");
+    Log::copyTo(destination);
+}
+
 void Log::initialize(string process_name) {
     _process_name = process_name;
     Filesystem::path_mkdir("log");
     Filesystem::path_mkdir("log/current");
-    file_out.open(Filesystem::path("log/current/" + process_name + ".tlog"));
+    Filesystem::path_mkdir("log/last");
+    _log_file = Filesystem::path("log/current/" + process_name + ".tlog");
+    backup_last_log();
+    
+    file_out.open(_log_file);
     if (file_out.fail()) {
         Log::log("Logger", "Could not initialize Logger File Output! " + string(strerror(errno)), Log::ERR());
     }
@@ -74,6 +85,17 @@ void Log::flush() {
 void Log::close() {
     file_out.flush();
     file_out.close();
+}
+
+string Log::file() {
+    return _log_file;
+}
+
+void Log::copyTo(string path) {
+    ifstream src(Log::file(), ios::binary);
+    ofstream dst(path, ios::binary);
+    
+    dst << src.rdbuf();
 }
 
 void Log::log(string name, string msg, Log::Level level) {

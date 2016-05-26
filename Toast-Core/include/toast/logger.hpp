@@ -29,6 +29,9 @@ namespace Toast {
         API void flush();
         API void close();
         
+        API std::string file();
+        API void copyTo(std::string path);
+        
         API void log(std::string name, std::string msg, Level level);
         API void log_raw(std::string msg, bool error, bool debug);
         API void info(std::string name, std::string msg);
