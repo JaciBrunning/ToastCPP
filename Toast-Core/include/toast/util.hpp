@@ -10,8 +10,9 @@
     #include <time.h>
 #else
     #include <sys/time.h>
-    #include <unistd.h>
     #include <sys/types.h>
+    #include <unistd.h>
+    #include <signal.h>
 #endif
 
 #include <errno.h>
