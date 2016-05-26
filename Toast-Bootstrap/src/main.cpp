@@ -4,16 +4,21 @@
 #include "toast/memory.hpp"
 #include "toast/filesystem.hpp"
 #include "toast/logger.hpp"
-#include "toast/bootstrap/splash.hpp"
+#include "toast/splash.hpp"
 #include "toast/environment.hpp"
 #include "toast/state.hpp"
 #include "toast/util.hpp"
+#include "toast/crash.hpp"
 
 using namespace Toast;
 
 Logger _b_log("Toast-Bootstrap");
 
 void init_toast_bootstrap(int argc, char *argv[]) {
+    Crash::initialize();
+    
+    CRASH_HANDLE_START
+    
     Net::Socket::socket_init();
     Filesystem::initialize();
     Memory::initialize_bootstrap();
@@ -27,4 +32,6 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     
     _b_log << "Initializing Loader";
     Bootstrap::Loader::initialize();
+    
+    CRASH_HANDLE_END
 }

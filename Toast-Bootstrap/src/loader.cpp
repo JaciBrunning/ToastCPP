@@ -47,7 +47,7 @@ void Loader::create_subprocesses() {
     for (auto module : __modules) {
         Loader::create_module_process(module);
     }
-    sleep_ms(100);
+    sleep_ms(1000);
 }
 
 static void create_process(Loader::ModuleAdapter *adapter) {

@@ -9,6 +9,7 @@
 #include "toast/state.hpp"
 #include "toast/util.hpp"
 #include "toast/memory.hpp"
+#include "toast/crash.hpp"
 
 #include <iostream>
 #include <string>
@@ -26,6 +27,12 @@ void toast_module_shutdown() {
 
 void init_toast_module(string module_name, string private_mempool_id) {
     if (Memory::Module::initialize(private_mempool_id) != 0) return;
+    
+    Crash::initialize();
+    Crash::on_shutdown(toast_module_shutdown);
+    
+    CRASH_HANDLE_START
+    
     Net::Socket::socket_init();
     Log::initialize(module_name);
     _logger.set_name("Module-" + module_name);
@@ -68,4 +75,6 @@ void init_toast_module(string module_name, string private_mempool_id) {
     // SHUTDOWN 
     
     toast_module_shutdown();
+    
+    CRASH_HANDLE_END
 }
