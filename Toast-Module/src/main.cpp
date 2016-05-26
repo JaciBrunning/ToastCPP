@@ -5,6 +5,7 @@
 #include "toast/internal/loader.hpp"
 #include "toast/module.hpp"
 #include "toast/logger.hpp"
+#include "toast/state.hpp"
 
 #include <iostream>
 #include <string>
@@ -52,4 +53,6 @@ CAPI void init_toast_module(string module_name, string private_mempool_id) {
     
     Memory::Module::finalize_load();
     _logger << "Module Loaded: " + string(info->name);
+    
+    States::start_tracker();
 }

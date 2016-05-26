@@ -5,6 +5,10 @@ model {
         toast_bootstrap(NativeLibrarySpec) {
             component_spec(it, project)
             
+            binaries.all {
+                cppCompiler.define "BOOTSTRAP"
+            }
+            
             sources {
                 cpp {
                     source {

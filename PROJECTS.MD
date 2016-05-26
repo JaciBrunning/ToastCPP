@@ -20,7 +20,7 @@ for words commonly used in this document are listed below.
 | Internal Core | The 'Internal Core' is the portion of Toast's library that functions inside of the Bootstrap. This is separate from  WPILib and the Toast Hooks |
 | External Core | The 'External Core' is the portion of Toast's library that functions inside of the Module. This provides the portion of Toast that the developer uses |
 | Shared Memory Pool | The 'Shared Memory Pool' is a block of shared memory that the Toast Internal Core and all Modules have access to. This is one big memory pool used for communication between all modules and processes |
-| Specific Memory Pool | The 'Specific Memory Pool', also referred to as the 'Private Memory Pool' is a block of shared memory allocated between the Toast Internal Core (parent process) and a single Module process. This is used for module-specific information |
+| Private Memory Pool | The 'Private Memory Pool' is a block of shared memory allocated between the Toast Internal Core (parent process) and a single Module process. This is used for module-specific information |
 
 # Toast-Core
 The Toast-Core is used by the Bootstrap and Module, but not by the Internals or Launcher. The purpose of this library is to provide
