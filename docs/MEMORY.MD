@@ -21,7 +21,7 @@ and the Toast Bootstrapper, relaying information about the Module and its load s
 | 0x01    | Char | Restart Byte | The restart byte simply describes whether the module is configured to be restartable or not. If the module specifies that it can be restarted (and it has loaded correctly), it will have a value of `0x01`, else, `0x00`. If there are any load errors as described in the `Verification Byte`, the module may not restart, as it will get stuck in a loop. |
 | 0x02    | Char | Info Set | If this is set to `0x01`, the information of the module (module name / restartable) has been set in the memory. |
 | 0x03 - 0x09 | _Unused_ | _Unused_ | _Unused_ |
-| 0x10 - 0x49 | Char[] | Module Name | 50 Bytes are allocated to store the name of the module. This is used as the identifier for the module and is identical to the one provided in the `MODULE_CLASS` macro |
+| 0x10 - 0x31 | Char[] | Module Name | 50 Bytes are allocated to store the name of the module. This is used as the identifier for the module and is identical to the one provided in the `MODULE_CLASS` macro |
 
 ## Shared Block
 The Shared Block is a block of shared memory 1 Megabyte large. The Shared block
