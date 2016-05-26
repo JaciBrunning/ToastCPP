@@ -17,6 +17,9 @@ namespace Toast {
             
             API void set_debug(bool is_debug);
             API bool get_debug();
+            
+            API void set_bootstrap_pid(int pid);
+            API int get_bootstrap_pid();
         }
         
         class Bridge {

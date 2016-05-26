@@ -72,7 +72,7 @@ State States::last_state() {
 }
 
 void States::start_tracker() {
-    while (1) {
+    while (is_process_alive(Memory::Shared::get_bootstrap_pid())) {
         int current_state = States::current_state_ordinal();
         State _cur = States::from_ordinal(current_state);
         

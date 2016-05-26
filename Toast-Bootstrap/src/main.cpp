@@ -7,6 +7,7 @@
 #include "toast/bootstrap/splash.hpp"
 #include "toast/environment.hpp"
 #include "toast/state.hpp"
+#include "toast/util.hpp"
 
 using namespace Toast;
 
@@ -19,7 +20,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     
     Log::initialize("Bootstrap");
     _b_log.raw(Splash::get_startup_splash() + "\n");
-    _b_log.raw("Toast Loaded on OS: [" + Environment::OS::to_string() + "]");
+    _b_log.raw("Toast Loaded on OS: [" + Environment::OS::to_string() + "] with Process ID [" + std::to_string(get_pid()) + "]");
     
     // Default Tick Timing (50Hz)
     States::Internal::set_tick_timing(20);

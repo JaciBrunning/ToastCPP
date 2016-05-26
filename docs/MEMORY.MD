@@ -32,9 +32,9 @@ Block is very large in comparison to the Private Block.
 
 | Address | Type | Name | Description |
 | ------- | ---- | ---- | ----------- |
-| 0x00    | _Unused_ | _Unused_ | _Unused_ |
-| 0x01    | Char | Debug | If set the `0x01`, Toast was launched in debug mode. This gives more in-depth logger output for the Bootstrap and Module Processes |
-| 0x02    | _Unused_ | _Unused_ | _Unused_ |
-| 0x03    | Char | Current State | The current state of the Robot as defined in `toast/state.hpp` |
-| 0x04    | Char | Last State    | The last state of the Robot as defined in `toast/state.hpp` |
-| 0x05    | Char | State Tick Timing | Stores how long (in milliseconds) modules should wait inbetween state ticks. |
+| 0x00 - 0x03    | Bootstrap PID | Int | The Process ID of the Toast Bootstrap. This is used to automatically kill module children when the bootstrap is killed |
+| 0x04    | Char | Debug | If set the `0x01`, Toast was launched in debug mode. This gives more in-depth logger output for the Bootstrap and Module Processes |
+| 0x05    | _Unused_ | _Unused_ | _Unused_ |
+| 0x06    | Char | Current State | The current state of the Robot as defined in `toast/state.hpp` |
+| 0x07    | Char | Last State    | The last state of the Robot as defined in `toast/state.hpp` |
+| 0x08    | Char | State Tick Timing | Stores how long (in milliseconds) modules should wait inbetween state ticks. |

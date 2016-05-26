@@ -1,5 +1,8 @@
 #include "toast/memory.hpp"
 
+#include "toast/util.hpp"
+#include "toast/net/transport.hpp"
+
 using namespace Toast;
 using namespace std;
 
@@ -11,6 +14,9 @@ void Memory::initialize_bootstrap() {
     __shared_block = Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
 
     Memory::Shared::zero();
+    
+    // Write the PID to the Shared Pool for client processes to work with
+    Memory::Shared::set_bootstrap_pid(get_pid());
 }
 
 void Memory::initialize() {
@@ -29,11 +35,19 @@ char *Memory::Shared::get() {
 }
 
 void Memory::Shared::set_debug(bool is_debug) {
-    __shared_block[0x01] = is_debug ? 0x01 : 0x00;
+    __shared_block[0x04] = is_debug ? 0x01 : 0x00;
 }
 
 bool Memory::Shared::get_debug() {
-    return __shared_block[0x01] == 0x01 ? true : false;
+    return __shared_block[0x04] == 0x01 ? true : false;
+}
+
+void Memory::Shared::set_bootstrap_pid(int pid) {
+    Net::Transport::intToBytes(pid, __shared_block, 0);
+}
+
+int Memory::Shared::get_bootstrap_pid() {
+    return Net::Transport::bytesToInt(__shared_block, 0);
 }
 
 // -- BRIDGED MEMORY STUFF -- //

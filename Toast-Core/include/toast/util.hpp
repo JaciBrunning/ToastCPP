@@ -11,7 +11,10 @@
 #else
     #include <sys/time.h>
     #include <unistd.h>
+    #include <sys/types.h>
 #endif
+
+#include <errno.h>
 
 // A collection of utilities that don't need to be in Toast's namespace
 
@@ -47,4 +50,35 @@ API inline long current_time_millis() {
     gettimeofday(&tv, NULL);
     return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
 #endif
+}
+
+// Get the Process ID of the current process
+API inline int get_pid() {
+    #ifdef OS_WIN
+        return GetCurrentProcessId();
+    #else
+        return getpid();
+    #endif
+}
+
+// Check if a process ID is alive
+API inline bool is_process_alive(int pid) {
+    #ifdef OS_WIN
+        DWORD exCode;
+        HANDLE processHandle = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid);
+        if (GetExitCodeProcess(processHandle, &exCode)) {
+            CloseHandle(processHandle);
+            if (exCode == STILL_ACTIVE) return true;
+            return false;
+        } else {
+            CloseHandle(processHandle);
+            return false;
+        }
+    #else
+        int ret = kill(pid, 0);
+        if (ret == -1 && errno == ESRCH) {
+            return false;
+        }
+        return true;
+    #endif
 }

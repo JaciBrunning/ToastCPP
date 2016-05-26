@@ -1,3 +1,4 @@
+#include "toast/module/statics.hpp"
 #include "toast/net/socket.hpp"
 #include "toast/library.hpp"
 #include "toast/module/memory.hpp"
@@ -6,6 +7,8 @@
 #include "toast/module.hpp"
 #include "toast/logger.hpp"
 #include "toast/state.hpp"
+#include "toast/util.hpp"
+#include "toast/memory.hpp"
 
 #include <iostream>
 #include <string>
@@ -15,7 +18,11 @@ using namespace std;
 
 static Logger _logger("Module");
 
-CAPI void init_toast_module(string module_name, string private_mempool_id) {
+void toast_module_shutdown() {
+    _logger << "Shutting Down Module...";
+}
+
+void init_toast_module(string module_name, string private_mempool_id) {
     if (Memory::Module::initialize(private_mempool_id) != 0) return;
     Net::Socket::socket_init();
     Log::initialize(module_name);
@@ -52,7 +59,11 @@ CAPI void init_toast_module(string module_name, string private_mempool_id) {
     module->construct();
     
     Memory::Module::finalize_load();
-    _logger << "Module Loaded: " + string(info->name);
+    _logger << "Module Loaded: " + string(info->name) + " [" + to_string(Memory::Shared::get_bootstrap_pid()) + " -> " + to_string(get_pid()) + "]";
     
+    // MAIN LOOP
     States::start_tracker();
+    // SHUTDOWN 
+    
+    toast_module_shutdown();
 }
