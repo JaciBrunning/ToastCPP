@@ -20,6 +20,8 @@ static Logger _logger("Module");
 
 void toast_module_shutdown() {
     _logger << "Shutting Down Module...";
+    Log::flush();
+    Log::close();
 }
 
 void init_toast_module(string module_name, string private_mempool_id) {
