@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     } else {
         DYNAMIC dyn = Loader::load_dynamic_library(Loader::library_name("toast_module"));
         SYMBOL sym = Loader::get_symbol(dyn, "init_toast_module");
-        reinterpret_cast<void (*)(string, string)>(sym)(string(argv[2]), string(argv[3]));
+        reinterpret_cast<void (*)(string, string, int)>(sym)(string(argv[2]), string(argv[3]), atoi(argv[4]));
     }
     return 0;
 }

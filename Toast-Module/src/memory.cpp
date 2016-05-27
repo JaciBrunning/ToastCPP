@@ -10,7 +10,7 @@ static char *__private_block;
 
 // -- MODULE INTERNALS -- //
 
-int Memory::Module::initialize(string private_mempool_id) {
+int Memory::Module::initialize(string private_mempool_id, int module_idx) {
     Memory::initialize();
     
     __mempool_id = private_mempool_id;
@@ -19,6 +19,8 @@ int Memory::Module::initialize(string private_mempool_id) {
     
     if (__private_block[0] == PMP_VERIFY) {
         __private_block[0] = PMP_VALID;             // Valid Block
+        int status = Memory::Shared::get()[0x10 + module_idx];
+        Memory::Shared::get()[0x10 + module_idx] = status == 0x03 ? 0x04 : 0x02;
         return 0;
     } else {
         __private_block[0] = PMP_INVALID;           // Block Validation Error
@@ -45,7 +47,7 @@ void Memory::Module::set_restart(bool restartable) {
 }
 
 void Memory::Module::bind_info(Toast::ModuleInfo *info) {
-    memcpy(&__private_block[10], info->name, 50);
+    memcpy(&__private_block[0x10], info->name, 50);
     __private_block[2] = 0x01;                      // Information has been Set
     Memory::Module::set_restart(info->restartable);
 }

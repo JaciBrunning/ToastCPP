@@ -3,6 +3,7 @@
 #include "toast/splash.hpp"
 #include "toast/environment.hpp"
 #include "toast/memory.hpp"
+#include "toast/module.hpp"
 
 #ifdef OS_WIN
     #include "compat/win32/backtrace.hpp"
@@ -93,27 +94,18 @@ void Crash::handle_exception(string type, string msg) {
         __logger.raw("\t" + i);
     }
     
-    // __logger.raw("\nModules:");
-    // for (auto module : Loader::modules()) {
-    //     __logger.raw("\t" + module->info->name);
-    //     __logger.raw("\t\tName: " + module->info->name);
-    //     __logger.raw("\t\tUnique: " + module->info->unique);
-    //     __logger.raw("\t\tFile: " + module->filepath);
-    // }
-    
-    // __logger.raw("\nModule Files:");
-    // for (auto module : Loader::module_files()) {
-    //     __logger.raw("\t" + module);
-    // }
-    
-    // __logger.raw("\nLibrary Files:");
-    // for (auto library : Loader::library_files()) {
-    //     __logger.raw("\t" + library);
-    // }
-    
-    // TODO file coredump of shared pool
-    // TODO contain module unique IDs in the shared pool, then use that here
-    // to get module information.
+    __logger.raw("\nModules:");
+    for (auto module : Toast::get_all_modules()) {
+        __logger.raw("\t" + module.file);
+        __logger.raw("\t\tName: " + module.name);
+        __logger.raw("\t\tId: " + to_string(module.module_idx));
+        __logger.raw("\t\tStatus: " + to_string(module.status) + 
+                " (" + 
+                    (module.status == 0x1 ? "Discovered" : 
+                        (module.status == 0x2 ? "Loaded" : 
+                            (module.status == 0x3 ? "Crashed" : "Restarted"))) + 
+                ")\n");
+    }
     
     __logger.raw("\n*******************");
     shutdown();

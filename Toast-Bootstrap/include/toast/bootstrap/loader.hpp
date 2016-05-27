@@ -24,7 +24,7 @@ namespace Toast {
             public:
                 ModuleAdapter() { }
                 std::string file;
-                std::string given_unq;
+                int idx;
                 
                 SHM_HANDLE private_mempool_handle;
                 char *private_mempool;
@@ -38,6 +38,10 @@ namespace Toast {
                     name_cache.clear();
                 }
                 
+                std::string get_mempool_id() {
+                    return "module_private_" + std::to_string(idx);
+                }
+                
                 std::string get_name();
             private:
                 std::string name_cache;
@@ -49,7 +53,6 @@ namespace Toast {
             void create_subprocesses();
             
             void create_module_process(ModuleAdapter *adapter);
-            std::string super_horrible_hash_func(std::string original);
             
             void create_private_mempool(ModuleAdapter *adapter);
             void free_private_mempool(ModuleAdapter *adapter);

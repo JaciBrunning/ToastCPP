@@ -10,7 +10,7 @@
 namespace Toast {
     namespace Memory {
         namespace Module {
-            int initialize(std::string private_mempool_id);
+            int initialize(std::string private_mempool_id, int module_idx);
             void finalize_load();
             
             void load_error(char state);

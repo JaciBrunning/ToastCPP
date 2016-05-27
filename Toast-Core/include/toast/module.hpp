@@ -4,6 +4,9 @@
 #include "toast/library.hpp"
 #include "toast/state.hpp"
 
+#include <vector>
+#include <string>
+
 #define MODULE_CLASS(NAME, RESTART, MODULE_CLASS)              \
         CAPI Toast::ModuleInfo *_get_module_information() {         \
             Toast::ModuleInfo *info = new Toast::ModuleInfo();      \
@@ -22,6 +25,13 @@ namespace Toast {
         bool restartable;
     } ModuleInfo;
     
+    API typedef struct {
+        std::string name;
+        std::string file;
+        int module_idx;
+        int status;
+    } ModuleData;
+    
     class Module {
         public:
             API virtual void construct() {};
@@ -35,4 +45,6 @@ namespace Toast {
                 States::register_iterative((IterativeBase *)this);
             }
     };
+    
+    API std::vector<ModuleData> get_all_modules();
 }

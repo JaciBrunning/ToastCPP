@@ -30,12 +30,16 @@ namespace Toast {
                 API void open();
                 API char *get();
                 API void destroy();
+                API void close();
                 API void zero();
+                API int size();
             private:
                 SHM_HANDLE _handle;
                 std::string _name;
                 int _size;
                 char *_block;
         };
+        
+        API void copy_private_pool(int module_idx, char *buffer);
     }
 }

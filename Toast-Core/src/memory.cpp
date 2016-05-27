@@ -3,6 +3,8 @@
 #include "toast/util.hpp"
 #include "toast/net/transport.hpp"
 
+#include "toast/logger.hpp"
+
 using namespace Toast;
 using namespace std;
 
@@ -22,6 +24,13 @@ void Memory::initialize_bootstrap() {
 void Memory::initialize() {
     __shm_handle_shared = Toast::Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, TOAST_SHARED_MEMPOOL_SIZE);
     __shared_block = Toast::Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
+}
+
+void Memory::copy_private_pool(int module_idx, char *buffer) {
+    Memory::Bridge b("module_private_" + to_string(module_idx), TOAST_PRIVATE_MEMPOOL_SIZE);
+    b.open();
+    memcpy(buffer, b.get(), b.size());
+    b.destroy();
 }
 
 // -- SHARED MEMORY BLOCK STUFF -- //
@@ -76,6 +85,14 @@ void Memory::Bridge::destroy() {
     Toast::Internal::SHM::close_shm_file(_name, _handle);
 }
 
+void Memory::Bridge::close() {
+    Toast::Internal::SHM::close_shm_file(_name, _handle);
+}
+
 void Memory::Bridge::zero() {
     memset(_block, 0, _size);
+}
+
+int Memory::Bridge::size() {
+    return _size;
 }
