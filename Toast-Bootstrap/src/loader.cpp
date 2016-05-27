@@ -20,7 +20,7 @@ string Loader::ModuleAdapter::get_name() {
     if (!name_cache.empty()) return name_cache;
     if (private_mempool[2] != 0x01) return file;
     char name[50];
-    memcpy(name, &private_mempool[10], 50);
+    memcpy(name, &private_mempool[0x10], 50);
     name_cache = string(name);
     return name_cache;
 }

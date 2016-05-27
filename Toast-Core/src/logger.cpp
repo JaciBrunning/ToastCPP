@@ -124,8 +124,9 @@ void Log::log_raw(string msg, bool error, bool debug) {
     if (error) flags = flags | 1;
     if (debug) flags = flags | (1 << 1);
     
-    Net::Transport::intToBytes(msg.length(), buffer, 0x1A);
-    memcpy(&buffer[0x1E], msg.c_str(), msg.length());
+    buffer[0xA] = flags;
+    Net::Transport::intToBytes(msg.length(), buffer, 0xB);
+    memcpy(&buffer[0xF], msg.c_str(), msg.length());
     
     if (file_out.is_open()) {
         file_out.write(buffer, total_length);

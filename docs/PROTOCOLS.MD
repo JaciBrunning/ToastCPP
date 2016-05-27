@@ -34,6 +34,6 @@ the stdout, but with some extra information for viewing purposes.
 | 0x01 - 0x04 | Int | Time | The time of the log, in milliseconds since the epoch |
 | 0x05 - 0x08 | Int | MatchTime | The time left in the match, in milliseconds |
 | 0x09 | Char | RobotState | The state of the robot (0 = DISABLED, 1 = AUTO, 2 = TELEOP, 3 = TEST) |
-| 0x10 | Char | Flags | 8 Sequential Bits relating to flags on the message. 0b0000 00XY. If X is 1, the message is for debugging. If Y is 1, the message is an error |
-| 0x1A - 0x1D | Int | Length | The length of the total message |
-| 0x1E+ | Char[] | Message | The message itself |
+| 0xA | Char | Flags | 8 Sequential Bits relating to flags on the message. 0b0000 00XY. If X is 1, the message is for debugging. If Y is 1, the message is an error |
+| 0xB - 0xE | Int | Length | The length of the total message |
+| 0xF+ | Char[] | Message | The message itself |
