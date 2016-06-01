@@ -9,8 +9,9 @@ model {
             sources {
                 cpp {
                     source {
-                        srcDirs = ['src']
+                        srcDirs = []
                         srcDirs += libraries.src()
+                        srcDirs += ['src']
                         includes = ['**/*.cpp']
                     }
                     exportedHeaders {

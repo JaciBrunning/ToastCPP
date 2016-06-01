@@ -15,7 +15,7 @@ static char buffer[1024 * 32];
 
 static string _log_file;
 
-ofstream file_out;
+static ofstream file_out;
 
 Log::Level _INFO      = {"INFO", false, false};
 Log::Level _WARN      = {"WARN", false, false};

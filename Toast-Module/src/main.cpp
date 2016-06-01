@@ -70,8 +70,6 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     Memory::Module::finalize_load();
     _logger << "Module Loaded: " + string(info->name) + " [" + to_string(Memory::Shared::get_bootstrap_pid()) + " -> " + to_string(get_pid()) + "]";
     
-    int i = 1 / Memory::Shared::get()[290];
-    
     // MAIN LOOP
     States::start_tracker();
     // SHUTDOWN 

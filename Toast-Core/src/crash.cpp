@@ -89,7 +89,7 @@ void Crash::handle_exception(string type, string msg) {
     __logger.raw("\tMessage: " + msg);
     
     __logger.raw("\nBacktrace:");
-    vector<string> backtrace = backtrace_get(2);
+    vector<string> backtrace = backtrace_get(0);
     for (auto i : backtrace) {
         __logger.raw("\t" + i);
     }
