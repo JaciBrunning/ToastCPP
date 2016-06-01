@@ -59,5 +59,3 @@ namespace Toast {
         }
     }
 }
-
-// TODO move to class model

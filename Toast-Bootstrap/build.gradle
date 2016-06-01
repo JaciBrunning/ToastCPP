@@ -18,6 +18,8 @@ model {
                     exportedHeaders {
                         srcDirs = ['include']
                     }
+                    // Link against the simulation flavor to ensure we don't run into library issues.
+                    lib project: ":Providers", library: "toast_hardware_provider", linkage: "shared"
                     lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
                 }
             }

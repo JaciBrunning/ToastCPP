@@ -63,5 +63,5 @@ char *Environment::get_env(char *string) {
 }
 
 string Environment::toast_home() {
-    return "toast/"; // TODO: /home/lvuser/toast/ for RoboRIO
+    return "toast/";
 }

@@ -1,0 +1,34 @@
+apply plugin: 'cpp'
+
+class SourcesAction implements Action<CppSourceSet> {
+    void execute(CppSourceSet set) {
+        
+    }
+}
+
+model {
+    // Flavors are the "Providers"
+    flavors {
+        "default" {}       // The 'default' flavor is actually simulation
+        wpilib2016 {
+            ext.roborio_binary = true
+        }
+    }
+    components {
+        toast_hardware_provider(NativeLibrarySpec) {
+            component_spec(it, project)
+            
+            binaries.all {
+                // This just adds all the source sets for each
+                // flavour
+                def name = flavor.name
+                
+                sources.create("provider_${name}", CppSourceSet)
+                def set = sources.get("provider_${name}")
+                set.source.srcDirs = [name]
+                set.source.includes = ["**/*.cpp"]
+                set.exportedHeaders.srcDirs = ['include']
+            }
+        }
+    }
+}

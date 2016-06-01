@@ -160,6 +160,9 @@ allprojects {
         doLast {
             if (!project.ext.has("ignore_copy")) {
                 binaries.forEach { binary ->
+                    def arm_binary = binary.flavor.hasProperty('roborio_binary')
+                    if (binary.flavor.name != "default" && !(isArm == arm_binary)) return;
+                    
                     if (binary in SharedLibraryBinarySpec)
                         rootProject.ext.copySharedBinary(binary)
                     else if (binary in NativeExecutableBinarySpec)
@@ -174,6 +177,8 @@ allprojects {
             if (!project.ext.has("ignore_test")) {
                 binaries.forEach { binary ->
                     if (!binary.targetPlatform.architecture.name.equals("x86-64") && !(binary.targetPlatform.architecture.name.equals("x86") && is32())) return;
+                    def arm_binary = binary.flavor.hasProperty('roborio_binary')
+                    if (binary.flavor.name != "default" && !(isArm == arm_binary)) return;
                     def binaryFile = null
                     
                     if (binary in SharedLibraryBinarySpec) {

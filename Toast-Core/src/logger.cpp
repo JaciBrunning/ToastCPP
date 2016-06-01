@@ -10,8 +10,8 @@ using namespace std;
 static string _process_name;
 static bool _debug;
 
-// 512 KB ought to be enough
-static char buffer[1024 * 512];
+// 32 KB ought to be enough
+static char buffer[1024 * 32];
 
 static string _log_file;
 
