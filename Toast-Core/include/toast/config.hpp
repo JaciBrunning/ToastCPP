@@ -1,6 +1,8 @@
 #pragma once
 
 #include "toast/library.hpp"
+#include "toast/logger.hpp"
+
 #include "json11.h"
 
 #include <string>
@@ -11,8 +13,7 @@ namespace Toast {
     class Config {
     public:
         API Config(std::string config_name);
-        void load();
-        API void reload();
+        API Config *reload();
         
         API static void unpack(Json *master_obj, std::string key, Json def);
         API static Json deepMerge(Json *a1, Json *a2);
@@ -26,14 +27,14 @@ namespace Toast {
         API Json getOrDefault(std::string name, Json def);
         API Json get(std::string name, Json def);
         
-        API int getInt(std::string name, int def);
-        API double getDouble(std::string name, double def);
-        API float getFloat(std::string name, float def);
-        API long getLong(std::string name, long def);
-        API bool getBool(std::string name, bool def);
-        API std::string getString(std::string name, std::string def);
+        API int get_int(std::string name, int def);
+        API double get_double(std::string name, double def);
+        API float get_float(std::string name, float def);
+        API long get_long(std::string name, long def);
+        API bool get_bool(std::string name, bool def);
+        API std::string get_string(std::string name, std::string def);
         
-        API std::vector<Json> getVector(std::string name, std::vector<Json> def);
+        API std::vector<Json> get_vector(std::string name, std::vector<Json> def);
         
         API Json *get_root_obj();
         API std::string get_config_name();
@@ -44,5 +45,7 @@ namespace Toast {
         Json defaults_obj;
         std::string name;
         std::string file;
+        Toast::Logger _log;
+        bool _first_load;
     };
 }

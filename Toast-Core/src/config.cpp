@@ -7,18 +7,13 @@
 using namespace Toast;
 using namespace std;
 
-Config::Config(string config_name) {
+Config::Config(string config_name) : _log("Config-" + config_name), _first_load(true) {
     name = config_name;
     file = Filesystem::path("config/" + config_name + ".json");
-    load();
-}
-
-void Config::load() {
     defaults_obj = Json::object();
-    reload();
 }
 
-void Config::reload() {
+Config *Config::reload() {
     string json_config = "";
     
     try {
@@ -30,15 +25,37 @@ void Config::reload() {
         file_in.close();
     } catch (const std::exception &e) { }
     
-    if (json_config.empty()) json_config = "{}";
-    Json obj = Json::parse(json_config);
-    master_obj = deepMerge(&defaults_obj, &obj);
-    string json = to_string(4);
-    
-    ofstream file_out;
-    file_out.open(file);
-    file_out << json << endl;
-    file_out.close();
+    if (trim(json_config).empty()) json_config = "{}";
+    try {
+        Json obj = Json::parse(json_config);
+        master_obj = deepMerge(&defaults_obj, &obj);
+        string json = to_string(4);
+        
+        ofstream file_out;
+        file_out.open(file);
+        file_out << json << endl;
+        file_out.close();
+    } catch (const std::exception &e) {
+        // Parsing error, it's okay, we'll fall back to what we had before. The user likely
+        // made a mistake when editing that produced malformed JSON.
+        
+        if (_first_load) {
+            _log.error("Error! JSON File is malformed! Substituting default values!");
+            Json emt = Json::object();
+            master_obj = deepMerge(&defaults_obj, &emt);
+        } else {
+            _log.error("Error! JSON File is malformed! Using old values!");
+        }
+        
+        string json = to_string(4);
+        
+        ofstream file_out;
+        file_out.open(file);
+        file_out << json << endl;
+        file_out.close();
+    }
+    _first_load = false;
+    return this;
 }
 
 void Config::unpack(Json *master_obj, string key, Json def) {
@@ -128,31 +145,31 @@ Json Config::get(string name, Json def) {
     return getOrDefault(name, def);
 }
 
-int Config::getInt(string name, int def) {
+int Config::get_int(string name, int def) {
     return (int) get(name, Json(def));
 }
 
-double Config::getDouble(string name, double def) {
+double Config::get_double(string name, double def) {
     return (double) get(name, Json(def));
 }
 
-float Config::getFloat(string name, float def) {
+float Config::get_float(string name, float def) {
     return (float) get(name, Json(def));
 }
 
-long Config::getLong(string name, long def) {
+long Config::get_long(string name, long def) {
     return (long) get(name, Json(def));
 }
 
-bool Config::getBool(string name, bool def) {
+bool Config::get_bool(string name, bool def) {
     return (bool) get(name, Json(def));
 }
 
-string Config::getString(string name, string def) {
+string Config::get_string(string name, string def) {
     return (string) get(name, Json(def));
 }
 
-vector<Json> Config::getVector(string name, vector<Json> def) {
+vector<Json> Config::get_vector(string name, vector<Json> def) {
     Json arr = Json::array();
     for (Json t : def) {
         arr << t;

@@ -23,6 +23,9 @@
 #include <sstream>
 #include <vector>
 
+#include <algorithm>
+#include <cctype>
+
 // A collection of utilities that don't need to be in Toast's namespace
 
 // Checks if a string ends with another specific string.
@@ -42,3 +45,9 @@ API int get_pid();
 API bool is_process_alive(int pid);
 
 API std::vector<std::string> split(const std::string &s, char delim);
+
+API inline std::string trim(const std::string &s) {
+   auto wsfront=std::find_if_not(s.begin(),s.end(),[](int c){return std::isspace(c);});
+   auto wsback=std::find_if_not(s.rbegin(),s.rend(),[](int c){return std::isspace(c);}).base();
+   return (wsback<=wsfront ? std::string() : std::string(wsfront,wsback));
+}
