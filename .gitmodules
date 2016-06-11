@@ -1,0 +1,6 @@
+[submodule "wpi/ntcore"]
+	path = wpi/ntcore
+	url = https://github.com/wpilibsuite/ntcore.git
+[submodule "wpi/allwpilib"]
+	path = wpi/allwpilib
+	url = https://github.com/wpilibsuite/allwpilib.git
