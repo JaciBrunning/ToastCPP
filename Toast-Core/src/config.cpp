@@ -13,6 +13,10 @@ Config::Config(string config_name) : _log("Config-" + config_name), _first_load(
     defaults_obj = Json::object();
 }
 
+Config *Config::load() {
+    return reload();
+}
+
 Config *Config::reload() {
     string json_config = "";
     
@@ -28,7 +32,7 @@ Config *Config::reload() {
     if (trim(json_config).empty()) json_config = "{}";
     try {
         Json obj = Json::parse(json_config);
-        master_obj = deepMerge(&defaults_obj, &obj);
+        master_obj = deepMerge(defaults_obj, obj);
         string json = to_string(4);
         
         ofstream file_out;
@@ -42,7 +46,7 @@ Config *Config::reload() {
         if (_first_load) {
             _log.error("Error! JSON File is malformed! Substituting default values!");
             Json emt = Json::object();
-            master_obj = deepMerge(&defaults_obj, &emt);
+            master_obj = deepMerge(defaults_obj, emt);
         } else {
             _log.error("Error! JSON File is malformed! Using old values!");
         }
@@ -60,38 +64,38 @@ Config *Config::reload() {
 
 void Config::unpack(Json *master_obj, string key, Json def) {
     vector<string> split_str = split(key, '.');
-    Json *last_obj = master_obj;
+    Json last_obj = *master_obj;
     for (int i = 0; i < split_str.size(); i++) {
         string cur = split_str[i];
-        if (!(last_obj->has(cur) && last_obj->get(cur).type() == Json::Type::OBJECT)) {
+        if (!(last_obj.has(cur) && last_obj.get(cur).type() == Json::Type::OBJECT)) {
             Json obj = Json::object();
-            last_obj->set(cur, obj);
+            last_obj.set(cur, obj);
         }
         if (i == split_str.size() - 1) {
-            last_obj->set(cur, def);
+            last_obj.set(cur, def);
         } else {
-            last_obj = &last_obj->get(cur);
+            last_obj = last_obj.get(cur);
         }
     }
 }
 
-Json Config::deepMerge(Json *a1, Json *a2) {
+Json Config::deepMerge(Json a1, Json a2) {
     Json d = Json::object();
     Json c = Json::object();
     
-    for (auto key : a1->keys()) {
-        unpack(&d, key, a1->get(key));
+    for (auto key : a1.keys()) {
+        unpack(&d, key, a1.get(key));
     }
     
-    for (auto key : a2->keys()) {
-        unpack(&c, key, a2->get(key));
+    for (auto key : a2.keys()) {
+        unpack(&c, key, a2.get(key));
     }
     
     for (auto kC : c.keys()) {
         Json vC = c[kC];
         if (d.has(kC)) {
             if (vC.type() == Json::Type::OBJECT) {
-                d.set(kC, deepMerge(&d.get(kC), &vC));
+                d.set(kC, deepMerge(d.get(kC), vC));
             } else {
                 d.set(kC, vC);
             }
@@ -106,21 +110,21 @@ Json Config::deepMerge(Json *a1, Json *a2) {
 Json Config::getObject(string name) {
     try {
         vector<string> split_str = split(name, '.');
-        Json *last_obj = &master_obj;
+        Json last_obj = master_obj;
         for (auto key : split_str) {
-            last_obj = &last_obj->get(key);
+            last_obj = last_obj.get(key);
         }
-        return *last_obj;
+        return last_obj;
     } catch (const std::exception &e) {}
     Json obj;
     return obj;
 }
 
-Json Config::to_string() {
+string Config::to_string() {
     return master_obj.stringify();
 }
 
-Json Config::to_string(int indent) {
+string Config::to_string(int indent) {
     return master_obj.stringify(indent);
 }
 

@@ -1,0 +1,36 @@
+// We had to rewrite NTCore's build.gradle a little bit to fit into Toast's overall
+// build system
+
+ext.wpi_project_dir = project.projectDir
+
+project(":wpi:nt") {
+    apply plugin: 'cpp'
+
+    model {
+        components {
+            ntcore(NativeLibrarySpec) {
+                component_spec(it, project)
+                
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ['../ntcore/src']
+                            includes = ['**/*.cpp']
+                        }
+                        exportedHeaders {
+                            srcDirs = ['../ntcore/include', '../ntcore/src']
+                            includes = ['**/*.h']
+                        }
+                    }
+                }
+                
+                binaries.all {
+                    if (toolChain in VisualCpp) {
+                        cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+                        linker.args '/DEF:ntcore.def'
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,6 +1,8 @@
 include "Toast-Bootstrap", "Toast-Core", "Toast-Launcher", "Toast-Module"
 include "Providers"
 
+include "wpi", "wpi:nt"
+
 include "_test_module"
 
 rootProject.name = 'Toast'

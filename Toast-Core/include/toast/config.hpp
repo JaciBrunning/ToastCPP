@@ -13,14 +13,15 @@ namespace Toast {
     class Config {
     public:
         API Config(std::string config_name);
+        API Config *load();
         API Config *reload();
         
         API static void unpack(Json *master_obj, std::string key, Json def);
-        API static Json deepMerge(Json *a1, Json *a2);
+        API static Json deepMerge(Json a1, Json a2);
         
         API Json getObject(std::string name);
-        API Json to_string();
-        API Json to_string(int indent);
+        API std::string to_string();
+        API std::string to_string(int indent);
         
         API bool has(std::string name);
         API void putDefault(std::string key, Json value);
