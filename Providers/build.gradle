@@ -84,7 +84,7 @@ ext.apply_model = { project, callback ->
                 sources {
                     cpp {
                         source {
-                            srcDirs = ["src"]
+                            srcDirs = [_provider.file("src/"), "src"]
                             if (project.hasProperty("extended_source_set"))
                                 project.extended_source_set.forEach { srcDirs += it.srcs }
                             includes = ["**/*.cpp"]
