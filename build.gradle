@@ -17,4 +17,8 @@ allprojects {
     project.ext.binaries = []
 }
 
+ext.apply_cpp = { project ->
+    project.apply plugin: 'cpp'
+}
+
 apply from: 'native.gradle'

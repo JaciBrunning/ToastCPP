@@ -105,14 +105,14 @@ ext.apply_model = { project, callback ->
 }
 
 project(":Providers:simulation") {
-    apply plugin: "cpp"
+    apply_cpp(project)
 
     apply_model(project, null)
 }
 
 if (isRoboRIO) {
     project(":Providers:wpilib") {
-        apply plugin: "cpp"
+        apply_cpp(project)
 
         ext.roborio_binary = true
         ext.extended_source_set = [wpi]

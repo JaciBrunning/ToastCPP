@@ -1,4 +1,4 @@
-apply plugin: 'cpp'
+apply_cpp(project)
 
 model {
     components {
