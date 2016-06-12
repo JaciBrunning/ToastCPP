@@ -1,34 +1,120 @@
-apply plugin: 'cpp'
+def _wpi = project(":wpi").file("allwpilib")
 
-class SourcesAction implements Action<CppSourceSet> {
-    void execute(CppSourceSet set) {
-        
+def libPattern = /lib(?<libName>.+).so$/
+def niLibraryArgs = []
+def niLibraryFileTree = fileTree(new File(_wpi, "ni-libraries").getAbsolutePath())
+
+niLibraryFileTree.each { lib ->
+    def nameMatcher = (lib.name =~ libPattern)
+    if (nameMatcher) {
+        def name = nameMatcher.group('libName')
+        niLibraryArgs << '-l' + name
     }
 }
 
-model {
-    // Flavors are the "Providers"
-    flavors {
-        "default" {}       // The 'default' flavor is actually simulation
-        wpilib2016 {
-            ext.roborio_binary = true
-        }
-    }
-    components {
-        toast_hardware_provider(NativeLibrarySpec) {
-            component_spec(it, project)
-            
-            binaries.all {
-                // This just adds all the source sets for each
-                // flavour
-                def name = flavor.name
-                
-                sources.create("provider_${name}", CppSourceSet)
-                def set = sources.get("provider_${name}")
-                set.source.srcDirs = [name]
-                set.source.includes = ["**/*.cpp"]
-                set.exportedHeaders.srcDirs = ['include']
+task addNiLibraryLinks() {
+    doLast {
+        binaries.all {
+            tasks.withType(CppCompile) {
+                linker.args << "-L" + new File(_wpi, "ni-libraries").getAbsolutePath()
+                linker.args.addAll(niLibraryArgs)
             }
         }
     }
 }
+
+ext.wpi = [
+    srcs: [
+        new File(_wpi, "/wpilibc/shared/src"),
+        new File(_wpi, "/wpilibc/athena/src"),
+        new File(_wpi, "/hal/lib/Athena"),
+        new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
+        new File(_wpi, "/hal/lib/Shared")
+    ],
+    includes: [
+        new File(_wpi, "/wpilibc/shared/include"),
+        new File(_wpi, "/wpilibc/athena/include"),
+        new File(_wpi, "/hal/include"),
+        new File(_wpi, "/hal/lib/Athena"),
+        new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
+        new File(_wpi, "/hal/lib/Shared")
+    ],
+    dependTask: [
+        addNiLibraryLinks
+    ],
+    prebuilt: [ ]
+]
+niLibraryFileTree.each { niLib -> ext.wpi.prebuilt += niLib }
+
+ext.apply_model = { project, callback -> 
+    project.model {
+        if (project.hasProperty("extended_source_set")) {
+            repositories {
+                libs(PrebuiltLibraries) { libs ->
+                    project.extended_source_set.forEach {
+                        if (it.hasProperty("prebuilt")) {
+                            it.prebuilt.forEach { niLib ->
+                                libs.create(niLib) {
+                                    binaries.withType(SharedLibraryBinary) {
+                                        sharedLibraryFile = file(niLib.path)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        components {
+            toast_hardware_provider(NativeLibrarySpec) {
+                component_spec(it, project)
+
+                if (project.hasProperty("extended_source_set"))
+                    project.extended_source_set.forEach {
+                        if (it.hasProperty("dependTask"))
+                            it.dependTask.forEach {
+                                tasks.withType(CppCompile) {
+                                    dependsOn it
+                                }
+                            }
+                    }
+
+                sources {
+                    cpp {
+                        source {
+                            srcDirs = ["src"]
+                            if (project.hasProperty("extended_source_set"))
+                                project.extended_source_set.forEach { srcDirs += it.srcs }
+                            includes = ["**/*.cpp"]
+                        }
+                        exportedHeaders {
+                            srcDirs = ["../include/", "include"]
+                            if (project.hasProperty("extended_source_set"))
+                                project.extended_source_set.forEach { srcDirs += it.includes }
+                        }
+                        lib project: ":wpi:nt", library: "ntcore", linkage: "shared"
+                    }
+                }
+            }
+        }
+    }
+}
+
+project(":Providers:simulation") {
+    apply plugin: "cpp"
+
+    apply_model(project, null)
+}
+
+if (isRoboRIO) {
+    project(":Providers:wpilib") {
+        apply plugin: "cpp"
+
+        ext.roborio_binary = true
+        ext.extended_source_set = [wpi]
+
+        apply_model(project, null)
+    }
+}
+
