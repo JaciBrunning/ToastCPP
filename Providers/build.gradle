@@ -1,4 +1,5 @@
 def _wpi = project(":wpi").file("allwpilib")
+def _provider = project(":Providers")
 
 def libPattern = /lib(?<libName>.+).so$/
 def niLibraryArgs = []
@@ -89,11 +90,13 @@ ext.apply_model = { project, callback ->
                             includes = ["**/*.cpp"]
                         }
                         exportedHeaders {
-                            srcDirs = ["../include/", "include"]
+                            srcDirs = [_provider.file("include/"), "include"]
                             if (project.hasProperty("extended_source_set"))
                                 project.extended_source_set.forEach { srcDirs += it.includes }
+                            includes = ["**/*.hpp", "**/*.h"]
                         }
                         lib project: ":wpi:nt", library: "ntcore", linkage: "shared"
+                        lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
                     }
                 }
             }

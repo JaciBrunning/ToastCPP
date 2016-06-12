@@ -11,12 +11,15 @@
 #include "toast/crash.hpp"
 #include "toast/config.hpp"
 
+#include "provider/provider.hpp"
+
 using namespace Toast;
 
 Logger _b_log("Toast-Bootstrap");
 Config _b_cfg("Toast-Bootstrap");
 
 void init_toast_bootstrap(int argc, char *argv[]) {
+    ProviderInfo *info = provider_info();
     Crash::initialize();
     
     CRASH_HANDLE_START
@@ -28,6 +31,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     Log::initialize("Bootstrap");
     _b_log.raw(Splash::get_startup_splash() + "\n");
     _b_log.raw("Toast Loaded on OS: [" + Environment::OS::to_string() + "] with Process ID [" + std::to_string(get_pid()) + "]");
+    _b_log.raw("Hardware Provider: " + std::string(info->name));
     _b_cfg.reload();
     
     // State Tick Timing (50Hz)
