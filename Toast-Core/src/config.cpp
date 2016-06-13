@@ -92,7 +92,7 @@ Json Config::deepMerge(Json a1, Json a2) {
     }
     
     for (auto kC : c.keys()) {
-        Json vC = c[kC];
+        Json vC = (Json)c[kC];
         if (d.has(kC)) {
             if (vC.type() == Json::Type::OBJECT) {
                 d.set(kC, deepMerge(d.get(kC), vC));
