@@ -1,6 +1,7 @@
 #include "toast/net/socket.hpp"
 #include "toast/bootstrap.hpp"
 #include "toast/bootstrap/loader.hpp"
+#include "toast/bootstrap/state.hpp"
 #include "toast/memory.hpp"
 #include "toast/filesystem.hpp"
 #include "toast/logger.hpp"
@@ -23,6 +24,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     Crash::initialize();
     
     CRASH_HANDLE_START
+    provider_preinit();
     
     Net::Socket::socket_init();
     Filesystem::initialize();
@@ -40,6 +42,9 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     
     _b_log << "Initializing Loader";
     Bootstrap::Loader::initialize();
+
+    Bootstrap::States::init();
+    provider_init();
     
     CRASH_HANDLE_END
 }
