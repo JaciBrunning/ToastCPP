@@ -1,6 +1,12 @@
 #include "thp/provider.hpp"
+#include "thp/wpi/base_robot.hpp"
+
+#include "WPILib.h"
+
+#include "toast/logger.hpp"
 
 using namespace std;
+using namespace Toast;
 
 static ProviderInfo info = {
     "WPILib (2016)",
@@ -20,8 +26,8 @@ ProviderInfo *provider_info() {
 void provider_preinit() { }
 void provider_init() {
     if (!HALInitialize()) {
-        _provider_logger.fatal("HAL could not be initialized");
-        throw new std::exception("HAL could not be initialized");
+        _provider_logger.severe("HAL could not be initialized");
+        throw "HAL could not be initialized";
     }
     HALReport(HALUsageReporting::kResourceType_Language,
               HALUsageReporting::kLanguage_CPlusPlus);
