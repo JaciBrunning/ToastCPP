@@ -1,6 +1,4 @@
-#include "toast/module.hpp"
-#include "toast/state.hpp"
-#include "toast/logger.hpp"
+#include "toast.hpp"
 
 #include <iostream>
 

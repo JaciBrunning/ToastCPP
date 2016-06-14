@@ -16,8 +16,6 @@ CAPI void provider_preinit();
 // Called after Toast loading
 CAPI void provider_init();
 
-CAPI void provider_free();
-
 CAPI void thp_state_set_callback(void (*callback_periodic)(bool,bool,bool,bool), void (*callback_transition)(bool,bool,bool,bool));
 CAPI void thp_state_call_periodic(bool disabled, bool auton, bool teleop, bool test);
 CAPI void thp_state_call_init(bool disabled, bool auton, bool teleop, bool test);

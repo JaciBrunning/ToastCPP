@@ -1,7 +1,7 @@
 #pragma once
 
 #include "toast/state.hpp"      // Toast-Core impl
-#include "provider/provider.hpp"
+#include "thp/provider.hpp"
 
 namespace Toast {
     namespace Bootstrap {

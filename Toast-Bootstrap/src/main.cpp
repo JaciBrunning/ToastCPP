@@ -12,7 +12,7 @@
 #include "toast/crash.hpp"
 #include "toast/config.hpp"
 
-#include "provider/provider.hpp"
+#include "thp/provider.hpp"
 
 using namespace Toast;
 

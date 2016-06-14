@@ -1,4 +1,4 @@
-#include "provider/provider.hpp"
+#include "thp/provider.hpp"
 
 using namespace std;
 
@@ -16,6 +16,7 @@ ProviderInfo *provider_info() {
 
 void provider_preinit() { }
 void provider_init() { }
+void provider_free() { }
 
 void thp_state_set_callback(void (*callback_periodic)(bool,bool,bool,bool), void (*callback_transition)(bool,bool,bool,bool)) {
     _state_callback_periodic = callback_periodic;
