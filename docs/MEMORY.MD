@@ -46,11 +46,11 @@ Block is very large in comparison to the Private Block.
 | Address | Type | Name | Description |
 | ------- | ---- | ---- | ----------- |
 | 0x00 | Char | Endian | _See Above_ |
-| 0x04 - 0x07    | Bootstrap PID | Int | The Process ID of the Toast Bootstrap. This is used to automatically kill module children when the bootstrap is killed |
-| 0x0B    | Char | Debug | If set the `0x01`, Toast was launched in debug mode. This gives more in-depth logger output for the Bootstrap and Module Processes |
 | 0x01 - 0x03 | _Unused_ | _Unused_ | _Unused_ |
+| 0x04 - 0x07    | Bootstrap PID | Int | The Process ID of the Toast Bootstrap. This is used to automatically kill module children when the bootstrap is killed |
 | 0x08    | Char | Current State | The current state of the Robot as defined in `toast/state.hpp` |
 | 0x09    | Char | Last State    | The last state of the Robot as defined in `toast/state.hpp` |
 | 0x0A    | Char | State Tick Timing | Stores how long (in milliseconds) modules should wait inbetween state ticks. |
+| 0x0B    | Char | Debug | If set the `0x01`, Toast was launched in debug mode. This gives more in-depth logger output for the Bootstrap and Module Processes |
 | 0x0C - 0x0F | _Unused_ | _Unused_ | _Unused_ | 
 | 0x10 - 0x10F | Char | Module Activity State | This 256 Byte Large block of memory contains information about module activity state. In short, each module is given a location in this block of memory, respective of the order they were loaded. The shared memory with name `module_private_{x}` will be the private block of that module, where `{x}` is the index of the entry minus the starting index of the Module Activity State Block (`0x10`). If the value is `0x00`, this module has not been discovered or loaded. If it is `0x01`, the module has been discovered but not loaded. If it is `0x02`, the module is currently active. If it is `0x03`, the module has recently crashed and is awaiting a restart if available. If the restart is successful, this becomes `0x04`.|

@@ -19,7 +19,7 @@ void Memory::initialize_bootstrap() {
     
     // Write the PID to the Shared Pool for client processes to work with
     Memory::Shared::set_bootstrap_pid(get_pid());
-    Memory::Shared::get()[0] = Memory::get_endian_bit();
+    Memory::Shared::get()[ADDR_ENDIAN] = Memory::get_endian_bit();
 }
 
 void Memory::initialize() {
@@ -54,19 +54,19 @@ char *Memory::Shared::get() {
 }
 
 void Memory::Shared::set_debug(bool is_debug) {
-    __shared_block[0x0B] = is_debug ? 0x01 : 0x00;
+    __shared_block[ADDR_DEBUG] = is_debug ? 0x01 : 0x00;
 }
 
 bool Memory::Shared::get_debug() {
-    return __shared_block[0x0B] == 0x01 ? true : false;
+    return __shared_block[ADDR_DEBUG] == 0x01 ? true : false;
 }
 
 void Memory::Shared::set_bootstrap_pid(int pid) {
-    Net::Transport::intToBytes(pid, __shared_block, 0);
+    Net::Transport::intToBytes(pid, __shared_block, ADDR_BOOTSTRAP_PID);
 }
 
 int Memory::Shared::get_bootstrap_pid() {
-    return Net::Transport::bytesToInt(__shared_block, 0);
+    return Net::Transport::bytesToInt(__shared_block, ADDR_BOOTSTRAP_PID);
 }
 
 // -- BRIDGED MEMORY STUFF -- //

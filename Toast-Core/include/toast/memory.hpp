@@ -2,10 +2,12 @@
 
 #include "toast/internal/shm.hpp"
 #include "toast/library.hpp"
+#include "toast/memaddr.hpp"
 
 #include <string>
 #include <stdlib.h>
 
+// Impl
 namespace Toast {
     namespace Memory {
         API void initialize_bootstrap();

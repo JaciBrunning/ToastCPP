@@ -18,9 +18,9 @@ static char _load_idx = 0x00;
 
 string Loader::ModuleAdapter::get_name() {
     if (!name_cache.empty()) return name_cache;
-    if (private_mempool[3] != 0x01) return file;
-    char name[48];
-    memcpy(name, &private_mempool[0x10], 48);
+    if (private_mempool[ADDR_INFO_SET] != 0x01) return file;
+    char name[LEN_MOD_NAME];
+    memcpy(name, &private_mempool[ADDR_MOD_NAME], LEN_MOD_NAME);
     name_cache = string(name);
     return name_cache;
 }
@@ -37,7 +37,7 @@ void Loader::search_modules() {
             Loader::ModuleAdapter *adapter = new Loader::ModuleAdapter();
             adapter->file = module;
             adapter->idx = (int)(_load_idx);
-            Memory::Shared::get()[0x10 + _load_idx] = 0x01;
+            Memory::Shared::get()[ADDR_MOD_ACT_STATE + _load_idx] = 0x01;
             _load_idx += 1;
             if (_load_idx == 0) {
                 // Overflow
@@ -56,7 +56,7 @@ void Loader::search_modules() {
 void Loader::create_subprocesses() {
     for (auto module : __modules) {
         Loader::create_module_process(module);
-        Memory::Shared::get()[0x10 + module->idx] = 0x03;
+        Memory::Shared::get()[ADDR_MOD_ACT_STATE + module->idx] = 0x03;
     }
     sleep_ms(1000);
 }
@@ -66,7 +66,7 @@ static void create_process(Loader::ModuleAdapter *adapter) {
     string file = adapter->file;
     
     adapter->private_mempool[1] = PMP_VERIFY;    // Verification Byte
-    memcpy(adapter->private_mempool + 0x100, file.c_str(), file.length());
+    memcpy(adapter->private_mempool + ADDR_MOD_FILE, file.c_str(), file.length());
     
     _log.debug("Launching Process for Module: " + adapter->file);
     #ifdef OS_WIN
@@ -96,7 +96,7 @@ static void create_process_thread(Loader::ModuleAdapter *adapter) {
         adapter->clear();
         create_process(adapter);
         _log.warn("Module " + adapter->get_name() + " has exited or crashed! " + (adapter->private_mempool[1] == 0x01 ? "Restarting..." : "Not Restarting..."));
-    } while (adapter->private_mempool[2] == 0x01);
+    } while (adapter->private_mempool[ADDR_RESTART] == 0x01);
 }
 
 void Loader::create_module_process(Loader::ModuleAdapter *adapter) {
@@ -108,7 +108,7 @@ void Loader::create_module_process(Loader::ModuleAdapter *adapter) {
 void Loader::create_private_mempool(Loader::ModuleAdapter *adapter) {
     adapter->private_mempool_handle = Internal::SHM::create_shm_file(adapter->get_mempool_id(), TOAST_PRIVATE_MEMPOOL_SIZE);
     adapter->private_mempool = Internal::SHM::map_shm_file(adapter->private_mempool_handle, TOAST_PRIVATE_MEMPOOL_SIZE);
-    adapter->private_mempool[0] = Memory::get_endian_bit();
+    adapter->private_mempool[ADDR_ENDIAN] = Memory::get_endian_bit();
 }
 
 void Loader::free_private_mempool(Loader::ModuleAdapter *adapter) {

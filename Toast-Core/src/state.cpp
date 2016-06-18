@@ -17,17 +17,17 @@ static State _TEST(STATE_TEST);
 static int _last_ordinal_state = 0;
 
 void States::Internal::set_state(int id) {
-    int last = Memory::Shared::get()[STATE_CURRENT_IDX];
-    Memory::Shared::get()[STATE_CURRENT_IDX] = id;
-    Memory::Shared::get()[STATE_LAST_IDX] = last;
+    int last = Memory::Shared::get()[ADDR_STATE_CURRENT];
+    Memory::Shared::get()[ADDR_STATE_CURRENT] = id;
+    Memory::Shared::get()[ADDR_STATE_LAST] = last;
 }
 
 void States::Internal::set_tick_timing(int ms) {
-    Memory::Shared::get()[STATE_TICK_TIMING_IDX] = ms;
+    Memory::Shared::get()[ADDR_TICK_TIMING] = ms;
 }
 
 int States::Internal::get_tick_timing() {
-    return Memory::Shared::get()[STATE_TICK_TIMING_IDX];
+    return Memory::Shared::get()[ADDR_TICK_TIMING];
 }
 
 State States::DISABLED() {
@@ -56,11 +56,11 @@ State States::from_ordinal(int id) {
 }
 
 int States::current_state_ordinal() {
-    return Memory::Shared::get()[STATE_CURRENT_IDX];
+    return Memory::Shared::get()[ADDR_STATE_CURRENT];
 }
 
 int States::last_state_ordinal() {
-    return Memory::Shared::get()[STATE_LAST_IDX];
+    return Memory::Shared::get()[ADDR_STATE_LAST];
 }
 
 State States::current_state() {
