@@ -1,102 +1,26 @@
-def _wpi = project(":wpi").file("allwpilib")
 def _provider = project(":Providers")
-
-def libPattern = /lib(?<libName>.+).so$/
-def niLibraryArgs = []
-def niLibraryFileTree = fileTree(new File(_wpi, "ni-libraries").getAbsolutePath())
-
-niLibraryFileTree.each { lib ->
-    def nameMatcher = (lib.name =~ libPattern)
-    if (nameMatcher) {
-        def name = nameMatcher.group('libName')
-        niLibraryArgs << '-l' + name
-    }
-}
-
-task addNiLibraryLinks() {
-    doLast {
-        binaries.all {
-            tasks.withType(CppCompile) {
-                linker.args << "-L" + new File(_wpi, "ni-libraries").getAbsolutePath()
-                linker.args.addAll(niLibraryArgs)
-            }
-        }
-    }
-}
-
-ext.wpi = [
-    srcs: [
-        new File(_wpi, "/wpilibc/shared/src"),
-        new File(_wpi, "/wpilibc/athena/src"),
-        new File(_wpi, "/hal/lib/Athena"),
-        new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
-        new File(_wpi, "/hal/lib/Shared")
-    ],
-    includes: [
-        new File(_wpi, "/wpilibc/shared/include"),
-        new File(_wpi, "/wpilibc/athena/include"),
-        new File(_wpi, "/hal/include"),
-        new File(_wpi, "/hal/lib/Athena"),
-        new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
-        new File(_wpi, "/hal/lib/Shared")
-    ],
-    dependTask: [
-        addNiLibraryLinks
-    ],
-    prebuilt: [ ]
-]
-niLibraryFileTree.each { niLib -> ext.wpi.prebuilt += niLib }
 
 ext.apply_model = { project, callback -> 
     project.model {
-        if (project.hasProperty("extended_source_set")) {
-            repositories {
-                libs(PrebuiltLibraries) { libs ->
-                    project.extended_source_set.forEach {
-                        if (it.hasProperty("prebuilt")) {
-                            it.prebuilt.forEach { niLib ->
-                                libs.create(niLib) {
-                                    binaries.withType(SharedLibraryBinary) {
-                                        sharedLibraryFile = file(niLib.path)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
         components {
             toast_hardware_provider(NativeLibrarySpec) {
                 component_spec(it, project)
-
-                if (project.hasProperty("extended_source_set"))
-                    project.extended_source_set.forEach {
-                        if (it.hasProperty("dependTask"))
-                            it.dependTask.forEach {
-                                tasks.withType(CppCompile) {
-                                    dependsOn it
-                                }
-                            }
-                    }
 
                 sources {
                     cpp {
                         source {
                             srcDirs = [_provider.file("src/"), "src"]
-                            if (project.hasProperty("extended_source_set"))
-                                project.extended_source_set.forEach { srcDirs += it.srcs }
                             includes = ["**/*.cpp"]
                         }
                         exportedHeaders {
                             srcDirs = [_provider.file("include/"), "include"]
-                            if (project.hasProperty("extended_source_set"))
-                                project.extended_source_set.forEach { srcDirs += it.includes }
                             includes = ["**/*.hpp", "**/*.h"]
                         }
                         lib project: ":wpi:nt", library: "ntcore", linkage: "shared"
                         lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
+                        project.libraries.forEach { libr ->
+                            lib project: libr.project, library: libr.library, linkage: libr.linkage
+                        }
                     }
                 }
             }
@@ -107,6 +31,8 @@ ext.apply_model = { project, callback ->
 project(":Providers:simulation") {
     apply_cpp(project)
 
+    ext.libraries = []
+
     apply_model(project, null)
 }
 
@@ -115,7 +41,9 @@ if (isRoboRIO) {
         apply_cpp(project)
 
         ext.roborio_binary = true
-        ext.extended_source_set = [wpi]
+        ext.libraries = [[
+            project: ":wpi:wpilib", library: "wpilib", linkage: "static"
+        ]]
 
         apply_model(project, null)
     }

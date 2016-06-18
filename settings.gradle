@@ -1,7 +1,8 @@
 include "Toast-Bootstrap", "Toast-Core", "Toast-Launcher", "Toast-Module"
+
 include "Providers", "Providers:simulation", "Providers:wpilib"
 
-include "wpi", "wpi:nt"
+include "wpi", "wpi:nt", "wpi:wpilib"
 
 include "_test_module"
 

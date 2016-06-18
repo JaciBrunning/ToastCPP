@@ -15,6 +15,7 @@ allprojects {
     project.buildDir = new File(build_directory, path);
     
     project.ext.binaries = []
+    project.ext.binaries_files = []
 }
 
 ext.apply_cpp = { project ->

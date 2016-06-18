@@ -1,0 +1,6 @@
+This directory serves no purpose except making Microsoft Happy
+
+For Microsoft's C++ Linker to function, the working directory it is launched in has
+to exist, even if the output file is in a different directory. As the gradle project
+:wpi:wpilib uses the working directory wpi/nt, this folder must exist. For this folder
+to be tracked by git, it requires at least one tracked file. I am that file.
