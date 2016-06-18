@@ -10,6 +10,7 @@ namespace Toast {
     namespace Memory {
         API void initialize_bootstrap();
         API void initialize();
+        API char get_endian_bit();
         
         namespace Shared {
             API char *get();

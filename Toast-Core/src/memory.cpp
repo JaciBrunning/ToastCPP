@@ -19,11 +19,21 @@ void Memory::initialize_bootstrap() {
     
     // Write the PID to the Shared Pool for client processes to work with
     Memory::Shared::set_bootstrap_pid(get_pid());
+    Memory::Shared::get()[0] = Memory::get_endian_bit();
 }
 
 void Memory::initialize() {
     __shm_handle_shared = Toast::Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, TOAST_SHARED_MEMPOOL_SIZE);
     __shared_block = Toast::Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
+}
+
+char Memory::get_endian_bit() {
+    union {
+        int i;
+        char c[4];
+    } bint = {0x01020304};
+
+    return bint.c[0] == 1 ? 0 : 1;  // 0 = Big, 1 = Little
 }
 
 void Memory::copy_private_pool(int module_idx, char *buffer) {
@@ -44,11 +54,11 @@ char *Memory::Shared::get() {
 }
 
 void Memory::Shared::set_debug(bool is_debug) {
-    __shared_block[0x04] = is_debug ? 0x01 : 0x00;
+    __shared_block[0x0B] = is_debug ? 0x01 : 0x00;
 }
 
 bool Memory::Shared::get_debug() {
-    return __shared_block[0x04] == 0x01 ? true : false;
+    return __shared_block[0x0B] == 0x01 ? true : false;
 }
 
 void Memory::Shared::set_bootstrap_pid(int pid) {

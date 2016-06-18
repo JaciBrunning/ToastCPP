@@ -18,9 +18,9 @@ static char _load_idx = 0x00;
 
 string Loader::ModuleAdapter::get_name() {
     if (!name_cache.empty()) return name_cache;
-    if (private_mempool[2] != 0x01) return file;
-    char name[50];
-    memcpy(name, &private_mempool[0x10], 50);
+    if (private_mempool[3] != 0x01) return file;
+    char name[48];
+    memcpy(name, &private_mempool[0x10], 48);
     name_cache = string(name);
     return name_cache;
 }
@@ -65,7 +65,7 @@ static void create_process(Loader::ModuleAdapter *adapter) {
     string mempool_handle = adapter->get_mempool_id();
     string file = adapter->file;
     
-    adapter->private_mempool[0] = PMP_VERIFY;    // Verification Byte
+    adapter->private_mempool[1] = PMP_VERIFY;    // Verification Byte
     memcpy(adapter->private_mempool + 0x100, file.c_str(), file.length());
     
     _log.debug("Launching Process for Module: " + adapter->file);
@@ -96,7 +96,7 @@ static void create_process_thread(Loader::ModuleAdapter *adapter) {
         adapter->clear();
         create_process(adapter);
         _log.warn("Module " + adapter->get_name() + " has exited or crashed! " + (adapter->private_mempool[1] == 0x01 ? "Restarting..." : "Not Restarting..."));
-    } while (adapter->private_mempool[1] == 0x01);
+    } while (adapter->private_mempool[2] == 0x01);
 }
 
 void Loader::create_module_process(Loader::ModuleAdapter *adapter) {
@@ -108,6 +108,7 @@ void Loader::create_module_process(Loader::ModuleAdapter *adapter) {
 void Loader::create_private_mempool(Loader::ModuleAdapter *adapter) {
     adapter->private_mempool_handle = Internal::SHM::create_shm_file(adapter->get_mempool_id(), TOAST_PRIVATE_MEMPOOL_SIZE);
     adapter->private_mempool = Internal::SHM::map_shm_file(adapter->private_mempool_handle, TOAST_PRIVATE_MEMPOOL_SIZE);
+    adapter->private_mempool[0] = Memory::get_endian_bit();
 }
 
 void Loader::free_private_mempool(Loader::ModuleAdapter *adapter) {

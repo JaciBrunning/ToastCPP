@@ -9,9 +9,9 @@
 #define STATE_TELEOP 2
 #define STATE_TEST 3
 
-#define STATE_CURRENT_IDX 0x06
-#define STATE_LAST_IDX 0x07
-#define STATE_TICK_TIMING_IDX 0x08
+#define STATE_CURRENT_IDX 0x08
+#define STATE_LAST_IDX 0x09
+#define STATE_TICK_TIMING_IDX 0x0A
 
 namespace Toast {
     class State { 
