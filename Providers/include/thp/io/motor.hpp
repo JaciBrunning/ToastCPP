@@ -4,9 +4,9 @@
 #include "toast/library.hpp"
 #include "io/motor.hpp"
 
-CAPI void thp_motor_maybe_init(int port, int interface, int type, int ctrl_period_ms);
-CAPI void thp_motor_set(int port, int interface, float speed);
-CAPI float thp_motor_get(int port, int interface);
+CAPI void thp_motor_init(int port, int m_interface, int type);
+CAPI void thp_motor_set(int port, int m_interface, float speed);
+CAPI float thp_motor_get(int port, int m_interface);
 
 // CAN Speed Controller (SRX, Jaguar not supported) //
 CAPI void thp_srx_set_p(int port, float p);     // X P_COEFFICIENT

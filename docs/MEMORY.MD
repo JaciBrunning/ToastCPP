@@ -17,7 +17,7 @@ and other control system blocks)
 It should be noted that datatypes that take up multiple bytes (such as `int`, `float`, `double`, `long`, etc)
 are encoded inside of memory using the System's native endianness. A single byte is set in ALL shared memory
 blocks that defines the system's endianness so shared memory dumps can be read easily. This byte is `0x00`, 
-and is set to `0` for Big-Endian, and `1` for Little-Endian.
+and is set to `1` for Big-Endian, and `2` for Little-Endian.
 
 ## Private Block
 The Private Block is a block of shared memory 512 Bytes large. The Private Block

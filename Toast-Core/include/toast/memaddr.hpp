@@ -23,3 +23,15 @@
 #define ADDR_TICK_TIMING    0x0A
 #define ADDR_DEBUG          0x0B
 #define ADDR_MOD_ACT_STATE  0x10    // LENGTH = 256 (1 per module)
+
+// Speed Controllers
+#define ADDR_SPD_OFFSET     0x130
+#define LEN_SPD             0x10    // 16 Bytes per Speed Controller
+#define COUNT_SPD           0x10    // 16 Speed Controllers (16 * 16 = 256 Total Length)
+    #define ADDR_SPD_ID         0x00
+    #define ADDR_SPD_PORT       0x01
+    #define ADDR_SPD_INTERFACE  0x02
+    #define ADDR_SPD_TYPE       0x03
+    #define ADDR_SPD_BT_INIT    0x04    // Boostrap Init
+    #define ADDR_SPD_GET        0x08
+    #define ADDR_SPD_SET        0x0C

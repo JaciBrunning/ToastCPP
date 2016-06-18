@@ -33,7 +33,7 @@ char Memory::get_endian_bit() {
         char c[4];
     } bint = {0x01020304};
 
-    return bint.c[0] == 1 ? 0 : 1;  // 0 = Big, 1 = Little
+    return bint.c[0] == 1 ? 1 : 2;  // 1 = Big, 2 = Little
 }
 
 void Memory::copy_private_pool(int module_idx, char *buffer) {

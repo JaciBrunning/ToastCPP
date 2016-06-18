@@ -1,9 +1,10 @@
 #include "toast/bootstrap/state.hpp"
+#include "toast/bootstrap/io.hpp"
 
 using namespace Toast;
 
 static void _periodic_func(bool disabled, bool auton, bool teleop, bool test) {
-    // Impl not currently required -> modules take care of this
+    io_motors_periodic(disabled, auton, teleop, test);
 }
 
 static void _transition_func(bool disabled, bool auton, bool teleop, bool test) {

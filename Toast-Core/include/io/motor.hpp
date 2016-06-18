@@ -1,23 +1,28 @@
+#pragma once
+
 #include "toast/library.hpp"
+#include "toast/memory.hpp"
 
-typedef enum {
-    thpMotorInterface_PWM = 0x01,
-    thpMotorInterface_CAN = 0x02
-} thpMotorInterface;
+enum MotorInterface {
+    MotorInterface_PWM = 0x01,
+    MotorInterface_CAN = 0x02
+};
 
-typedef enum {
-    thpMotorType_Talon = 0x01,
-    thpMotorType_TalonSRX = 0x02,
-    thpMotorType_CANTalon = 0x03,
+enum MotorType {
+    MotorType_Talon = 0x01,
+    MotorType_TalonSRX = 0x02,
+    MotorType_CANTalon = 0x03,
 
-    thpMotorType_Victor = 0x10,
-    thpMotorType_VictorSP = 0x11,
+    MotorType_Victor = 0x10,
+    MotorType_VictorSP = 0x11,
     
-    thpMotorType_SD540 = 0x20,
-    thpMotorType_Spark = 0x30
-} thpMotorType;
+    MotorType_SD540 = 0x20,
+    MotorType_Spark = 0x30
+};
 
 namespace Motor {
-    API void set(int port, int interface, int type, float speed);
-    API float get(int port, int interface);
+    API char *getBlockFor(int id);
+    API int init(int port, int motor_interface, int type);
+    API void set(int id, float speed);
+    API float get(int id);
 }
