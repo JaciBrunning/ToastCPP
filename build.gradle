@@ -1,3 +1,5 @@
+import org.gradle.internal.os.OperatingSystem
+
 allprojects {
     repositories {
         mavenCentral()
@@ -19,7 +21,10 @@ allprojects {
 
 ext.apply_cpp = { project ->
     project.apply plugin: 'cpp'
-    project.apply plugin: 'visual-studio'
+
+    if (OperatingSystem.current().isWindows()) {
+        project.apply plugin: 'visual-studio'
+    }
 }
 
 apply from: 'native.gradle'
