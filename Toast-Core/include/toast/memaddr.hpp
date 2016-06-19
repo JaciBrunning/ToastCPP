@@ -24,8 +24,30 @@
 #define ADDR_DEBUG          0x0B
 #define ADDR_MOD_ACT_STATE  0x10    // LENGTH = 256 (1 per module)
 
+// Power And Distribution
+#define ADDR_PWR_OFFSET			0x120
+	#define ADDR_PWR_CAN_ID				0x00
+	#define ADDR_PWR_PDP_VOLTAGE		0x04
+	#define ADDR_PWR_PDP_TEMP			0x08
+	#define ADDR_PWR_PDP_TOTAL_PWR		0x0C
+	#define ADDR_PWR_PDP_TOTAL_ENG		0x10
+	#define ADDR_PWR_CONTR_IN_VOLT		0x14
+	#define ADDR_PWR_CONTR_IN_CUR		0x18
+	#define ADDR_PWR_PDP_TOTAL_CUR		0x1C
+	#define ADDR_PWR_PDP_CUR_OFFSET		0x20
+	#define ADDR_PWR_CONTR_FAULTS_3V3	0x60
+	#define ADDR_PWR_CONTR_FAULTS_5V	0x62
+	#define ADDR_PWR_CONTR_FAULTS_6V	0x64
+	#define ADDR_PWR_CONTR_BUS_ENABLE	0x66
+	#define ADDR_PWR_CONTR_VOLT_3V3		0x68
+	#define ADDR_PWR_CONTR_VOLT_5V		0x6C
+	#define ADDR_PWR_CONTR_VOLT_6V		0x70
+	#define ADDR_PWR_CONTR_CUR_3V3		0x74
+	#define ADDR_PWR_CONTR_CUR_5V		0x78
+	#define ADDR_PWR_CONTR_CUR_6V		0x7C
+
 // Speed Controllers
-#define ADDR_SPD_OFFSET     0x130
+#define ADDR_SPD_OFFSET     0x1C0
 #define LEN_SPD             0x10    // 16 Bytes per Speed Controller
 #define COUNT_SPD           0x10    // 16 Speed Controllers (16 * 16 = 256 Total Length)
     #define ADDR_SPD_ID         0x00

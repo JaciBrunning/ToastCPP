@@ -1,8 +1,6 @@
 #include "io/motor.hpp"
 #include <inttypes.h>
 
-#include "toast/logger.hpp"
-
 using namespace Motor;
 using namespace Toast::Memory;
 

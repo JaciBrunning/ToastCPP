@@ -14,3 +14,4 @@ export/
 !ToastCPP.vcxproj
 !ToastCPP.vcxproj.filters
 !ToastCPP.vcxproj.user
+*.opendb

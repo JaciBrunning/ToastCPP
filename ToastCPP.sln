@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ToastCPP", "ToastCPP.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_test_module_test_moduleDll", "_test_module\_test_module_test_moduleDll.vcxproj", "{BDC7F10B-4C8A-31F7-AE46-110AB52D7A49}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wpi_wpilib_wpilibLib", "wpi\wpilib\wpi_wpilib_wpilibLib.vcxproj", "{CB48B01A-2190-3C9E-BA88-DD700190604C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|ARM = debug|ARM
@@ -188,6 +190,28 @@ Global
 		{BDC7F10B-4C8A-31F7-AE46-110AB52D7A49}.x86|Native.ActiveCfg = x86|Win32
 		{BDC7F10B-4C8A-31F7-AE46-110AB52D7A49}.x86|x86.ActiveCfg = x86|Win32
 		{BDC7F10B-4C8A-31F7-AE46-110AB52D7A49}.x86|x86.Build.0 = x86|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.debug|ARM.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.debug|Native.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.debug|x86.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.debug|x86.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.Release|ARM.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.Release|ARM.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.Release|Native.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.Release|Native.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.Release|x86.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.Release|x86.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x64|ARM.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x64|ARM.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x64|Native.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x64|Native.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x64|x86.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x64|x86.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|ARM.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|ARM.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|Native.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|Native.Build.0 = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|x86.ActiveCfg = debug|Win32
+		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|x86.Build.0 = debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
