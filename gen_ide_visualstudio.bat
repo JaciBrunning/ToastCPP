@@ -1,0 +1,1 @@
+gradlew toast_hardware_providerVisualStudio -Parm -Proborio && gradlew toast_bootstrapVisualStudio && gradlew toast_moduleVisualStudio

@@ -14,12 +14,12 @@ allprojects {
     if (project == rootProject) path = project.name
     project.buildDir = new File(build_directory, path);
     
-    project.ext.binaries = []
     project.ext.binaries_files = []
 }
 
 ext.apply_cpp = { project ->
     project.apply plugin: 'cpp'
+    project.apply plugin: 'visual-studio'
 }
 
 apply from: 'native.gradle'
