@@ -1,4 +1,5 @@
-apply plugin: 'cpp'
+// apply plugin: 'cpp'
+apply_cpp(project)
 
 ext.ignore_copy = true
 ext.test_path = new File(test_path(), "toast/modules")
