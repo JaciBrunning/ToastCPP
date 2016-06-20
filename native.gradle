@@ -2,6 +2,14 @@ import org.gradle.internal.os.OperatingSystem
 
 ext.isArm = hasProperty("arm")
 ext.isRoboRIO = hasProperty("roborio")
+
+// Compiler-Optimize the binary. This may be potentially unsafe, but will make Toast faster and more
+// efficient
+ext.isOptimizedBinary = hasProperty("opt")
+// Only use this if you're a speed demon. May make Toast unstable, but it will make it faster. I take no
+// responsibility for crashes that occur with this optimization level.
+ext.isHarshOptimize = hasProperty("harsh")
+
 def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
 
 ext.cross64 = hasProperty("cross64")
@@ -115,9 +123,35 @@ ext.component_spec = { comp, project ->
         
         if (toolChain in VisualCpp) {
             cppCompiler.args "/Zi", "/FS"
+
+            if (isOptimizedBinary && !isHarshOptimize) {
+                // /O2 is known to eat up more stack space than we need for large memory blocks (i.e. the Shared pool),
+                // and /O1 is less likely to intefere with debugging. While this is usually a release binary, /O1 is preferred
+                // as the Toast Crash Handler steps through the backtrace to find the source of an error, and so debugging
+                // information is still important. 
+                // It should be noted that this backtrace crawling will not affect modules, but WILL affect Toast itself. If
+                // Toast itself crashes, we would like as much information as possible. Module debugging ability will be defined
+                // as what they choose in their optimization flags.
+                cppCompiler.args "/O1"
+                cppCompiler.define "COMPILER_OPTIMIZE"
+            } else if (isHarshOptimize) {
+                // Fuck it
+                cppCompiler.args "/O2"
+                cppCompiler.define "COMPILER_OPTIMIZE_HARSH"
+            }
             linker.args "/DEBUG"
         } else {
             cppCompiler.args "-std=c++1y", "-g"
+            
+            // See above for debug info
+            if (isOptimizedBinary && !isHarshOptimize) {
+                cppCompiler.args "-Og"
+                cppCompiler.define "COMPILER_OPTIMIZE"
+            } else if (isHarshOptimize) {
+                cppCompiler.args "-Ofast"   // -O3 is inherited by -Ofast
+                cppCompiler.define "COMPILER_OPTIMIZE_HARSH"
+            }
+
             if (toolChain in Gcc) {
                 linker.args "-ldl", "-lrt", "-lm"
             }
