@@ -39,9 +39,9 @@ void Loader::search_modules() {
             adapter->idx = (int)(_load_idx);
             Memory::Shared::get()[ADDR_MOD_ACT_STATE + _load_idx] = 0x01;
             _load_idx += 1;
-            if (_load_idx == 0) {
+            if (_load_idx == 128) {
                 // Overflow
-                _log.error("Wow! You've loaded more than 256 modules. Unfortunately, we don't support more than 256 modules due to technical limitations. File a bug report to the ToastC++ Repository on OpenRIO and we'll start working on support for more modules!");
+                _log.error("Wow! You've loaded more than 128 modules. Unfortunately, we don't support more than 256 modules due to technical limitations. File a bug report to the ToastC++ Repository on OpenRIO and we'll start working on support for more modules!");
                 _log.error("Any further modules will be ignored.");
             } else {
                 __modules.push_back(adapter);

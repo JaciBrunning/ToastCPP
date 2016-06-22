@@ -7,7 +7,7 @@
 
 // The Toast Shared Memory Internals
 
-#define TOAST_PRIVATE_MEMPOOL_SIZE 512
+#define TOAST_PRIVATE_MEMPOOL_SIZE 320
 
 #define TOAST_SHARED_MEMPOOL_SIZE (1024 * 1024)
 #define TOAST_SHARED_MEMPOOL_NAME "shared_public"

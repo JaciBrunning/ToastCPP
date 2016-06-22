@@ -19,22 +19,32 @@ are encoded inside of memory using the System's native endianness. A single byte
 blocks that defines the system's endianness so shared memory dumps can be read easily. This byte is `0x00`, 
 and is set to `1` for Big-Endian, and `2` for Little-Endian.
 
+Specific breakdowns of the format of the Private and Shared Blocks can be found in the Excel spreadsheet
+"Memory_Sheet.xlsx". In the below sections are breakdowns of the _notable_ variables in each block and
+what they represent. For everything else, see the Excel spreadsheet. In most cases, the names are self
+explanatory and corrolate directly to the WPILib Method Names of the class(es) those object models belong
+to.
+
+It should be noted that both the Private and Shared Blocks both try to align all multi-wide datatypes
+(anything larger than a char / int8_t, such as short, int, float, double to name a few) in multiples of
+half-octets (4, 8, 12, 16 bytes). The reason behind this is because most implementations of `memcpy` try
+not to copy 1 byte at a time, but instead muliple, as most CPUs really like to deal with multiple bytes at
+once instead of 1 single byte for the sake of efficiency. Not only does this make calls to `memcpy` theoretically
+faster, but also makes the format much cleaner and easier to deal with. 
+
 ## Private Block
-The Private Block is a block of shared memory 512 Bytes large. The Private Block
+The Private Block is a block of shared memory 320 Bytes large. The Private Block
 is given a unique identifier by a hash function of the Module File absolute path on
 the filesystem. The Private Block is used for communication between a single module 
 and the Toast Bootstrapper, relaying information about the Module and its load state.
 
-| Address | Type | Name | Description |
-| ------- | ---- | ---- | ----------- |
-| 0x00 | Char | Endian | _See Above_ |
-| 0x01    | Char | Verification Byte | The Verification Byte is used to keep track of a modules load process and error state. This byte is set to `0x7A` before the module is loaded, and the module checks against this. If the module detects the byte as `0x7A`, it sets it to `0x7B` and continues with initialization. If it doesn't match, it is set to `0x80` and the module stopped. If a module file cannot be loaded (i.e. is corrupt), this byte is set to `0x8A`. If the `_get_module_information` method is missing, it is set to `0x8B`. If the `_allocate_module_instance` method is missing, it is set to `0x8C`. If there are no issues during the initial loading of the module, it is set to `0x7C` and the module is marked as valid. |
-| 0x02    | Char | Restart Byte | The restart byte simply describes whether the module is configured to be restartable or not. If the module specifies that it can be restarted (and it has loaded correctly), it will have a value of `0x01`, else, `0x00`. If there are any load errors as described in the `Verification Byte`, the module may not restart, as it will get stuck in a loop. |
-| 0x03    | Char | Info Set | If this is set to `0x01`, the information of the module (module name / restartable) has been set in the memory. |
-| 0x04 - 0x0F | _Unused_ | _Unused_ | _Unused_ |
-| 0x10 - 0x3F | Char[] | Module Name | 48 Bytes are allocated to store the name of the module. This is used as the identifier for the module and is identical to the one provided in the `MODULE_CLASS` macro |
-| 0x40 - 0xFF | _Unused_ | _Unused_ | _Unused_ |
-| 0x100 - 0x1FF | Char[] | Module File | The filename of the module |
+| Type | Name | Description |
+| ---- | ---- | ----------- |
+| Char | Verification Byte | The Verification Byte is used to keep track of a modules load process and error state. This byte is set to `0x7A` before the module is loaded, and the module checks against this. If the module detects the byte as `0x7A`, it sets it to `0x7B` and continues with initialization. If it doesn't match, it is set to `0x80` and the module stopped. If a module file cannot be loaded (i.e. is corrupt), this byte is set to `0x8A`. If the `_get_module_information` method is missing, it is set to `0x8B`. If the `_allocate_module_instance` method is missing, it is set to `0x8C`. If there are no issues during the initial loading of the module, it is set to `0x7C` and the module is marked as valid. |
+| Char | Restart Byte | The restart byte simply describes whether the module is configured to be restartable or not. If the module specifies that it can be restarted (and it has loaded correctly), it will have a value of `0x01`, else, `0x00`. If there are any load errors as described in the `Verification Byte`, the module may not restart, as it will get stuck in a loop. |
+| Char | Info Set | If this is set to `0x01`, the information of the module (module name / restartable) has been set in the memory. |
+| Char[] | Module Name | 48 Bytes are allocated to store the name of the module. This is used as the identifier for the module and is identical to the one provided in the `MODULE_CLASS` macro |
+| Char[] | Module File | The filename of the module |
 
 ## Shared Block
 The Shared Block is a block of shared memory 1 Megabyte large. The Shared block
@@ -43,14 +53,11 @@ is used to relay information about Robot State, Motor and I/O values, and almost
 everything that is used in cross-process communication. For this reason, the Shared
 Block is very large in comparison to the Private Block.
 
-| Address | Type | Name | Description |
-| ------- | ---- | ---- | ----------- |
-| 0x00 | Char | Endian | _See Above_ |
-| 0x01 - 0x03 | _Unused_ | _Unused_ | _Unused_ |
-| 0x04 - 0x07    | Bootstrap PID | Int | The Process ID of the Toast Bootstrap. This is used to automatically kill module children when the bootstrap is killed |
-| 0x08    | Char | Current State | The current state of the Robot as defined in `toast/state.hpp` |
-| 0x09    | Char | Last State    | The last state of the Robot as defined in `toast/state.hpp` |
-| 0x0A    | Char | State Tick Timing | Stores how long (in milliseconds) modules should wait inbetween state ticks. |
-| 0x0B    | Char | Debug | If set the `0x01`, Toast was launched in debug mode. This gives more in-depth logger output for the Bootstrap and Module Processes |
-| 0x0C - 0x0F | _Unused_ | _Unused_ | _Unused_ | 
-| 0x10 - 0x10F | Char | Module Activity State | This 256 Byte Large block of memory contains information about module activity state. In short, each module is given a location in this block of memory, respective of the order they were loaded. The shared memory with name `module_private_{x}` will be the private block of that module, where `{x}` is the index of the entry minus the starting index of the Module Activity State Block (`0x10`). If the value is `0x00`, this module has not been discovered or loaded. If it is `0x01`, the module has been discovered but not loaded. If it is `0x02`, the module is currently active. If it is `0x03`, the module has recently crashed and is awaiting a restart if available. If the restart is successful, this becomes `0x04`.|
+| Type | Name | Description |
+| ---- | ---- | ----------- |
+| Bootstrap PID | Int | The Process ID of the Toast Bootstrap. This is used to automatically kill module children when the bootstrap is killed |
+| Char | Current State | The current state of the Robot as defined in `toast/state.hpp` |
+| Char | Last State    | The last state of the Robot as defined in `toast/state.hpp` |
+| Char | State Tick Timing | Stores how long (in milliseconds) modules should wait inbetween state ticks. |
+| Char | Debug | If set the `0x01`, Toast was launched in debug mode. This gives more in-depth logger output for the Bootstrap and Module Processes |
+| Char | Module Activity State | This 128 Byte Large block of memory contains information about module activity state. In short, each module is given a location in this block of memory, respective of the order they were loaded. The shared memory with name `module_private_{x}` will be the private block of that module, where `{x}` is the index of the entry minus the starting index of the Module Activity State Block (`0x10`). If the value is `0x00`, this module has not been discovered or loaded. If it is `0x01`, the module has been discovered but not loaded. If it is `0x02`, the module is currently active. If it is `0x03`, the module has recently crashed and is awaiting a restart if available. If the restart is successful, this becomes `0x04`.|
