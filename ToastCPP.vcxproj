@@ -68,6 +68,9 @@
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <OutDir>.\build\vs\$(Configuration)</OutDir>
     <IntDir>.\build\vs\_intermediate\$(Configuration)</IntDir>
+    <IncludePath />
+    <LibraryPath />
+    <ReferencePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <NMakeBuildCommandLine>gradlew build</NMakeBuildCommandLine>
@@ -75,6 +78,9 @@
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <OutDir>$(SolutionDir)build\vs\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\vs\_int\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath />
+    <LibraryPath />
+    <ReferencePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <NMakeBuildCommandLine>gradlew build</NMakeBuildCommandLine>
@@ -82,6 +88,9 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <OutDir>$(SolutionDir)build\vs\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\vs\_int\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath />
+    <LibraryPath />
+    <ReferencePath />
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <NMakeBuildCommandLine>gradlew build -Parm -Proborio</NMakeBuildCommandLine>
@@ -89,6 +98,9 @@
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
     <OutDir>$(SolutionDir)build\vs\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)build\vs\_int\$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath />
+    <LibraryPath />
+    <ReferencePath />
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>

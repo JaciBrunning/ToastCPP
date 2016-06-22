@@ -11,10 +11,10 @@ void io_motors_periodic(bool disabled, bool auton, bool teleop, bool test) {
         if (type != 0) {
             int port = block[ADDR_SPD_PORT];
             int m_interface = block[ADDR_SPD_INTERFACE];
-            int initflag = block[ADDR_SPD_BT_INIT];
+            int initflag = block[ADDR_SPD_BOOTINIT];
             if (initflag == 0) {
                 // thp_motor_init(port, m_interface, type);
-                block[ADDR_SPD_BT_INIT] = 0x01;
+                block[ADDR_SPD_BOOTINIT] = 0x01;
             }
             float desired = *(float *)(block + ADDR_SPD_SET);
             // thp_motor_set(port, m_interface, desired);

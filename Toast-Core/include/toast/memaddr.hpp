@@ -93,7 +93,7 @@
 	#define ADDR_AN_IN_AVG_BITS		0x10
 	#define ADDR_AN_IN_OVSMPL_BITS	0x14	// Oversample Bits
 	#define ADDR_AN_IN_LSB_WEIGHT	0x18
-	#define ADDR_AN_IN_OFFSET		0x1C
+	#define ADDR_AN_IN_OFFSET_VAL	0x1C
 	#define ADDR_AN_IN_ACCUM_MASK	0x20
 	#define ADDR_AN_IN_ACCUM_COUNT	0x24
 	#define ADDR_AN_IN_ACCUM_DB		0x28	// Accumulator Deadband

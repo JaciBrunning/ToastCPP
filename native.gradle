@@ -222,7 +222,7 @@ allprojects {
     task copyBinary() {
         doLast {
             if (!project.ext.has("ignore_copy")) {
-                binaries_files.forEach { binary ->
+                binaries_files.each { binary ->
                     def roborio_binary = project.ext.has("roborio_binary") && project.ext.roborio_binary
                     if (roborio_binary && !isRoboRIO) return;
                     
@@ -238,7 +238,7 @@ allprojects {
     task copyTest() {
         doLast {
             if (!project.ext.has("ignore_test")) {
-                binaries_files.forEach { binary ->
+                binaries_files.each { binary ->
                     if (!binary.targetPlatform.architecture.name.equals("x86-64") && !(binary.targetPlatform.architecture.name.equals("x86") && is32())) return;
                     
                     def roborio_binary = project.ext.has("roborio_binary") && project.ext.roborio_binary

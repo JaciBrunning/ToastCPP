@@ -18,7 +18,7 @@ ext.apply_model = { project, callback ->
                         }
                         lib project: ":wpi:nt", library: "ntcore", linkage: "shared"
                         lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
-                        project.libraries.forEach { libr ->
+                        project.libraries.each { libr ->
                             lib project: libr.project, library: libr.library, linkage: libr.linkage
                         }
                     }
