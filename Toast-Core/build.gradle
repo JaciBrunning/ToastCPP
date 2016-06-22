@@ -12,7 +12,7 @@ model {
                         srcDirs = []
                         srcDirs += libraries.src()
                         srcDirs += ['src']
-                        includes = ['**/*.cpp']
+                        includes = ['**/*.cpp', '**/*.c']
                     }
                     exportedHeaders {
                         srcDirs = ['include']

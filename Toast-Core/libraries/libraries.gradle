@@ -10,3 +10,4 @@ libraries.headers = {
 }
 
 libraries.libs["json11"] = "json11"
+libraries.libs["mongoose"] = "mongoose"
