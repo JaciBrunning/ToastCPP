@@ -6,6 +6,14 @@ model {
         toast_core(NativeLibrarySpec) {
             component_spec(it, project)
             
+            binaries.all {
+                // Mongoose
+                cppCompiler.define "MG_DISABLE_MQTT"
+                cppCompiler.define "MG_DISABLE_JSON_RPC"
+                cppCompiler.define "MG_DISABLE_JSON_RPC"
+                cppCompiler.define "MG_DISABLE_HTTP_KEEP_ALIVE"
+            }
+
             sources {
                 cpp {
                     source {
