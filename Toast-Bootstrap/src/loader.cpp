@@ -58,7 +58,7 @@ void Loader::create_subprocesses() {
         Loader::create_module_process(module);
         Memory::Shared::get()[ADDR_MOD_ACT_STATE + module->idx] = 0x03;
     }
-    sleep_ms(1000);
+	sleep_ms(1000);
 }
 
 static void create_process(Loader::ModuleAdapter *adapter) {
