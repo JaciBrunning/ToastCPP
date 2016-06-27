@@ -1,11 +1,24 @@
+import org.gradle.internal.os.OperatingSystem
+
 apply_cpp(project)
+if (OperatingSystem.current().isWindows()) {
+    apply plugin: 'windows-resources'
+}
 
 model {
     components {
-        toast_launcher(NativeExecutableSpec) {
+        toast(NativeExecutableSpec) {
             component_spec(it, project)
             
             sources {
+                if (OperatingSystem.current().isWindows()) {
+                    rc {
+                        source {
+                            srcDirs "res"
+                            include "**/*.rc"
+                        }
+                    }
+                }
                 cpp {
                     source {
                         srcDirs = ['src']

@@ -78,14 +78,14 @@ static void create_process(Loader::ModuleAdapter *adapter) {
         ZeroMemory(&pi, sizeof(pi));
         
         if (CreateProcess(NULL, 
-            (char *)("toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str(), 
+            (char *)("toast __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str(), 
             NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
             WaitForSingleObject(pi.hProcess, INFINITE);
             CloseHandle(pi.hProcess);
             CloseHandle(pi.hThread);
         }
     #else
-        system(("./toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str());
+        system(("./toast __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str());
     #endif
 }
 
