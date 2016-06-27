@@ -38,6 +38,8 @@ namespace Toast {
 			API virtual void webSocketReady(WebSocket *websocket);
 			API virtual void webSocketData(WebSocket *websocket, string data);
 			API virtual void webSocketClosed(WebSocket *websocket);
+			API virtual void registerWebSocket(string route, WebSocketHandler *handler);
+			API virtual void webSocket(string route, WebSocketHandler *handler);	// same as registerWebSocket
 
 			API virtual void registerRoute(string httpMethod, string route, RequestHandlerBase *handler);
 			API virtual void setup();
@@ -50,6 +52,7 @@ namespace Toast {
 			Server *server;
 			string prefix;
 			map<string, RequestHandlerBase* > routes;
+			map<string, WebSocketHandler *> wsRoutes;
 			vector<string> urls;
 		};
 

@@ -20,9 +20,41 @@ void Handler::setServer(Server *serv) {
 	server = serv;
 }
 
-void Handler::webSocketReady(WebSocket *ws) { }
-void Handler::webSocketData(WebSocket *ws, string data) { }
-void Handler::webSocketClosed(WebSocket *ws) { }
+void Handler::webSocketReady(WebSocket *ws) {
+	map<string, WebSocketHandler *>::iterator it;
+	for (it = wsRoutes.begin(); it != wsRoutes.end(); it++) {
+		if (ws->request()->match(it->first)) {
+			it->second->onReady(ws);
+		}
+	}
+}
+
+void Handler::webSocketData(WebSocket *ws, string data) {
+	map<string, WebSocketHandler *>::iterator it;
+	for (it = wsRoutes.begin(); it != wsRoutes.end(); it++) {
+		if (ws->request()->match(it->first)) {
+			it->second->onMessage(ws, data);
+		}
+	}
+}
+
+void Handler::webSocketClosed(WebSocket *ws) {
+	map<string, WebSocketHandler *>::iterator it;
+	for (it = wsRoutes.begin(); it != wsRoutes.end(); it++) {
+		if (ws->request()->match(it->first)) {
+			it->second->onClosed(ws);
+		}
+	}
+}
+
+void Handler::registerWebSocket(string route, WebSocketHandler *handler) {
+	string key = "GET:" + prefix + route;
+	wsRoutes[key] = handler;
+}
+
+void Handler::webSocket(string route, WebSocketHandler *handler) {
+	registerWebSocket(route, handler);
+}
 
 bool Handler::handles(string method, string url) {
 	string key = method + ":" + url;

@@ -74,5 +74,12 @@ namespace Toast {
 			map<int, WebSocket*> websocketsById;
 			int id;
 		};
+
+		class WebSocketHandler {
+		public:
+			API virtual void onReady(WebSocket *ws) {}
+			API virtual void onMessage(WebSocket *ws, string data) { }
+			API virtual void onClosed(WebSocket *ws) { }
+		};
 	}
 }
