@@ -27,8 +27,8 @@ namespace Toast {
 
 		class WebSocket {
 		public:
-			API WebSocket(struct mg_connection *connection, struct http_message *http_message);
-			API Request *getRequest();
+			API WebSocket(struct mg_connection *connection, struct http_message *msg);
+			API Request *request();
 			API struct mg_connection *getConnection();
 			
 			API void send(string data, int opcode = WEBSOCKET_OPCODE_TEXT);
@@ -49,10 +49,11 @@ namespace Toast {
 			Mutex mutex;
 			int id;
 			string data;
-			Request request;
 			struct mg_connection *connection;
+			struct http_message *message;
 			bool closed;
 			vector<WebSocketContainer *> containers;
+			Request req;
 		};
 
 		class WebSocketContainer {

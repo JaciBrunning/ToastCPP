@@ -108,10 +108,11 @@ void WebSocketContainer::clean() {
 }
 
 // WebSocket Instance
-WebSocket::WebSocket(struct mg_connection *connection_, struct http_message *msg_) : connection(connection_), closed(false), request(connection_, msg_), data(""), id(-1) { }
+WebSocket::WebSocket(struct mg_connection *connection_, struct http_message *msg_) 
+	: connection(connection_), message(msg_), req(connection, message), closed(false), data(""), id(-1) { }
 
-Request *WebSocket::getRequest() {
-	return &request;
+Request *WebSocket::request() {
+	return &req;
 }
 
 struct mg_connection *WebSocket::getConnection() {

@@ -28,8 +28,9 @@ namespace Toast {
 
 			// Internal Handling
 			API int _handleRequest(struct mg_connection *conn, struct http_message *msg);
-			API void _webSocketReady(struct mg_connection *conn);
+			API void _webSocketReady(struct mg_connection *conn, struct http_message *msg);
 			API int _webSocketData(struct mg_connection *conn, string data);
+			API void _webSocketClosed(struct mg_connection *conn);
 		private:
 			bool stopped;
 			int port;

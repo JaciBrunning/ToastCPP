@@ -12,11 +12,11 @@
 
 using namespace std;
 
-#define route(httpMethod, url, controllerType, method) \
-    registerRoute(httpMethod, url, new RequestHandler<controllerType, StreamResponse>(this, &controllerType::method ));
+#define route(httpMethod, url, handlerType, method) \
+    registerRoute(httpMethod, url, new RequestHandler<handlerType, StreamResponse>(this, &handlerType::method ));
 
-#define route_type(httpMethod, url, controllerType, method, responseType) \
-    registerRoute(httpMethod, url, new RequestHandler<controllerType, responseType>(this, &controllerType::method ));
+#define route_type(httpMethod, url, handlerType, method, responseType) \
+    registerRoute(httpMethod, url, new RequestHandler<handlerType, responseType>(this, &handlerType::method ));
 
 namespace Toast {
 	namespace HTTP {
@@ -37,6 +37,7 @@ namespace Toast {
 
 			API virtual void webSocketReady(WebSocket *websocket);
 			API virtual void webSocketData(WebSocket *websocket, string data);
+			API virtual void webSocketClosed(WebSocket *websocket);
 
 			API virtual void registerRoute(string httpMethod, string route, RequestHandlerBase *handler);
 			API virtual void setup();

@@ -14,11 +14,30 @@ static void set_server(struct mg_connection *nc, Server *serv) {
 static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 	Server *server = get_server(nc);
 
-	//if (server != NULL) {
+	if (server != NULL) {
+		// WebSocket
+		if (ev == MG_EV_WEBSOCKET_HANDSHAKE_REQUEST) {
+			struct http_message *msg = (struct http_message *) ev_data;
+			nc->user_data = msg;
+		} else if (ev == MG_EV_WEBSOCKET_HANDSHAKE_DONE) {
+			// Websocket Opened
+			struct http_message *msg = (struct http_message *) nc->user_data;
+			server->_webSocketReady(nc, msg);
+		} else if (ev == MG_EV_WEBSOCKET_FRAME) {
+			// Websocket Data Received
+			struct websocket_message *wm = (struct websocket_message *) ev_data;
+			server->_webSocketData(nc, string((char *)wm->data, wm->size));
+		} else if (ev == MG_EV_CLOSE) {
+			// Websocket Closed
+			if (nc->flags & MG_F_IS_WEBSOCKET) 
+				server->_webSocketClosed(nc);
+		}
+
+		// HTTP
 		if (ev == MG_EV_HTTP_REQUEST) {
 			server->_handleRequest(nc, (struct http_message *) ev_data);
 		}
-	//}
+	}
 }
 
 string Toast::HTTP::htmlEntities(string data) {
@@ -114,6 +133,54 @@ Response *Server::handleRequest(Request *request) {
 			return response;
 	}
 	return NULL;
+}
+
+void Server::_webSocketReady(struct mg_connection *conn, struct http_message *msg) {
+	WebSocket *ws = new WebSocket(conn, msg);
+	websockets.add(ws);
+	websockets.clean();
+
+	vector<Handler *>::iterator it;
+	for (it = handlers.begin(); it != handlers.end(); it++) {
+		(*it)->webSocketReady(ws);
+	}
+}
+
+int Server::_webSocketData(struct mg_connection *conn, string data) {
+	WebSocket *websocket = websockets.get(conn);
+
+	if (websocket != NULL) {
+		websocket->appendData(data);
+
+		string fullPacket = websocket->flushData();
+		vector<Handler *>::iterator it;
+		for (it = handlers.begin(); it != handlers.end(); it++) {
+			(*it)->webSocketData(websocket, fullPacket);
+		}
+
+		if (websocket->isClosed()) {
+			websockets.remove(websocket);
+			return 0;
+		}
+		else {
+			return -1;
+		}
+	}
+	else {
+		return 0;
+	}
+}
+
+void Server::_webSocketClosed(struct mg_connection *conn) {
+	WebSocket *websocket = websockets.get(conn);
+	websocket->close();
+
+	vector<Handler *>::iterator it;
+	for (it = handlers.begin(); it != handlers.end(); it++) {
+		(*it)->webSocketClosed(websocket);
+	}
+
+	websockets.clean();
 }
 
 WebSocketContainer *Server::getWebSockets() {

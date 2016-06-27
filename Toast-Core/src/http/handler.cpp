@@ -22,6 +22,7 @@ void Handler::setServer(Server *serv) {
 
 void Handler::webSocketReady(WebSocket *ws) { }
 void Handler::webSocketData(WebSocket *ws, string data) { }
+void Handler::webSocketClosed(WebSocket *ws) { }
 
 bool Handler::handles(string method, string url) {
 	string key = method + ":" + url;
