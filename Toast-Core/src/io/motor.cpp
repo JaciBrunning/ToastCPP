@@ -4,7 +4,7 @@
 using namespace Motor;
 using namespace Toast::Memory;
 
-static int __id_counter = 0;
+static int __id_counter = 0;	// Todo, this needs to be in the shared pool
 
 char *Motor::getBlockFor(int id) {
     return Shared::get() + ADDR_SPD_OFFSET + (id * LEN_SPD);
@@ -17,6 +17,7 @@ int Motor::init(int port, int motor_interface, int type) {
     block[ADDR_SPD_PORT] = (char)port;
     block[ADDR_SPD_INTERFACE] = (char)motor_interface;
     block[ADDR_SPD_TYPE] = (char)type;
+	if (block[ADDR_SPD_BOOTINIT] == 0) block[ADDR_SPD_BOOTINIT] = -1;
     __id_counter += 1;
     return id;
 }
