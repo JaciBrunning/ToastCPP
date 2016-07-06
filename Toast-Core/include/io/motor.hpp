@@ -2,6 +2,7 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
+#include "io/common.hpp"
 
 enum MotorInterface {
     MotorInterface_PWM = 0x01,

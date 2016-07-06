@@ -3,6 +3,7 @@
 using namespace Toast::Memory;
 
 char *DIO::getBlockFor(int id) {
+	PORT_CHECK(id, 25);
 	return Shared::get() + ADDR_DIO_OFFSET + (id * LEN_DIO);
 }
 

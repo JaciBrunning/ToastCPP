@@ -2,6 +2,7 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
+#include "io/common.hpp"
 
 #include <inttypes.h>
 
@@ -29,12 +30,12 @@ namespace Analog {
 		API void set_oversample_bits(int port, uint32_t bits);
 		API uint32_t get_oversample_bits(int port);
 		API uint32_t get_lsb_weight(int port);
-		API int32_t get_offset();
+		API int32_t get_offset(int port);
 
 		API bool is_accum(int port);
 		API void init_accum(int port);
 		API void set_accum_initial(int port, int64_t initial);
-		API void reset_accume(int port);
+		API void reset_accum(int port);
 		API void set_accum_center(int port, int32_t center);
 		API void set_accum_deadband(int port, int32_t deadband);
 		API int64_t get_accum_value(int port);

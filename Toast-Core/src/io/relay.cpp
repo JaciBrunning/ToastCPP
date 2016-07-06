@@ -3,6 +3,7 @@
 using namespace Toast::Memory;
 
 char *Relay::getBlockFor(int id) {
+	PORT_CHECK(id, 4);
 	return Shared::get() + ADDR_RELAY_OFFSET + (id * LEN_RELAY);
 }
 

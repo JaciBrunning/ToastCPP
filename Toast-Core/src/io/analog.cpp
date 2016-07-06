@@ -10,6 +10,7 @@ float Analog::get_sample_rate() {
 // Out
 
 char *Out::getBlockFor(int id) {
+	PORT_CHECK(id, 2);
 	return Shared::get() + ADDR_AN_OUT_OFFSET + (id * LEN_AN_OUT);
 }
 
@@ -26,6 +27,7 @@ void Out::set(int port, float volts) {
 // In
 
 char *In::getBlockFor(int id) {
+	PORT_CHECK(id, 8);
 	return Shared::get() + ADDR_AN_IN_OFFSET + (id * LEN_AN_IN);
 }
 
@@ -52,5 +54,63 @@ float In::get_avg_voltage(int port) {
 }
 
 void In::set_avg_bits(int port, uint32_t bits) {
+	*(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_AVG_BITS) = bits;
+}
+
+uint32_t In::get_avg_bits(int port) {
+	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_AVG_BITS);
+}
+
+void In::set_oversample_bits(int port, uint32_t bits) {
+	*(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_OVSMPL_BITS) = bits;
+}
+
+uint32_t In::get_oversample_bits(int port) {
+	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_OVSMPL_BITS);
+}
+
+uint32_t In::get_lsb_weight(int port) {
+	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_LSB_WEIGHT);
+}
+
+int32_t In::get_offset(int port) {
+	return *(int32_t *)(In::getBlockFor(port) + ADDR_AN_IN_OFFSET_VAL);
+}
+
+bool In::is_accum(int port) {
+	return In::getBlockFor(port)[ADDR_AN_IN_ACCUM_MASK] & 1 != 0;
+}
+
+void In::init_accum(int port) {
+	In::getBlockFor(port)[ADDR_AN_IN_ACCUM_MASK] |= (1 << 1);
+}
+
+void In::set_accum_initial(int port, int64_t initial) {
 	char *b = In::getBlockFor(port);
+	*(int64_t *)(b + ADDR_AN_IN_ACCUM_INIT) = initial;
+	b[ADDR_AN_IN_ACCUM_MASK] |= (1 << 3);
+}
+
+void In::reset_accum(int port) {
+	In::getBlockFor(port)[ADDR_AN_IN_ACCUM_MASK] |= (1 << 2);
+}
+
+void In::set_accum_center(int port, int32_t centre) {
+	char *b = In::getBlockFor(port);
+	*(int32_t *)(b + ADDR_AN_IN_ACCUM_CENTRE) = centre;
+	b[ADDR_AN_IN_ACCUM_MASK] |= (1 << 4);
+}
+
+void In::set_accum_deadband(int port, int32_t deadband) {
+	char *b = In::getBlockFor(port);
+	*(int32_t *)(b + ADDR_AN_IN_ACCUM_DB) = deadband;
+	b[ADDR_AN_IN_ACCUM_MASK] |= (1 << 5);
+}
+
+int64_t In::get_accum_value(int port) {
+	return *(int64_t *)(In::getBlockFor(port) + ADDR_AN_IN_ACCUM_VALUE);
+}
+
+uint32_t In::get_accum_count(int port) {
+	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_ACCUM_COUNT);
 }
