@@ -51,6 +51,10 @@ namespace IO {
 		API Motor(int port, Interface motor_interface = Interface::PWM, Type type = Type::Talon);
 		API virtual ~Motor() = default;
 
+		API bool operator==(Motor &m2) {
+			return (m2._interface == _interface) && (m2._port == _port);
+		}
+
 		API int get_shm_id();
 		API int get_port();
 		API Interface get_interface();
@@ -61,6 +65,7 @@ namespace IO {
 	private:
 		int _shm_id;
 		int _port;
+		int _interface;
 		char *_shm;
 	};
 

@@ -13,6 +13,10 @@ namespace IO {
 		API PCM(int module_id);
 		API virtual ~PCM() = default;
 
+		API bool operator==(PCM &p2) {
+			return p2._mod_id == _mod_id;
+		}
+
 		API int get_shm_id();
 		API int get_module_id();
 

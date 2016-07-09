@@ -12,6 +12,10 @@ namespace IO {
 		API Relay(int port);
 		API virtual ~Relay() = default;
 	
+		API bool operator==(Relay &r2) {
+			return r2._port == _port;
+		}
+
 		API int get_port();
 
 		API void set_forward(bool on);

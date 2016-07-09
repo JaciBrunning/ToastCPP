@@ -13,9 +13,13 @@ namespace IO {
 		API Joystick(int port);
 		API virtual ~Joystick() = default;
 
+		API bool operator==(Joystick &j2) {
+			return j2._port == _port;
+		}
+
 		API int get_port();
 
-		// Todo common joystick bindings here or in a child class?
+		// Todo common joystick bindings (e.g. getX, getY) here or in a child class?
 
 		API int get_num_axis();
 		API int get_num_button();

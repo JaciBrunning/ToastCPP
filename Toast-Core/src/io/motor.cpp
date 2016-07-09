@@ -31,10 +31,11 @@ char *IO::get_servo_block() {
 
 // Motor
 
-Motor::Motor(int port, Motor::Interface motor_i, Motor::Type type) : _port(port) {
+Motor::Motor(int port, Motor::Interface motor_i, Motor::Type type) : _port(port), _interface((int)motor_i) {
 	_shm_id = get_motor_shm_id(port, motor_i);
 	_shm = get_motor_block(_shm_id);
 	_shm[ADDR_SPD_PORT] = port;
+	_shm[ADDR_SPD_INTERFACE] = (int)motor_i;
 	_shm[ADDR_SPD_ID] = _shm_id;
 	SET_BIT(_shm[ADDR_SPD_BOOTINIT], 0);
 }

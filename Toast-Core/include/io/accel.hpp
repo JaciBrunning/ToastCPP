@@ -9,7 +9,7 @@ namespace IO {
 	
 	class Accelerometer {
 	public:
-		virtual ~Accelerometer() = default;
+		API virtual ~Accelerometer() = default;
 		enum Range { 
 			Range_2G = 0x00, 
 			Range_4G = 0x01, 
@@ -17,19 +17,19 @@ namespace IO {
 			Range_16G = 0x03 
 		};
 
-		virtual void set_range(Range range) = 0;
-		virtual float x() = 0;
-		virtual float y() = 0;
-		virtual float z() = 0;
+		API virtual void set_range(Range range) = 0;
+		API virtual float x() = 0;
+		API virtual float y() = 0;
+		API virtual float z() = 0;
 	};
 
 	class BuiltInAccelerometer : public Accelerometer {
 	public:
-		BuiltInAccelerometer();
+		API BuiltInAccelerometer();
 
-		virtual void set_range(Range range);
-		virtual float x();
-		virtual float y();
-		virtual float z();
+		API virtual void set_range(Range range);
+		API virtual float x();
+		API virtual float y();
+		API virtual float z();
 	};
 }

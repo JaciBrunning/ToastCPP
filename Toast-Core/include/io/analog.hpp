@@ -18,6 +18,10 @@ namespace IO {
 
 		API int get_port();
 
+		API bool operator==(AnalogOutput &a2) {
+			return a2._port == _port;
+		}
+
 		API void set(float volts);
 		API float get();
 	private:
@@ -29,6 +33,10 @@ namespace IO {
 	public:
 		API AnalogInput(int port);
 		API virtual ~AnalogInput() = default;
+
+		API bool operator==(AnalogInput &a2) {
+			return a2._port == _port;
+		}
 
 		API int get_port();
 

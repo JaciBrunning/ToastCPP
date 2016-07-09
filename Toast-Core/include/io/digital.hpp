@@ -16,6 +16,10 @@ namespace IO {
 		API DIO(int port, Mode mode = Mode::INPUT);
 		API virtual ~DIO() = default;
 
+		API bool operator==(DIO &d2) {
+			return d2._port == _port;
+		}
+
 		API int get_port();
 		API Mode get_mode();
 		API bool is_output() { return get_mode() == Mode::OUTPUT; }
