@@ -1,57 +1,62 @@
 #include "io/digital.hpp"
 
+using namespace IO;
 using namespace Toast::Memory;
 
-char *DIO::getBlockFor(int id) {
-	PORT_CHECK(id, 25);
-	return Shared::get() + ADDR_DIO_OFFSET + (id * LEN_DIO);
+char *IO::get_dio_block(int port) {
+	PORT_CHECK(port, 26);
+	return Shared::get() + ADDR_DIO_OFFSET + (port * LEN_DIO);
 }
 
-int DIO::init(int port, int mode) {
-	char *block = DIO::getBlockFor(port);
-	block[ADDR_DIO_PORT] = (char)port;
-	block[ADDR_DIO_MODE] = (char)mode;
+DIO::DIO(int port, DIO::Mode mode) : _port(port) {
+	_shm = get_dio_block(port);
+
+	_shm[ADDR_DIO_MODE] = (char)mode;
+	SET_BIT(_shm[ADDR_DIO_BOOTINIT], 0);
 }
 
-bool DIO::get(int port) {
-	return DIO::getBlockFor(port)[ADDR_DIO_VALUE] == 1;
+int DIO::get_port() {
+	return _port;
 }
 
-void DIO::set(int port, bool state) {
-	DIO::getBlockFor(port)[ADDR_DIO_VALUE] = (state ? 1 : 0);
+DIO::Mode DIO::get_mode() {
+	return (DIO::Mode)((int)_shm[ADDR_DIO_MODE]);
 }
 
-void DIO::set_pulse(int port, float len) {
-	char *bl = DIO::getBlockFor(port);
-	*(float *)(bl + ADDR_DIO_PULSE_LENGTH) = len;
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 3);
+bool DIO::get() {
+	return bool(_shm[ADDR_DIO_VALUE]);
 }
 
-bool DIO::is_pulsing(int port) {
-	return DIO::getBlockFor(port)[ADDR_DIO_PWM_PULSE_ENABLE] & (1 << 2) != 0;
+void DIO::set(bool state) {
+	_shm[ADDR_DIO_VALUE] = (char)state;
 }
 
-void DIO::set_pwm_rate(int port, float rate) {
-	char *bl = DIO::getBlockFor(port);
-	*(float *)(bl + ADDR_DIO_PWM_RATE) = rate;
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 4);
+void DIO::set_pulse(float length) {
+	MEM_VAL(float, _shm, ADDR_DIO_PULSE_LENGTH) = length;
+	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 3);
 }
 
-void DIO::set_pwm_enable(int port, float dc) {
-	char *bl = DIO::getBlockFor(port);
-	*(float *)(ADDR_DIO_PWM_DUTY_CYCLE) = dc;
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 0);
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 1);
+bool DIO::is_pulsing() {
+	return IS_BIT_SET(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 2);
 }
 
-void DIO::set_pwm_disable(int port) {
-	char *bl = DIO::getBlockFor(port);
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 0);
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 1);
+void DIO::set_pwm_rate(float rate) {
+	MEM_VAL(float, _shm, ADDR_DIO_PWM_RATE) = rate;
+	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 4);
 }
 
-void DIO::set_pwm_duty_cycle(int port, float dc) {
-	char *bl = DIO::getBlockFor(port);
-	*(float *)(ADDR_DIO_PWM_DUTY_CYCLE) = dc;
-	bl[ADDR_DIO_PWM_PULSE_ENABLE] |= (1 << 5);
+void DIO::set_pwm_enable(float initial_duty_cycle) {
+	MEM_VAL(float, _shm, ADDR_DIO_PWM_DUTY_CYCLE) = initial_duty_cycle;
+	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 0);
+	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 1);
+}
+
+void DIO::set_pwm_disable() {
+	UNSET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 0);
+	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 1);
+}
+
+void DIO::set_pwm_duty_cycle(float duty_cycle) {
+	MEM_VAL(float, _shm, ADDR_DIO_PWM_DUTY_CYCLE) = duty_cycle;
+	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 5);
 }

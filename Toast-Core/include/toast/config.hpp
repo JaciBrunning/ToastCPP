@@ -24,8 +24,8 @@ namespace Toast {
         API std::string to_string(int indent);
         
         API bool has(std::string name);
-        API void putDefault(std::string key, Json value);
-        API Json getOrDefault(std::string name, Json def);
+        API void put_default(std::string key, Json value);
+        API Json get_or_default(std::string name, Json def);
         API Json get(std::string name, Json def);
         
         API int get_int(std::string name, int def);

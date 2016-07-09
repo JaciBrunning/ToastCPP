@@ -52,7 +52,7 @@
 #define ADDR_DIO_OFFSET		0x110
 #define LEN_DIO				0x10	// 16 Bytes per DIO Port
 #define COUNT_DIO			26		// 26 Total DIO Ports (10 onboard, 16 MXP)
-	#define ADDR_DIO_PORT				0x00
+	#define ADDR_DIO_BOOTINIT			0x00
 	#define ADDR_DIO_MODE				0x01
 	#define ADDR_DIO_VALUE				0x02
 	#define ADDR_DIO_PWM_PULSE_ENABLE	0x03
@@ -134,6 +134,7 @@
 	#define ADDR_PWM_BOUNDS_CENTRE	0x20
 	#define ADDR_PWM_BOUNDS_DB_MIN	0x24	// Deadband Min
 	#define ADDR_PWM_BOUNDS_MIN		0x28
+	#define ADDR_PWM_BOUNDS_MODE	0x2C
 
 // Speed Controllers
 #define ADDR_SPD_OFFSET     0x8B0
@@ -144,7 +145,6 @@
     #define ADDR_SPD_INTERFACE		0x02
     #define ADDR_SPD_TYPE			0x03
     #define ADDR_SPD_BOOTINIT		0x04
-	#define ADDR_SPD_CONTROL_FLAGS	0x05
     #define ADDR_SPD_GET			0x08
     #define ADDR_SPD_SET			0x0C
 
@@ -152,8 +152,8 @@
 #define ADDR_SERVO_OFFSET	0x9B0
 #define LEN_SERVO			0x70	// 112 Bytes long for all servos under one block
 	#define ADDR_SERVO_BOOTINIT_MASK		0x00
-	#define ADDR_SERVO_OFFLINE_PEND_MASK	0x04
-	#define ADDR_SERVO_UPDATE_PEND_MASK		0x08
+	#define ADDR_SERVO_OFFLINE_PEND_MASK	0x08
+	#define ADDR_SERVO_UPDATE_PEND_MASK		0x0C
 	#define ADDR_SERVO_MIN_ANGLE			0x10
 	#define ADDR_SERVO_MAX_ANGLE			0x14
 	#define ADDR_SERVO_ANGLE_RANGE			0x18
@@ -164,10 +164,10 @@
 #define ADDR_OB_ACCEL_OFFSET	0xA20
 	#define ADDR_OB_ACCEL_RANGE		0x00
 	#define ADDR_OB_RANGE_UPDATE	0x01
-	#define ADDR_OB_BOOTINIT		0x02
-	#define ADDR_OB_X				0x04
-	#define ADDR_OB_Y				0x08
-	#define ADDR_OB_Z				0x0C
+	#define ADDR_OB_ACCEL_BOOTINIT	0x02
+	#define ADDR_OB_ACCEL_X			0x04
+	#define ADDR_OB_ACCEL_Y			0x08
+	#define ADDR_OB_ACCEL_Z			0x0C
 
 // Joysticks and Human Interface
 #define ADDR_JOY_OFFSET			0xA30

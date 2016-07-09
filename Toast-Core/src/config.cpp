@@ -132,21 +132,21 @@ bool Config::has(string name) {
     return master_obj.has(name);
 }
 
-void Config::putDefault(string key, Json value) {
+void Config::put_default(string key, Json value) {
     defaults_obj.set(key, value);
     reload();
 }
 
-Json Config::getOrDefault(string name, Json def) {
+Json Config::get_or_default(string name, Json def) {
     if (!has(name)) {
-        putDefault(name, def);
+        put_default(name, def);
     }
     Json get = getObject(name);
     return get.type() == Json::Type::JSNULL ? def : get;
 }
 
 Json Config::get(string name, Json def) {
-    return getOrDefault(name, def);
+    return get_or_default(name, def);
 }
 
 int Config::get_int(string name, int def) {

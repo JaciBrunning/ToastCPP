@@ -1,116 +1,124 @@
 #include "io/analog.hpp"
 
-using namespace Analog;
+using namespace IO;
 using namespace Toast::Memory;
 
-float Analog::get_sample_rate() {
+float IO::get_analog_sample_rate() {
 	return *(float *)(Shared::get() + ADDR_AN_SS_OFFSET + ADDR_AN_SS_SAMPLE_RATE);
 }
 
-// Out
-
-char *Out::getBlockFor(int id) {
-	PORT_CHECK(id, 2);
-	return Shared::get() + ADDR_AN_OUT_OFFSET + (id * LEN_AN_OUT);
+char *IO::get_analog_out_block(int port) {
+	PORT_CHECK(port, 2);
+	return Shared::get() + ADDR_AN_OUT_OFFSET + (port * LEN_AN_OUT);
 }
 
-void Out::init(int port) {
-	char *b = Out::getBlockFor(port);
-	b[ADDR_AN_OUT_PORT] = (char)port;
-	if (b[ADDR_AN_OUT_BOOTINIT] == 0) b[ADDR_AN_OUT_BOOTINIT] = -1;
+char *IO::get_analog_in_block(int port) {
+	PORT_CHECK(port, 8);
+	return Shared::get() + ADDR_AN_IN_OFFSET + (port * LEN_AN_IN);
 }
 
-void Out::set(int port, float volts) {
-	*(float *)(Out::getBlockFor(port) + ADDR_AN_OUT_VOLTAGE) = volts;
+// Analog Output
+AnalogOutput::AnalogOutput(int port) : _port(port) {
+	_shm = get_analog_out_block(port);
+
+	_shm[ADDR_AN_OUT_PORT] = (char)port;
+	SET_BIT(_shm[ADDR_AN_OUT_BOOTINIT], 0);
 }
 
-// In
-
-char *In::getBlockFor(int id) {
-	PORT_CHECK(id, 8);
-	return Shared::get() + ADDR_AN_IN_OFFSET + (id * LEN_AN_IN);
+int AnalogOutput::get_port() {
+	return _port;
 }
 
-void In::init(int port) {
-	char *b = In::getBlockFor(port);
-	b[ADDR_AN_IN_PORT] = (char)port;
-	if (b[ADDR_AN_IN_BOOTINIT] == 0) b[ADDR_AN_IN_BOOTINIT] = -1;
+void AnalogOutput::set(float volts) {
+	MEM_VAL(float, _shm, ADDR_AN_OUT_VOLTAGE) = volts;
 }
 
-int16_t In::get_value(int port) {
-	return *(int16_t *)(In::getBlockFor(port) + ADDR_AN_IN_VALUE);
+float AnalogOutput::get() {
+	return MEM_VAL(float, _shm, ADDR_AN_OUT_VOLTAGE);
 }
 
-int32_t In::get_avg_value(int port) {
-	return *(int32_t *)(In::getBlockFor(port) + ADDR_AN_IN_AVG_VAL);
+// Analog Input
+AnalogInput::AnalogInput(int port) : _port(port) {
+	_shm = get_analog_in_block(port);
+	_shm[ADDR_AN_IN_PORT] = (char)port;
+	SET_BIT(_shm[ADDR_AN_IN_BOOTINIT], 0);
 }
 
-float In::get_voltage(int port) {
-	return *(float *)(In::getBlockFor(port) + ADDR_AN_IN_VOLTS);
+int AnalogInput::get_port() {
+	return _port;
 }
 
-float In::get_avg_voltage(int port) {
-	return *(float *)(In::getBlockFor(port) + ADDR_AN_IN_AVG_VOLTS);
+int16_t AnalogInput::get_value() {
+	return MEM_VAL(int16_t, _shm, ADDR_AN_IN_VALUE);
 }
 
-void In::set_avg_bits(int port, uint32_t bits) {
-	*(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_AVG_BITS) = bits;
+int32_t AnalogInput::get_average_value() {
+	return MEM_VAL(int32_t, _shm, ADDR_AN_IN_AVG_VAL);
 }
 
-uint32_t In::get_avg_bits(int port) {
-	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_AVG_BITS);
+float AnalogInput::get() {
+	return MEM_VAL(float, _shm, ADDR_AN_IN_VOLTS);
 }
 
-void In::set_oversample_bits(int port, uint32_t bits) {
-	*(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_OVSMPL_BITS) = bits;
+float AnalogInput::get_average() {
+	return MEM_VAL(float, _shm, ADDR_AN_IN_AVG_VOLTS);
 }
 
-uint32_t In::get_oversample_bits(int port) {
-	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_OVSMPL_BITS);
+void AnalogInput::set_average_bits(uint32_t bits) {
+	MEM_VAL(uint32_t, _shm, ADDR_AN_IN_AVG_BITS) = bits;
 }
 
-uint32_t In::get_lsb_weight(int port) {
-	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_LSB_WEIGHT);
+uint32_t AnalogInput::get_average_bits() {
+	return MEM_VAL(uint32_t, _shm, ADDR_AN_IN_AVG_BITS);
 }
 
-int32_t In::get_offset(int port) {
-	return *(int32_t *)(In::getBlockFor(port) + ADDR_AN_IN_OFFSET_VAL);
+void AnalogInput::set_oversample_bits(uint32_t bits) {
+	MEM_VAL(uint32_t, _shm, ADDR_AN_IN_OVSMPL_BITS) = bits;
 }
 
-bool In::is_accum(int port) {
-	return In::getBlockFor(port)[ADDR_AN_IN_ACCUM_MASK] & 1 != 0;
+uint32_t AnalogInput::get_oversample_bits() {
+	return MEM_VAL(uint32_t, _shm, ADDR_AN_IN_OVSMPL_BITS);
 }
 
-void In::init_accum(int port) {
-	In::getBlockFor(port)[ADDR_AN_IN_ACCUM_MASK] |= (1 << 1);
+uint32_t AnalogInput::get_lsb_weight() {
+	return MEM_VAL(uint32_t, _shm, ADDR_AN_IN_LSB_WEIGHT);
 }
 
-void In::set_accum_initial(int port, int64_t initial) {
-	char *b = In::getBlockFor(port);
-	*(int64_t *)(b + ADDR_AN_IN_ACCUM_INIT) = initial;
-	b[ADDR_AN_IN_ACCUM_MASK] |= (1 << 3);
+int32_t AnalogInput::get_offset() {
+	return MEM_VAL(int32_t, _shm, ADDR_AN_IN_OFFSET_VAL);
 }
 
-void In::reset_accum(int port) {
-	In::getBlockFor(port)[ADDR_AN_IN_ACCUM_MASK] |= (1 << 2);
+bool AnalogInput::is_accumulator() {
+	return IS_BIT_SET(_shm[ADDR_AN_IN_ACCUM_MASK], 0);
 }
 
-void In::set_accum_center(int port, int32_t centre) {
-	char *b = In::getBlockFor(port);
-	*(int32_t *)(b + ADDR_AN_IN_ACCUM_CENTRE) = centre;
-	b[ADDR_AN_IN_ACCUM_MASK] |= (1 << 4);
+void AnalogInput::init_accumulator() {
+	SET_BIT(_shm[ADDR_AN_IN_ACCUM_MASK], 1);
 }
 
-void In::set_accum_deadband(int port, int32_t deadband) {
-	char *b = In::getBlockFor(port);
-	*(int32_t *)(b + ADDR_AN_IN_ACCUM_DB) = deadband;
-	b[ADDR_AN_IN_ACCUM_MASK] |= (1 << 5);
+void AnalogInput::set_accumulator_initial(int64_t initial) {
+	MEM_VAL(int64_t, _shm, ADDR_AN_IN_ACCUM_INIT) = initial;
+	SET_BIT(_shm[ADDR_AN_IN_ACCUM_MASK], 3);
 }
 
-int64_t In::get_accum_value(int port) {
-	return *(int64_t *)(In::getBlockFor(port) + ADDR_AN_IN_ACCUM_VALUE);
+void AnalogInput::reset_accumulator() {
+	SET_BIT(_shm[ADDR_AN_IN_ACCUM_MASK], 2);
 }
 
-uint32_t In::get_accum_count(int port) {
-	return *(uint32_t *)(In::getBlockFor(port) + ADDR_AN_IN_ACCUM_COUNT);
+void AnalogInput::set_accumulator_center(int32_t center) {
+	MEM_VAL(int32_t, _shm, ADDR_AN_IN_ACCUM_CENTRE) = center;
+	SET_BIT(_shm[ADDR_AN_IN_ACCUM_MASK], 4);
+}
+
+void AnalogInput::set_accumulator_deadband(int32_t deadband) {
+	MEM_VAL(int32_t, _shm, ADDR_AN_IN_ACCUM_DB) = deadband;
+	SET_BIT(_shm[ADDR_AN_IN_ACCUM_MASK], 5);
+}
+
+int64_t AnalogInput::get_accumulator_value() {
+	return MEM_VAL(int64_t, _shm, ADDR_AN_IN_ACCUM_VALUE);
+}
+
+uint32_t AnalogInput::get_accumulator_count() {
+	return MEM_VAL(uint32_t, _shm, ADDR_AN_IN_ACCUM_COUNT);
 }

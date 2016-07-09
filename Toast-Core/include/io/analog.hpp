@@ -6,39 +6,55 @@
 
 #include <inttypes.h>
 
-namespace Analog {
-	API float get_sample_rate();
-	
-	namespace Out {
-		API char *getBlockFor(int port);
-		API void init(int port);
-		API void set(int port, float volts);
-	}
+namespace IO {
+	API float get_analog_sample_rate();
+	API char *get_analog_out_block(int port);
+	API char *get_analog_in_block(int port);
 
-	namespace In {
-		API char *getBlockFor(int port);
-		API void init(int port);
-		
-		API int16_t get_value(int port);
-		API int32_t get_avg_value(int port);
-		
-		API float get_voltage(int port);
-		API float get_avg_voltage(int port);
+	class AnalogOutput {
+	public:
+		API AnalogOutput(int port);
+		API virtual ~AnalogOutput() = default;
 
-		API void set_avg_bits(int port, uint32_t bits);
-		API uint32_t get_avg_bits(int port);
-		API void set_oversample_bits(int port, uint32_t bits);
-		API uint32_t get_oversample_bits(int port);
-		API uint32_t get_lsb_weight(int port);
-		API int32_t get_offset(int port);
+		API int get_port();
 
-		API bool is_accum(int port);
-		API void init_accum(int port);
-		API void set_accum_initial(int port, int64_t initial);
-		API void reset_accum(int port);
-		API void set_accum_center(int port, int32_t center);
-		API void set_accum_deadband(int port, int32_t deadband);
-		API int64_t get_accum_value(int port);
-		API uint32_t get_accum_count(int port);
-	}
+		API void set(float volts);
+		API float get();
+	private:
+		int _port;
+		char *_shm;
+	};
+
+	class AnalogInput {
+	public:
+		API AnalogInput(int port);
+		API virtual ~AnalogInput() = default;
+
+		API int get_port();
+
+		API int16_t get_value();
+		API int32_t get_average_value();
+
+		API float get();
+		API float get_average();
+
+		API void set_average_bits(uint32_t bits);
+		API uint32_t get_average_bits();
+		API void set_oversample_bits(uint32_t bits);
+		API uint32_t get_oversample_bits();
+		API uint32_t get_lsb_weight();
+		API int32_t get_offset();
+
+		API bool is_accumulator();
+		API void init_accumulator();
+		API void set_accumulator_initial(int64_t initial);
+		API void reset_accumulator();
+		API void set_accumulator_center(int32_t center);
+		API void set_accumulator_deadband(int32_t deadband);
+		API int64_t get_accumulator_value();
+		API uint32_t get_accumulator_count();
+	private:
+		int _port;
+		char *_shm;
+	};
 }

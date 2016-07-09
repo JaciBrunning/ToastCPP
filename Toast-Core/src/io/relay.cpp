@@ -1,32 +1,34 @@
 #include "io/relay.hpp"
 
+using namespace IO;
 using namespace Toast::Memory;
 
-char *Relay::getBlockFor(int id) {
-	PORT_CHECK(id, 4);
-	return Shared::get() + ADDR_RELAY_OFFSET + (id * LEN_RELAY);
+char *IO::get_relay_block(int port) {
+	PORT_CHECK(port, 4);
+	return Shared::get() + ADDR_RELAY_OFFSET + (port * LEN_RELAY);
 }
 
-void Relay::init(int port) {
-	char *block = Relay::getBlockFor(port);
-	block[ADDR_RELAY_PORT] = (char)port;
-	block[ADDR_RELAY_BOOTINIT] = -1;
+Relay::Relay(int port) : _port(port) {
+	_shm = get_relay_block(port);
+	SET_BIT(_shm[ADDR_RELAY_BOOTINIT], 0);
 }
 
-void Relay::set_forward(int port, bool on) {
-	char *b = Relay::getBlockFor(port);
-	b[ADDR_RELAY_DIR_MASK] ^= (-(on ? 1 : 0) ^ b[ADDR_RELAY_DIR_MASK]) & (1 << 0);
+int Relay::get_port() {
+	return _port;
 }
 
-bool Relay::get_forward(int port) {
-	return Relay::getBlockFor(port)[ADDR_RELAY_DIR_MASK] & (1 << 0) != 0;
+void Relay::set_forward(bool on) {
+	SET_BIT_TO(_shm[ADDR_RELAY_DIR_MASK], 0, on);
 }
 
-void Relay::set_reverse(int port, bool on) {
-	char *b = Relay::getBlockFor(port);
-	b[ADDR_RELAY_DIR_MASK] ^= (-(on ? 1 : 0) ^ b[ADDR_RELAY_DIR_MASK]) & (1 << 1);
+bool Relay::get_forward() {
+	return IS_BIT_SET(_shm[ADDR_RELAY_DIR_MASK], 0);
 }
 
-bool Relay::get_reverse(int port) {
-	return Relay::getBlockFor(port)[ADDR_RELAY_DIR_MASK] & (1 << 1) != 0;
+void Relay::set_reverse(bool on) {
+	SET_BIT_TO(_shm[ADDR_RELAY_DIR_MASK], 1, on);
+}
+
+bool Relay::get_reverse() {
+	return IS_BIT_SET(_shm[ADDR_RELAY_DIR_MASK], 1);
 }

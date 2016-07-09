@@ -4,14 +4,23 @@
 #include "toast/memory.hpp"
 #include "io/common.hpp"
 
-#include <inttypes.h>
+namespace IO {
+	API char *get_relay_block(int port);
 
-namespace Relay {
-	API char *getBlockFor(int id);
+	class Relay {
+	public:
+		API Relay(int port);
+		API virtual ~Relay() = default;
+	
+		API int get_port();
 
-	API void init(int port);
-	API void set_forward(int port, bool on);
-	API bool get_forward(int port);
-	API void set_reverse(int port, bool on);
-	API bool get_reverse(int port);
+		API void set_forward(bool on);
+		API bool get_forward();
+
+		API void set_reverse(bool on);
+		API bool get_reverse();
+	private:
+		int _port;
+		char *_shm;
+	};
 }

@@ -9,12 +9,18 @@
 using namespace Toast;
 using namespace std;
 
+using namespace IO;
+
 class MyModule : public Module {
     public:
         virtual void construct() {
-            Motor::init(10, MotorInterface_PWM, MotorType_Talon);
-            Motor::init(12, MotorInterface_CAN, MotorType_CANTalon);
-            Motor::set(1, 0.14);
+			Talon t(1);
+			t.set(0.5);
+
+			Victor v(1);
+			cout << v.get() << endl;
+			cout << t.get_type() << endl;
+			cout << v.get_type() << endl;
 
             ofstream outfile("shared.txt", ios::binary);
 			outfile.write(Memory::Shared::get(), TOAST_SHARED_MEMPOOL_SIZE);
