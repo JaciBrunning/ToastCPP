@@ -31,6 +31,9 @@
 // Checks if a string ends with another specific string.
 API bool ends_with(std::string const & value, std::string const & ending);
 
+// Checks if a string starts with another specific string.
+API bool starts_with(std::string const & value, std::string const & starting);
+
 // C++ doesn't provide a universal, cross-platform way to perform a sleep
 // call, so here's our own one.
 API void sleep_ms(int milliseconds);

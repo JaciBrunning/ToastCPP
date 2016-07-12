@@ -17,6 +17,8 @@ using namespace std;
 
 namespace Toast {
 	namespace HTTP {
+		std::string mime_type(std::string extension, std::string fallback);
+
 		class Response {
 		public:
 			API Response();

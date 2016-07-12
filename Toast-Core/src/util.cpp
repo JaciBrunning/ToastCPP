@@ -5,6 +5,10 @@ bool ends_with(std::string const & value, std::string const & ending) {
     return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
 }
 
+bool starts_with(std::string const & value, std::string const & starting) {
+	return !value.compare(0, starting.size(), starting);
+}
+
 void sleep_ms(int milliseconds) {
 #ifdef WIN32
     Sleep(milliseconds);

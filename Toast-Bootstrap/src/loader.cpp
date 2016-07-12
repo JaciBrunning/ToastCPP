@@ -41,7 +41,7 @@ void Loader::search_modules() {
             _load_idx += 1;
             if (_load_idx == 128) {
                 // Overflow
-                _log.error("Wow! You've loaded more than 128 modules. Unfortunately, we don't support more than 256 modules due to technical limitations. File a bug report to the ToastC++ Repository on OpenRIO and we'll start working on support for more modules!");
+                _log.error("Wow! You've loaded more than 128 modules. Unfortunately, we don't support more than 128 modules due to technical limitations. File a bug report to the ToastC++ Repository on OpenRIO and we'll start working on support for more modules!");
                 _log.error("Any further modules will be ignored.");
             } else {
                 __modules.push_back(adapter);
@@ -58,7 +58,7 @@ void Loader::create_subprocesses() {
         Loader::create_module_process(module);
         Memory::Shared::get()[ADDR_MOD_ACT_STATE + module->idx] = 0x03;
     }
-	sleep_ms(1000);
+	sleep_ms(10000);
 }
 
 static void create_process(Loader::ModuleAdapter *adapter) {

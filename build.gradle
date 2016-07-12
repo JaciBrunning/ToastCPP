@@ -14,9 +14,29 @@ def build_directory = rootProject.buildDir
 allprojects {
     def path = project.path.substring(1).replaceAll(":", "/")
     if (project == rootProject) path = project.name
-    project.buildDir = new File(build_directory, path);
-    
+    project.buildDir = new File(build_directory, path)
+    project.ext.resourcesRootDir = new File(project.buildDir, "resources")
+    project.ext.resourcesName = path
+    project.ext.resourcesDir = new File(project.resourcesRootDir, project.resourcesName);
+
     project.ext.binaries_files = []
+
+    task clean_resources(type: Delete) {
+        delete project.resourcesDir
+    }
+
+    task copy_resources(type: Copy) {
+        from 'resources'
+        into project.resourcesDir
+    }
+
+    task build_resources() {
+        dependsOn clean_resources, copy_resources
+    }
+
+    plugins.withType(CppPlugin).whenPluginAdded {
+        build.dependsOn build_resources
+    }
 }
 
 ext.apply_cpp = { project ->

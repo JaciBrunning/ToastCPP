@@ -61,5 +61,14 @@ namespace Toast {
 			API HTTPHandler();
 			API void preProcess(Request *request, Response *response);
 		};
+
+		class DirHandler : public Handler {
+		public:
+			API DirHandler(string uri_base, string dir);
+			API virtual Response *process(Request *request);
+		private:
+			string _uri_base;
+			string _dir;
+		};
 	}
 }

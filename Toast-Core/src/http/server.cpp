@@ -35,7 +35,13 @@ static void ev_handler(struct mg_connection *nc, int ev, void *ev_data) {
 
 		// HTTP
 		if (ev == MG_EV_HTTP_REQUEST) {
-			server->_handleRequest(nc, (struct http_message *) ev_data);
+			if (!server->_handleRequest(nc, (struct http_message *) ev_data)) {
+				// 404
+				std::string reason = "404: Page not found";
+				mg_send_head(nc, 404, reason.size(), "Content-Type: text/plain\r\nConnection: close");
+				mg_send(nc, reason.c_str(), reason.size());
+				nc->flags |= MG_F_SEND_AND_CLOSE;
+			}
 		}
 	}
 }
@@ -66,6 +72,7 @@ Server::~Server() {
 
 void Server::start(int pollTiming) {
 	mg_mgr_init(&mgr, NULL);
+
 	mgr.user_data = (Server *)this;
 	struct mg_connection *conn = mg_bind(&mgr, to_string(port).c_str(), ev_handler);
 	mg_set_protocol_http_websocket(conn);

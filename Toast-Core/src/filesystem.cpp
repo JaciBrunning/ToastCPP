@@ -6,11 +6,11 @@
     #include <direct.h>
     #include <windows.h>
 #else
-    #include <sys/stat.h>
-    #include <sys/types.h>
     #include <unistd.h>
     #include <dirent.h>
 #endif
+#include <sys/stat.h>
+#include <sys/types.h>
 
 using namespace Toast;
 using namespace std;
@@ -66,6 +66,27 @@ void Filesystem::mkdir(string path) {
     #else
         ::mkdir((char *)path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
     #endif
+}
+
+bool Filesystem::exists(string path) {
+	struct stat info;
+	if (stat(path.c_str(), &info) != 0) {
+		return false;
+	} else {
+		return true;
+	}
+}
+
+bool Filesystem::is_directory(string path) {
+	struct stat info;
+	if (stat(path.c_str(), &info) == 0 && info.st_mode & S_IFDIR) {
+		return true;
+	}
+	return false;
+}
+
+string Filesystem::extension(string path) {
+	return path.substr(path.find_last_of(".") + 1);
 }
 
 vector<string> Filesystem::ls(string path) {

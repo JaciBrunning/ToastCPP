@@ -1,5 +1,11 @@
 #include "toast/http/handler.hpp"
 
+#include "toast/util.hpp"
+#include "toast/filesystem.hpp"
+
+#include <fstream>
+#include <sstream>
+
 using namespace std;
 using namespace Toast::HTTP;
 
@@ -112,4 +118,25 @@ vector<string> Handler::getUrls() {
 HTTPHandler::HTTPHandler() { }
 void HTTPHandler::preProcess(Request *req, Response *resp) {
 	resp->setHeader("Content-Type", "text/html");
+}
+
+// Directory Handler
+DirHandler::DirHandler(string uri_base, string dir) : _dir(dir), _uri_base(uri_base) {}
+Response *DirHandler::process(Request *req) {
+	std::string uri = req->getUrl().substr(1);
+	if (!starts_with(uri, _uri_base + "/")) return NULL;
+
+	std::string target = _dir + "/" + uri.substr(4);
+
+	ifstream is;
+	is.open(target.c_str(), ios::binary);
+	if (!is.good()) return NULL;
+
+	StreamResponse *res = new StreamResponse;
+	(*res) << is.rdbuf();
+	is.close();
+
+	res->setHeader("Content-Type", mime_type(Filesystem::extension(target), "text/plain"));
+
+	return res;
 }
