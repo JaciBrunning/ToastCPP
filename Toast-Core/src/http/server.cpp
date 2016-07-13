@@ -95,7 +95,7 @@ void Server::stop() {
 }
 
 void Server::register_handler(Handler *handler) {
-	handler->setServer(this);
+	handler->set_server(this);
 	handler->setup();
 	handlers.push_back(handler);
 }
@@ -116,7 +116,7 @@ int Server::_handleRequest(struct mg_connection *conn, struct http_message *msg)
 	if (response == NULL)
 		return 0;
 	else {
-		req.writeResponse(response);
+		req.write_response(response);
 		delete response;
 		return 1;
 	}
@@ -194,6 +194,6 @@ void Server::_webSocketClosed(struct mg_connection *conn) {
 	websockets.clean();
 }
 
-WebSocketContainer *Server::getWebSockets() {
+WebSocketContainer *Server::get_web_sockets() {
 	return &websockets;
 }

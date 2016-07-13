@@ -65,24 +65,24 @@ string Toast::HTTP::mime_type(string ext, string fallback) {
 Response::Response() : code(HTTP_OK), headers() { }
 Response::~Response() { }
 
-bool Response::hasHeader(string key) {
+bool Response::has_header(string key) {
 	return headers.find(key) != headers.end();
 }
 
-void Response::setHeader(string key, string value) {
+void Response::set_header(string key, string value) {
 	headers[key] = value;
 }
 
-string Response::getData() {
-	string body = getBody();
+string Response::get_data() {
+	string body = get_body();
 	ostringstream data;
 
 	data << "HTTP/1.0 " << code << "\r\n";
 
-	if (!hasHeader("Content-Length")) {
+	if (!has_header("Content-Length")) {
 		ostringstream length;
 		length << body.size();
-		setHeader("Content-Length", length.str());
+		set_header("Content-Length", length.str());
 	}
 
 	map<string, string>::iterator it;
@@ -97,22 +97,22 @@ string Response::getData() {
 	return data.str();
 }
 
-void Response::setCode(int code_) {
+void Response::set_code(int code_) {
 	code = code_;
 }
 
 // Basic
 
-void BasicResponse::setBody(string content) {
+void BasicResponse::set_body(string content) {
 	body = content;
 }
 
-string BasicResponse::getBody() {
+string BasicResponse::get_body() {
 	return body;
 }
 
 // Stream
-string StreamResponse::getBody() {
+string StreamResponse::get_body() {
 	return this->str();
 }
 
@@ -122,6 +122,6 @@ void TemplateResponse::render(Template::Context *ctx, string tmpl_name) {
 	_tmpl = tmpl_name;
 }
 
-string TemplateResponse::getBody() {
+string TemplateResponse::get_body() {
 	return _ctx->render(_tmpl);
 }

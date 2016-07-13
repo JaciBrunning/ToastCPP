@@ -25,11 +25,11 @@ namespace Toast {
 			API Response();
 			API virtual ~Response();
 
-			API virtual bool hasHeader(string key);
-			API virtual void setHeader(string key, string value);
-			API virtual string getData();
-			API virtual void setCode(int code);
-			API virtual string getBody() = 0;	// This should be overridden
+			API virtual bool has_header(string key);
+			API virtual void set_header(string key, string value);
+			API virtual string get_data();
+			API virtual void set_code(int code);
+			API virtual string get_body() = 0;	// This should be overridden
 
 		protected:
 			int code;
@@ -38,8 +38,8 @@ namespace Toast {
 
 		class BasicResponse : public Response {
 		public:
-			API virtual void setBody(string content);
-			API virtual string getBody();
+			API virtual void set_body(string content);
+			API virtual string get_body();
 		
 		protected:
 			string body;
@@ -47,13 +47,13 @@ namespace Toast {
 
 		class StreamResponse : public ostringstream, public Response {
 		public:
-			API virtual string getBody();
+			API virtual string get_body();
 		};
 
 		class TemplateResponse : public Response {
 		public:
 			API void render(Template::Context *ctx, std::string template_name);
-			API virtual string getBody();
+			API virtual string get_body();
 		private:
 			Template::Context *_ctx;
 			string _tmpl;

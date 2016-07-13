@@ -22,7 +22,7 @@ Handler::~Handler() {
 
 void Handler::setup() { }
 
-void Handler::setServer(Server *serv) {
+void Handler::set_server(Server *serv) {
 	server = serv;
 }
 
@@ -53,13 +53,13 @@ void Handler::webSocketClosed(WebSocket *ws) {
 	}
 }
 
-void Handler::registerWebSocket(string route, WebSocketHandler *handler) {
+void Handler::register_web_socket(string route, WebSocketHandler *handler) {
 	string key = "GET:" + prefix + route;
 	wsRoutes[key] = handler;
 }
 
-void Handler::webSocket(string route, WebSocketHandler *handler) {
-	registerWebSocket(route, handler);
+void Handler::web_socket(string route, WebSocketHandler *handler) {
+	register_web_socket(route, handler);
 }
 
 bool Handler::handles(string method, string url) {
@@ -67,7 +67,7 @@ bool Handler::handles(string method, string url) {
 	return (routes.find(key) != routes.end());
 }
 
-void Handler::preProcess(Request *req, Response *resp) { }
+void Handler::pre_process(Request *req, Response *resp) { }
 
 Response *Handler::process(Request *request) {
 	Response *response = NULL;
@@ -83,19 +83,19 @@ Response *Handler::process(Request *request) {
 	return response;
 }
 
-void Handler::postProcess(Request *req, Response *resp) { }
+void Handler::post_process(Request *req, Response *resp) { }
 
-Response *Handler::handleRequest(Request *req) {
+Response *Handler::handle_request(Request *req) {
 	Response *response = process(req);
-	if (response != NULL) postProcess(req, response);
+	if (response != NULL) post_process(req, response);
 	return response;
 }
 
-void Handler::setPrefix(string pre) {
+void Handler::set_prefix(string pre) {
 	prefix = pre;
 }
 
-void Handler::registerRoute(string httpMethod, string route, RequestHandlerBase *handler) {
+void Handler::register_route(string httpMethod, string route, RequestHandlerBase *handler) {
 	string key = httpMethod + ":" + prefix + route;
 	routes[key] = handler;
 	urls.push_back(prefix + route);
@@ -110,13 +110,13 @@ Response *Handler::serverInternalError(string message) {
 	return response;
 }
 
-vector<string> Handler::getUrls() {
+vector<string> Handler::get_urls() {
 	return urls;
 }
 
 // Basic HTTP Handler
 HTTPHandler::HTTPHandler() { }
-void HTTPHandler::preProcess(Request *req, Response *resp) {
+void HTTPHandler::pre_process(Request *req, Response *resp) {
 	resp->setHeader("Content-Type", "text/html");
 }
 

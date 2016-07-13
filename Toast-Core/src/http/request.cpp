@@ -10,32 +10,32 @@ Request::Request(struct mg_connection *conn, struct http_message *msg) : connect
 	data = string(message->body.p, message->body.len);
 }
 
-string Request::getUrl() {
+string Request::get_url() {
 	return url;
 }
 
-string Request::getMethod() {
+string Request::get_method() {
 	return method;
 }
 
-string Request::getData() {
+string Request::get_data() {
 	return data;
 }
 
-void Request::writeResponse(Response *response) {
+void Request::write_response(Response *response) {
 	string data = response->getData();
 	mg_send(connection, data.c_str(), data.size());
 	//mg_send_http_chunk(connection, "", 0);
 }
 
-bool Request::hasUriVariable(string key) {
+bool Request::has_uri_variable(string key) {
 	if (mg_get_http_var(&message->query_string, key.c_str(), not_used, 1) != 0) {
 		return true;
 	}
 	return false;
 }
 
-string Request::getUriVariable(string key, string fallback) {
+string Request::get_uri_variable(string key, string fallback) {
 	char buffer[1024];
 	int ret = mg_get_http_var(&message->query_string, key.c_str(), buffer, 1024);
 	if (ret == 0 || ret == -1) {
@@ -45,17 +45,17 @@ string Request::getUriVariable(string key, string fallback) {
 }
 
 string Request::get(string key, string fallback) {
-	return getUriVariable(key, fallback);
+	return get_uri_variable(key, fallback);
 }
 
-bool Request::hasPostVariable(string key) {
+bool Request::has_post_variable(string key) {
 	if (mg_get_http_var(&message->body, key.c_str(), not_used, 1) != 0) {
 		return true;
 	}
 	return false;
 }
 
-string Request::getPostVariable(string key, string fallback) {
+string Request::get_post_variable(string key, string fallback) {
 	char buffer[1024];
 	int ret = mg_get_http_var(&message->body, key.c_str(), buffer, 1024);
 	if (ret == 0 || ret == -1) {
@@ -65,16 +65,16 @@ string Request::getPostVariable(string key, string fallback) {
 }
 
 string Request::post(string key, string fallback) {
-	return getPostVariable(key, fallback);
+	return get_post_variable(key, fallback);
 }
 
-string Request::getHeader(string key) {
+string Request::get_header(string key) {
 	mg_str *str = mg_get_http_header(message, key.c_str());
 	if (str == NULL) return string();
 	return string(str->p, str->len);
 }
 
-map<string, string> Request::getAllHeaders() {
+map<string, string> Request::get_all_headers() {
 	map<string, string> map;
 	int i;
 	for (i = 0; i < MG_MAX_HTTP_HEADERS && message->header_names[i].len > 0; i++) {
@@ -85,7 +85,7 @@ map<string, string> Request::getAllHeaders() {
 	return map;
 }
 
-smatch Request::getMatches() {
+smatch Request::get_matches() {
 	return matches;
 }
 

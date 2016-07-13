@@ -29,21 +29,21 @@ void WebSocketContainer::add(WebSocket *ws) {
 	mutex.lock();
 	int newId = id++;
 	mutex.unlock();
-	ws->setId(newId);
+	ws->set_id(newId);
 
-	struct mg_connection *connection = ws->getConnection();
+	struct mg_connection *connection = ws->get_connection();
 
 	mutex.lock();
 	if (websockets.find(connection) != websockets.end()) {
 		remove(websockets[connection], false);
 	}
 
-	websocketsById[ws->getId()] = ws;
+	websocketsById[ws->get_id()] = ws;
 	websockets[connection] = ws;
 	mutex.unlock();
 }
 
-WebSocket *WebSocketContainer::getById(int id_) {
+WebSocket *WebSocketContainer::get_by_id(int id_) {
 	if (websocketsById.find(id_) != websocketsById.end()) 
 		return websocketsById[id_];
 	return NULL;
@@ -65,17 +65,17 @@ void WebSocketContainer::send(string data) {
 }
 
 void WebSocketContainer::remove(WebSocket *ws, bool lock) {
-	struct mg_connection *connection = ws->getConnection();
+	struct mg_connection *connection = ws->get_connection();
 
 	if (lock) mutex.lock();
 
 	if (websockets.find(connection) != websockets.end()) {
-		ws->removeContainer(this);
+		ws->remove_container(this);
 		websockets.erase(connection);
-		websocketsById.erase(ws->getId());
+		websocketsById.erase(ws->get_id());
 
 		ws->close();
-		ws->notifyContainers();
+		ws->notify_containers();
 		delete ws;
 	}
 
@@ -95,7 +95,7 @@ void WebSocketContainer::clean() {
 
 	mutex.lock();
 	for (it = websockets.begin(); it != websockets.end(); it++) {
-		if ((*it).second->isClosed()) {
+		if ((*it).second->is_closed()) {
 			toDelete.push_back((*it).second);
 		}
 	}
@@ -115,26 +115,26 @@ Request *WebSocket::request() {
 	return &req;
 }
 
-struct mg_connection *WebSocket::getConnection() {
+struct mg_connection *WebSocket::get_connection() {
 	return connection;
 }
 
-void WebSocket::setId(int id_) { id = id_; }
-int WebSocket::getId() { return id; }
+void WebSocket::set_id(int id_) { id = id_; }
+int WebSocket::get_id() { return id; }
 
 void WebSocket::send(string data, int opcode) {
-	if (isClosed()) return;
+	if (is_closed()) return;
 
 	mutex.lock();
 	mg_send_websocket_frame(connection, opcode, data.c_str(), data.size());
 	mutex.unlock();
 }
 
-void WebSocket::appendData(string data_) {
+void WebSocket::append_data(string data_) {
 	data += data_;
 }
 
-string WebSocket::flushData() {
+string WebSocket::flush_data() {
 	string old = "";
 	data.swap(old);
 	return old;
@@ -144,17 +144,17 @@ void WebSocket::close() {
 	closed = true;
 }
 
-bool WebSocket::isClosed() {
+bool WebSocket::is_closed() {
 	return closed;
 }
 
-void WebSocket::addContainer(WebSocketContainer *websockets) {
+void WebSocket::add_container(WebSocketContainer *websockets) {
 	mutex.lock();
 	containers.push_back(websockets);
 	mutex.unlock();
 }
 
-void WebSocket::removeContainer(WebSocketContainer *websockets) {
+void WebSocket::remove_container(WebSocketContainer *websockets) {
 	mutex.lock();
 	vector<WebSocketContainer *>::iterator it;
 
@@ -167,7 +167,7 @@ void WebSocket::removeContainer(WebSocketContainer *websockets) {
 	mutex.unlock();
 }
 
-void WebSocket::notifyContainers() {
+void WebSocket::notify_containers() {
 	vector<WebSocketContainer *>::iterator it;
 
 	mutex.lock();

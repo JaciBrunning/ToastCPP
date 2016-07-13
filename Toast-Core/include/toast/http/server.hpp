@@ -23,7 +23,7 @@ namespace Toast {
 			API void register_handler(Handler *handler);
 
 			API Response *handleRequest(Request *request);
-			API WebSocketContainer *getWebSockets();
+			API WebSocketContainer *get_web_sockets();
 			API bool handles(string method, string url);
 
 			// Internal Handling

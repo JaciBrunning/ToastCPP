@@ -13,10 +13,10 @@
 using namespace std;
 
 #define route(httpMethod, url, handlerType, method) \
-    registerRoute(httpMethod, url, new RequestHandler<handlerType, StreamResponse>(this, &handlerType::method ));
+    register_route(httpMethod, url, new RequestHandler<handlerType, StreamResponse>(this, &handlerType::method ));
 
 #define route_type(httpMethod, url, handlerType, method, responseType) \
-    registerRoute(httpMethod, url, new RequestHandler<handlerType, responseType>(this, &handlerType::method ));
+    register_route(httpMethod, url, new RequestHandler<handlerType, responseType>(this, &handlerType::method ));
 
 namespace Toast {
 	namespace HTTP {
@@ -27,26 +27,26 @@ namespace Toast {
 			API Handler();
 			API virtual ~Handler();
 
-			API virtual void setServer(Server *server);
-			API virtual void preProcess(Request *request, Response *response);
+			API virtual void set_server(Server *server);
+			API virtual void pre_process(Request *request, Response *response);
 			API virtual Response *process(Request *request);
-			API virtual void postProcess(Request *request, Response *response);
+			API virtual void post_process(Request *request, Response *response);
 
-			API virtual Response *handleRequest(Request *request);
-			API void setPrefix(string prefix);
+			API virtual Response *handle_request(Request *request);
+			API void set_prefix(string prefix);
 
 			API virtual void webSocketReady(WebSocket *websocket);
 			API virtual void webSocketData(WebSocket *websocket, string data);
 			API virtual void webSocketClosed(WebSocket *websocket);
-			API virtual void registerWebSocket(string route, WebSocketHandler *handler);
-			API virtual void webSocket(string route, WebSocketHandler *handler);	// same as registerWebSocket
+			API virtual void register_web_socket(string route, WebSocketHandler *handler);
+			API virtual void web_socket(string route, WebSocketHandler *handler);	// same as registerWebSocket
 
-			API virtual void registerRoute(string httpMethod, string route, RequestHandlerBase *handler);
+			API virtual void register_route(string httpMethod, string route, RequestHandlerBase *handler);
 			API virtual void setup();
 
 			API virtual Response *serverInternalError(string message);
 			API virtual bool handles(string method, string url);
-			API vector<string> getUrls();
+			API vector<string> get_urls();
 
 		protected:
 			Server *server;
@@ -59,7 +59,7 @@ namespace Toast {
 		class HTTPHandler : public Handler {
 		public:
 			API HTTPHandler();
-			API void preProcess(Request *request, Response *response);
+			API void pre_process(Request *request, Response *response);
 		};
 
 		class DirHandler : public Handler {

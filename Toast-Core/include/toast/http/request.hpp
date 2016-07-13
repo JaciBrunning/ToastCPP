@@ -15,25 +15,25 @@ namespace Toast {
 		class Request {
 		public:
 			API Request(struct mg_connection *connection, struct http_message *msg);
-			API void writeResponse(Response *response);
+			API void write_response(Response *response);
 
-			API bool hasUriVariable(string key);
-			API string getUriVariable(string key, string fallback = "");
+			API bool has_uri_variable(string key);
+			API string get_uri_variable(string key, string fallback = "");
 			API string get(string key, string fallback = "");	// same as getUriVariable
 
-			API bool hasPostVariable(string key);
-			API string getPostVariable(string key, string fallback = "");
+			API bool has_post_variable(string key);
+			API string get_post_variable(string key, string fallback = "");
 			API string post(string key, string fallback = "");	// same as getPostVariable
 
-			API string getHeader(string key);
-			API map<string, string> getAllHeaders();
+			API string get_header(string key);
+			API map<string, string> get_all_headers();
 
-			API smatch getMatches();
+			API smatch get_matches();
 			API bool match(string pattern);
 
-			API string getUrl();
-			API string getMethod();
-			API string getData();
+			API string get_url();
+			API string get_method();
+			API string get_data();
 
 		protected:
 			string method;
@@ -61,7 +61,7 @@ namespace Toast {
 				R *response = new R;
 				
 				try {
-					handler->preProcess(request, response);
+					handler->pre_process(request, response);
 					(handler->*function)(request, response);
 				} catch (string exception) {
 					return handler->serverInternalError(exception);

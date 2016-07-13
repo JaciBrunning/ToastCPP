@@ -29,21 +29,21 @@ namespace Toast {
 		public:
 			API WebSocket(struct mg_connection *connection, struct http_message *msg);
 			API Request *request();
-			API struct mg_connection *getConnection();
+			API struct mg_connection *get_connection();
 			
 			API void send(string data, int opcode = WEBSOCKET_OPCODE_TEXT);
-			API void appendData(string data);
-			API string flushData();
+			API void append_data(string data);
+			API string flush_data();
 
 			API void close();
-			API bool isClosed();
+			API bool is_closed();
 
-			API void setId(int id_);
-			API int getId();
+			API void set_id(int id_);
+			API int get_id();
 
-			API void addContainer(WebSocketContainer *wsc);
-			API void removeContainer(WebSocketContainer *wsc);
-			API void notifyContainers();
+			API void add_container(WebSocketContainer *wsc);
+			API void remove_container(WebSocketContainer *wsc);
+			API void notify_containers();
 
 		protected:
 			Mutex mutex;
@@ -66,7 +66,7 @@ namespace Toast {
 			API WebSocket *get(struct mg_connection *connection);
 			API void clean();
 			API void remove(WebSocket *ws, bool lock = true);
-			API WebSocket *getById(int id);
+			API WebSocket *get_by_id(int id);
 
 		protected:
 			Mutex mutex;
@@ -77,9 +77,9 @@ namespace Toast {
 
 		class WebSocketHandler {
 		public:
-			API virtual void onReady(WebSocket *ws) {}
-			API virtual void onMessage(WebSocket *ws, string data) { }
-			API virtual void onClosed(WebSocket *ws) { }
+			API virtual void on_ready(WebSocket *ws) {}
+			API virtual void on_message(WebSocket *ws, string data) { }
+			API virtual void on_closed(WebSocket *ws) { }
 		};
 	}
 }
