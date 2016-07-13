@@ -115,3 +115,13 @@ string BasicResponse::getBody() {
 string StreamResponse::getBody() {
 	return this->str();
 }
+
+// Template
+void TemplateResponse::render(Template::Context *ctx, string tmpl_name) {
+	_ctx = ctx;
+	_tmpl = tmpl_name;
+}
+
+string TemplateResponse::getBody() {
+	return _ctx->render(_tmpl);
+}

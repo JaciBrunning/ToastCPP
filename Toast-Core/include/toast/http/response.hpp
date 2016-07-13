@@ -1,6 +1,7 @@
 #pragma once
 
 #include "toast/library.hpp"
+#include "toast/http/template.hpp"
 #include "mongoose.h"
 
 #include <map>
@@ -47,6 +48,15 @@ namespace Toast {
 		class StreamResponse : public ostringstream, public Response {
 		public:
 			API virtual string getBody();
+		};
+
+		class TemplateResponse : public Response {
+		public:
+			API void render(Template::Context *ctx, std::string template_name);
+			API virtual string getBody();
+		private:
+			Template::Context *_ctx;
+			string _tmpl;
 		};
 	}
 }

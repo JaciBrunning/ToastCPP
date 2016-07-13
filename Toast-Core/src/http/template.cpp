@@ -8,16 +8,20 @@
 #include <sstream>
 
 using namespace Toast::HTTP::Template;
+using namespace Toast;
 using namespace std;
+
+#define GCTX_ADD(name, file) global_context.add_template_file(name, Resources::get_resource_file("Toast-Core", file))
 
 static bool global_init = false;
 static Context global_context;
 
 static void init_global_ctx() {
 	if (!global_init) {
-		// register stuff here
+		global_init = true;		// Prevents an indirect recursion from Template::parse()
+		
+		GCTX_ADD("core/include/css", "templates/include/css.html");
 	}
-	global_init = true;
 }
 
 class ScopedBuffer {
@@ -192,10 +196,13 @@ void Context::add_template_file(string name, string file) {
 }
 
 string Context::render(string name) {
-	temp_def.clear();
 	string resp = _render(name);
 	temp_def.clear();
 	return resp;
+}
+
+std::map<string, string> &Context::args() {
+	return temp_def;
 }
 
 string Context::_lookup(string var) {

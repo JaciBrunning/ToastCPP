@@ -3,6 +3,8 @@
 using namespace Toast::Concurrent;
 using namespace Toast::HTTP;
 
+static DirHandler globalResourceHandler("res", "resources");
+
 static Server *get_server(struct mg_connection *nc) {
 	return (Server *)nc->mgr->user_data;
 }
@@ -65,7 +67,9 @@ string Toast::HTTP::htmlEntities(string data) {
 }
 
 // Server
-Server::Server(int port_) : stopped(false), mgr(), websockets(), port(port_) { }
+Server::Server(int port_) : stopped(false), mgr(), websockets(), port(port_) {
+	register_handler(&globalResourceHandler);
+}
 Server::~Server() {
 	stop();
 }
@@ -90,7 +94,7 @@ void Server::stop() {
 	stopped = true;
 }
 
-void Server::registerHandler(Handler *handler) {
+void Server::register_handler(Handler *handler) {
 	handler->setServer(this);
 	handler->setup();
 	handlers.push_back(handler);

@@ -20,7 +20,7 @@ namespace Toast {
 			API ~Server();
 			API void start(int pollTiming = 500);
 			API void stop();
-			API void registerHandler(Handler *handler);
+			API void register_handler(Handler *handler);
 
 			API Response *handleRequest(Request *request);
 			API WebSocketContainer *getWebSockets();

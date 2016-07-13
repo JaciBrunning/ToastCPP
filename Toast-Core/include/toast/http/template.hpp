@@ -31,6 +31,7 @@ namespace Toast {
 				API void add_template(std::string name, std::string content);
 				API void add_template_file(std::string name, std::string file);
 				API std::string render(std::string name);
+				API std::map<std::string, std::string> &args();
 				std::string _lookup(std::string variable);
 				std::string _render(std::string name);
 			private:
