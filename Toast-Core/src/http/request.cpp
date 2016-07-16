@@ -23,7 +23,7 @@ string Request::get_data() {
 }
 
 void Request::write_response(Response *response) {
-	string data = response->getData();
+	string data = response->get_data();
 	mg_send(connection, data.c_str(), data.size());
 	//mg_send_http_chunk(connection, "", 0);
 }

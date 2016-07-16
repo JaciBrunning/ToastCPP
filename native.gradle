@@ -274,7 +274,7 @@ allprojects {
                         into project.ext.test_path
                     }
 
-                    def resourcesDir = new File(project.test_path, "resources/" + project.resourcesName)
+                    def resourcesDir = new File(test_path(), "resources/" + project.resourcesName)
 
                     project.delete {
                         delete resourcesDir

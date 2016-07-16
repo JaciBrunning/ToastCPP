@@ -14,14 +14,26 @@ using namespace std;
 
 using namespace IO;
 
+Template::Context ctx;
+
 class MyHttpHandler : public HTTPHandler {
 public:
 	void hello(Request *req, StreamResponse *resp) {
-		*resp << "Hello: " << req->getUrl() << endl;
+		*resp << "Hello: " << req->get_url() << endl;
+	}
+
+	void some_template(Request *req, TemplateResponse *resp) {
+		ctx.args()["get"] = req->get("val");
+		resp->render(&ctx, req->get_url().substr(1));
+	}
+
+	void index(Request *req, TemplateResponse *resp) {
+		resp->render(&ctx, "index");
 	}
 
 	void setup() {
 		route("GET", "/hello", MyHttpHandler, hello);
+		route_type("GET", "/", MyHttpHandler, index, TemplateResponse);
 	}
 };
 
@@ -32,26 +44,19 @@ class MyModule : public Module {
 			t.set(0.5);
 
 			Victor v(1);
-			cout << v.get() << endl;
-			cout << t.get_type() << endl;
-			cout << v.get_type() << endl;
 
             ofstream outfile("shared.txt", ios::binary);
 			outfile.write(Memory::Shared::get(), TOAST_SHARED_MEMPOOL_SIZE);
 
-			Template::Context ctx;
 			ctx["test_str"] = "Hello World";
 
 			ctx.add_template("out", "#using base\n#define TITLE myTitle\nHello: {{ test_str }}");
-			ctx.add_template("base", "<html><title>{{TITLE}}</title></html>\n{{#}}");
-
-			Log::info("TestThing", ctx.render("out"));
+			ctx.add_template("base", "<html><title>{{TITLE}}</title>{{include core/include/css}}</html>\n{{#}}\nGET => {{get}}");
+			ctx.add_template_file("index", Resources::get_resource_file("_test_module", "index.html"));
 
 			Server s(8001);
 			MyHttpHandler h;
-			DirHandler h2("res", "resources");
-			s.registerHandler(&h);
-			s.registerHandler(&h2);
+			s.register_handler(&h);
 			s.start();
         }
 };

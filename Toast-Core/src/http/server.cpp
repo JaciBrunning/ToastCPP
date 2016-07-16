@@ -161,15 +161,15 @@ int Server::_webSocketData(struct mg_connection *conn, string data) {
 	WebSocket *websocket = websockets.get(conn);
 
 	if (websocket != NULL) {
-		websocket->appendData(data);
+		websocket->append_data(data);
 
-		string fullPacket = websocket->flushData();
+		string fullPacket = websocket->flush_data();
 		vector<Handler *>::iterator it;
 		for (it = handlers.begin(); it != handlers.end(); it++) {
 			(*it)->webSocketData(websocket, fullPacket);
 		}
 
-		if (websocket->isClosed()) {
+		if (websocket->is_closed()) {
 			websockets.remove(websocket);
 			return 0;
 		}

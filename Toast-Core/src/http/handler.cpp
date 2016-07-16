@@ -30,7 +30,7 @@ void Handler::webSocketReady(WebSocket *ws) {
 	map<string, WebSocketHandler *>::iterator it;
 	for (it = wsRoutes.begin(); it != wsRoutes.end(); it++) {
 		if (ws->request()->match(it->first)) {
-			it->second->onReady(ws);
+			it->second->on_ready(ws);
 		}
 	}
 }
@@ -39,7 +39,7 @@ void Handler::webSocketData(WebSocket *ws, string data) {
 	map<string, WebSocketHandler *>::iterator it;
 	for (it = wsRoutes.begin(); it != wsRoutes.end(); it++) {
 		if (ws->request()->match(it->first)) {
-			it->second->onMessage(ws, data);
+			it->second->on_message(ws, data);
 		}
 	}
 }
@@ -48,7 +48,7 @@ void Handler::webSocketClosed(WebSocket *ws) {
 	map<string, WebSocketHandler *>::iterator it;
 	for (it = wsRoutes.begin(); it != wsRoutes.end(); it++) {
 		if (ws->request()->match(it->first)) {
-			it->second->onClosed(ws);
+			it->second->on_closed(ws);
 		}
 	}
 }
@@ -104,7 +104,7 @@ void Handler::register_route(string httpMethod, string route, RequestHandlerBase
 Response *Handler::serverInternalError(string message) {
 	StreamResponse *response = new StreamResponse;
 
-	response->setCode(HTTP_INTERNAL_ERROR);
+	response->set_code(HTTP_INTERNAL_ERROR);
 	*response << "[500] Server internal error: " << message;
 
 	return response;
@@ -117,13 +117,13 @@ vector<string> Handler::get_urls() {
 // Basic HTTP Handler
 HTTPHandler::HTTPHandler() { }
 void HTTPHandler::pre_process(Request *req, Response *resp) {
-	resp->setHeader("Content-Type", "text/html");
+	resp->set_header("Content-Type", "text/html");
 }
 
 // Directory Handler
 DirHandler::DirHandler(string uri_base, string dir) : _dir(dir), _uri_base(uri_base) {}
 Response *DirHandler::process(Request *req) {
-	std::string uri = req->getUrl().substr(1);
+	std::string uri = req->get_url().substr(1);
 	if (!starts_with(uri, _uri_base + "/")) return NULL;
 
 	std::string target = _dir + "/" + uri.substr(4);
@@ -136,7 +136,7 @@ Response *DirHandler::process(Request *req) {
 	(*res) << is.rdbuf();
 	is.close();
 
-	res->setHeader("Content-Type", mime_type(Filesystem::extension(target), "text/plain"));
+	res->set_header("Content-Type", mime_type(Filesystem::extension(target), "text/plain"));
 
 	return res;
 }
