@@ -63,5 +63,25 @@ char *Environment::get_env(char *string) {
 }
 
 string Environment::toast_home() {
-    return "toast/";
+	return "toast/";
+}
+
+string Environment::user_home() {
+	char *var = getenv("USER");
+	if (var) {
+		return string(var);
+	} else {
+
+	#ifdef OS_WIN
+		var = getenv("USERPROFILE");
+		if (var) {
+			return string(var);
+		} else {
+			return "/";
+		}
+	#else
+		return string(getpwuid(getuid())->pw_dir);
+	#endif
+
+	}
 }

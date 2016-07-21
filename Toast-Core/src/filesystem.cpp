@@ -1,5 +1,6 @@
 #include "toast/environment.hpp"
 #include "toast/filesystem.hpp"
+#include "toast/util.hpp"
 
 #ifdef OS_WIN
     #include "compat/win32/dirent.h"
@@ -8,12 +9,21 @@
 #else
     #include <unistd.h>
     #include <dirent.h>
+	#include <pwd.h>
 #endif
 #include <sys/stat.h>
 #include <sys/types.h>
 
 using namespace Toast;
 using namespace std;
+
+string Filesystem::toast_dir() {
+	return Environment::toast_home();
+}
+
+string Filesystem::user_dir() {
+	return Environment::user_home();
+}
 
 string Filesystem::join(string path1, string path2) {
     string total_path = path1;
@@ -24,7 +34,7 @@ string Filesystem::join(string path1, string path2) {
 }
 
 string Filesystem::path(string path) {
-    return Filesystem::join(Environment::toast_home(), path);
+    return Filesystem::join(Filesystem::toast_dir(), path);
 }
 
 string Filesystem::path_mkdir(string path) {
@@ -34,6 +44,15 @@ string Filesystem::path_mkdir(string path) {
 }
 
 string Filesystem::absolute(string path) {
+	if (path.length() > 0) {
+		if (path[0] == '/') return path;
+		else if (path[0] == '~' && path[1] == '/') {
+			return Filesystem::join(Filesystem::user_dir(), path.substr(2));
+		} else if (path.length() > 2 && path[1] == ':') {	// Windows drive
+			return path;
+		}
+	}
+
     char current_directory[256];
     #ifdef OS_WIN
         GetCurrentDirectory(256, current_directory);
@@ -83,6 +102,10 @@ bool Filesystem::is_directory(string path) {
 		return true;
 	}
 	return false;
+}
+
+void Filesystem::rm(string path) {
+	remove(path.c_str());
 }
 
 string Filesystem::extension(string path) {

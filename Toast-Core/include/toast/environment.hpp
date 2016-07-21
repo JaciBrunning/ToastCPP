@@ -45,5 +45,6 @@ namespace Toast {
         API char *get_env(char *name);
         
         API std::string toast_home();
+		API std::string user_home();
     }
 }
