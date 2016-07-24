@@ -73,8 +73,8 @@ var pcm_readouts = (function() {
         obj.ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
         var i = 0;
-        for (var r = 0; r < 4; r++) {
-            for (var c = 0; c < 2; c++) {
+        for (var c = 0; c < 2; c++) {
+            for (var r = 0; r < 4; r++) {
                 var x = (r * SQ_SIZE + r * SQ_PAD);
                 var y = (c * SQ_SIZE + c * SQ_PAD);
                 var sol = obj.solenoids[i];
