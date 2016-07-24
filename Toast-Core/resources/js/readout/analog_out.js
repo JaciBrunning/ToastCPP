@@ -31,6 +31,9 @@ var an_out_readouts = (function() {
 
     function draw(obj) {
         obj.ctx.clearRect(0, 0, WIDTH, HEIGHT);
+        obj.ctx.fillStyle = COMMON.COL_GRY_10;
+        obj.ctx.fillRect(WIDTH / 3, 0, 2 * WIDTH / 3.5, HEIGHT);
+
         obj.ctx.fillStyle = COMMON.COL_GRN;
         obj.ctx.fillRect(WIDTH / 3, 0, 2 * WIDTH / 3.5 * (obj.voltage / MAXVOLT), HEIGHT);
 
@@ -40,5 +43,5 @@ var an_out_readouts = (function() {
         obj.ctx.fillText(obj.voltage.toFixed(2) + "V", 35, HEIGHT - 2);
     }
 
-    return { readouts: readouts };
+    return readouts;
 })();

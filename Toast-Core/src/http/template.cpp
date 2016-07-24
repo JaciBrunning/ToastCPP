@@ -28,6 +28,8 @@ static void init_global_ctx() {
 		GCTX_ADD("core/components/readout/motors", "templates/components/readout/motors.html");
 		GCTX_ADD("core/components/readout/relay", "templates/components/readout/relay.html");
 		GCTX_ADD("core/components/readout/analog_out", "templates/components/readout/analog_out.html");
+		GCTX_ADD("core/components/readout/pcm", "templates/components/readout/pcm.html");
+		GCTX_ADD("core/components/readout/dio", "templates/components/readout/dio.html");
 
 		GCTX_ADD("core/base", "templates/base.html");
 	}

@@ -14,10 +14,10 @@ var relay_readouts = (function() {
             td_port.innerHTML = "#" + i;
             tr.appendChild(td_port);
             var td_fwd = document.createElement("td");
-            td_fwd.style.backgroundColor = COMMON.COL_RED;
+            td_fwd.style.backgroundColor = COMMON.COL_GRY_10;
             tr.appendChild(td_fwd);
             var td_rvs = document.createElement("td");
-            td_rvs.style.backgroundColor = COMMON.COL_RED;
+            td_rvs.style.backgroundColor = COMMON.COL_GRY_10;
             tr.appendChild(td_rvs);
 
             parent.appendChild(tr);
@@ -46,5 +46,5 @@ var relay_readouts = (function() {
         }
     });
 
-    return { readouts: readouts };
+    return readouts;
 })();

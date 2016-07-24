@@ -75,3 +75,7 @@ td, th {
     padding: 0px;
     font-size: 14px;
 }
+
+table {
+    width: 90%;
+}
