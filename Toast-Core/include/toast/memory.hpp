@@ -2,7 +2,9 @@
 
 #include "toast/internal/shm.hpp"
 #include "toast/library.hpp"
-#include "toast/memaddr.hpp"
+
+#include "shared.fwi.hpp"
+#include "private.fwi.hpp"
 
 #include <string>
 #include <stdlib.h>
@@ -14,17 +16,8 @@ namespace Toast {
         API void initialize();
         API char get_endian_bit();
         
-        namespace Shared {
-            API char *get();
-            API void zero();
-            
-            API void set_debug(bool is_debug);
-            API bool get_debug();
-            
-            API void set_bootstrap_pid(int pid);
-            API int get_bootstrap_pid();
-        }
-        
+		API inline SharedPool *shared();
+
         class Bridge {
             public:
                 API Bridge(std::string name, int size);

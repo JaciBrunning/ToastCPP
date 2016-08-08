@@ -40,14 +40,15 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     
     DYNAMIC dyn = Internal::Loader::load_dynamic_library(module_name);
     if (dyn == NULL) {
-        Memory::Module::load_error(PMP_LOAD_ERR);
+		//Memory::Module::load_error(PMP_LOAD_ERR);
+		Memory::get_private()->set_verification(Memory::Verification::VERIFY_CORRUPT_LIBRARY);
         _logger.severe("Error! Dynamic Library could not be found or is corrupt.");
         _logger.severe("Dynamic Error: " + Internal::Loader::get_dynamic_error());
         return;
     }
     SYMBOL info_sym = Internal::Loader::get_symbol(dyn, "_get_module_information");
     if (info_sym == NULL) {
-        Memory::Module::load_error(PMP_INFO_ERR);
+		Memory::get_private()->set_verification(Memory::Verification::VERIFY_INFO_METHOD_MISSING);
         _logger.severe("Error! Module Information could not be gathered. Check your _get_module_information method.");
         _logger.severe("Dynamic Error: " + Internal::Loader::get_dynamic_error());
         return;
@@ -59,7 +60,7 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     
     SYMBOL init_sym = Internal::Loader::get_symbol(dyn, "_allocate_module_instance");
     if (init_sym == NULL) {
-        Memory::Module::load_error(PMP_INIT_ERR);
+		Memory::get_private()->set_verification(Memory::Verification::VERIFY_ALLOC_METHOD_MISSING);
         _logger.severe("Error! Module Instantiation for " + module_name + " could not be done. Check your _allocate_module_instance method and Module Constructor.");
         _logger.severe("Dynamic Error: " + Internal::Loader::get_dynamic_error());
         return;
@@ -68,7 +69,7 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     module->construct();
     
     Memory::Module::finalize_load();
-    _logger << "Module Loaded: " + string(info->name) + " [" + to_string(Memory::Shared::get_bootstrap_pid()) + " -> " + to_string(get_pid()) + "]";
+    _logger << "Module Loaded: " + string(info->name) + " [" + to_string(Memory::shared()->get_bootstrap_pid()) + " -> " + to_string(get_pid()) + "]";
     
     // MAIN LOOP
     States::start_tracker();

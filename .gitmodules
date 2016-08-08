@@ -4,3 +4,6 @@
 [submodule "wpi/allwpilib"]
 	path = wpi/allwpilib
 	url = https://github.com/wpilibsuite/allwpilib.git
+[submodule "Toast-Core/interchange/ToastFWI"]
+	path = Toast-Core/interchange/ToastFWI
+	url = https://github.com/Open-RIO/ToastFWI.git

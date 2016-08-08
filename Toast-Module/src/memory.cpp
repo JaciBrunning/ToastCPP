@@ -1,5 +1,4 @@
 #include "toast/module/memory.hpp"
-#include "toast/memory.hpp"
 
 using namespace Toast;
 using namespace std;
@@ -7,6 +6,7 @@ using namespace std;
 static string __mempool_id;
 static SHM_HANDLE __shm_handle;
 static char *__private_block;
+static Memory::PrivatePool _private;
 
 // -- MODULE INTERNALS -- //
 
@@ -15,51 +15,42 @@ int Memory::Module::initialize(string private_mempool_id, int module_idx) {
     
     __mempool_id = private_mempool_id;
     __shm_handle = Toast::Internal::SHM::open_shm_file(private_mempool_id);
-    __private_block = Toast::Internal::SHM::map_shm_file(__shm_handle, TOAST_PRIVATE_MEMPOOL_SIZE);
+    __private_block = Toast::Internal::SHM::map_shm_file(__shm_handle, Memory::PrivatePool::SIZE);
+	_private.map_to(__private_block);
     
-    if (__private_block[1] == PMP_VERIFY) {
-        __private_block[1] = PMP_VALID;             // Valid Block
-        int status = Memory::Shared::get()[ADDR_MOD_ACT_STATE + module_idx];
-        Memory::Shared::get()[ADDR_MOD_ACT_STATE + module_idx] = status == 0x03 ? 0x04 : 0x02;
+	Memory::Verification verify_byte = _private.get_verification();
+	Memory::SharedPool *sp = Memory::shared();
+
+    if (verify_byte == Memory::Verification::VERIFY_AWAIT) {
+		_private.set_verification(Memory::Verification::VERIFY_CONFIRM);
+		Memory::ModuleActState state = sp->get_module_activity_state(module_idx);
+		sp->set_module_activity_state(module_idx, state == Memory::ModuleActState::CRASHED ? Memory::ModuleActState::RESTARTED : Memory::ModuleActState::ACTIVE);
         return 0;
     } else {
-        __private_block[ADDR_VERIFY] = PMP_INVALID;           // Block Validation Error
-        return -1;
+		_private.set_verification(Memory::Verification::VERIFY_DENIED);
+		return -1;
     }
 }
 
 void Memory::Module::finalize_load() {
-    if (__private_block[ADDR_VERIFY] == PMP_VALID)
-        __private_block[ADDR_VERIFY] = PMP_LOAD_COMPLETE;     // Loading finalized properly
-}
-
-void Memory::Module::load_error(char state) {
-    __private_block[ADDR_VERIFY] = state;                     // Loading encountered an error, set the error condition
-    Memory::Module::set_restart(false);             // Internal load errors may not restart
-}
-
-void Memory::Module::set_restart(bool restartable) {
-    if (restartable) {
-        __private_block[ADDR_RESTART] = 0x01;                  // This module may restart
-    } else {
-        __private_block[ADDR_RESTART] = 0x00;
-    }
+	if (_private.get_verification() == Memory::Verification::VERIFY_CONFIRM)
+		_private.set_verification(Memory::Verification::VERIFY_VALID);
 }
 
 void Memory::Module::bind_info(Toast::ModuleInfo *info) {
-    memcpy(&__private_block[ADDR_MOD_NAME], info->name, LEN_MOD_NAME);
-    __private_block[ADDR_INFO_SET] = 0x01;                      // Information has been Set
-    Memory::Module::set_restart(info->restartable);
+	memcpy(_private.get_module_name(), info->name, _private.module_name_length());
+	_private.set_info_set(true);
+	_private.set_restart(info->restartable);
 }
 
 string Memory::Module::private_mempool_id() {
     return __mempool_id;
 }
 
-char *Memory::Module::get_private_block() {
-    return __private_block;
+Memory::PrivatePool *Memory::Module::get_private() {
+	return &_private;
 }
 
-char *Memory::private_block() {
-    return Memory::Module::get_private_block();
+Memory::PrivatePool *Memory::get_private() {
+    return Memory::Module::get_private();
 }

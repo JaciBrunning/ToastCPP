@@ -2,23 +2,20 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
-#include "io/common.hpp"
 
 #include <inttypes.h>
 
 namespace IO {
 	API float get_analog_sample_rate();
-	API char *get_analog_out_block(int port);
-	API char *get_analog_in_block(int port);
 
 	class AnalogOutput {
 	public:
 		API AnalogOutput(int port);
 		API virtual ~AnalogOutput() = default;
 
-		API int get_port();
+		API int get_port() const;
 
-		API bool operator==(AnalogOutput &a2) {
+		API bool operator==(AnalogOutput &a2) const {
 			return a2._port == _port;
 		}
 
@@ -26,7 +23,7 @@ namespace IO {
 		API float get();
 	private:
 		int _port;
-		char *_shm;
+		Toast::Memory::Shared::IO::AnalogOut *_mem;
 	};
 
 	class AnalogInput {
@@ -34,7 +31,7 @@ namespace IO {
 		API AnalogInput(int port);
 		API virtual ~AnalogInput() = default;
 
-		API bool operator==(AnalogInput &a2) {
+		API bool operator==(AnalogInput &a2) const {
 			return a2._port == _port;
 		}
 
@@ -63,6 +60,6 @@ namespace IO {
 		API uint32_t get_accumulator_count();
 	private:
 		int _port;
-		char *_shm;
+		Toast::Memory::Shared::IO::AnalogIn *_mem;
 	};
 }

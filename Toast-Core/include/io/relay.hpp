@@ -2,17 +2,14 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
-#include "io/common.hpp"
 
 namespace IO {
-	API char *get_relay_block(int port);
-
 	class Relay {
 	public:
 		API Relay(int port);
 		API virtual ~Relay() = default;
 	
-		API bool operator==(Relay &r2) {
+		API bool operator==(Relay &r2) const {
 			return r2._port == _port;
 		}
 
@@ -25,6 +22,6 @@ namespace IO {
 		API bool get_reverse();
 	private:
 		int _port;
-		char *_shm;
+		Toast::Memory::Shared::IO::Relay *_mem;
 	};
 }

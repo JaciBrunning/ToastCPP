@@ -2,21 +2,16 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
-#include "io/common.hpp"
 
 namespace IO {
-	API char *get_dio_block(int port);
-
 	class DIO {
 	public:
-		enum Mode {
-			OUTPUT = 0x01, INPUT = 0x02
-		};
+		typedef Toast::Memory::Shared::IO::DIO_Mode Mode;
 
 		API DIO(int port, Mode mode = Mode::INPUT);
 		API virtual ~DIO() = default;
 
-		API bool operator==(DIO &d2) {
+		API bool operator==(DIO &d2) const {
 			return d2._port == _port;
 		}
 
@@ -37,6 +32,6 @@ namespace IO {
 		API void set_pwm_duty_cycle(float duty_cycle);
 	private:
 		int _port;
-		char *_shm;
+		Toast::Memory::Shared::IO::DIO *_mem;
 	};
 }
