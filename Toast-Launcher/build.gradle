@@ -7,7 +7,7 @@ if (OperatingSystem.current().isWindows()) {
 
 model {
     components {
-        toast(NativeExecutableSpec) {
+        toast_launcher(NativeExecutableSpec) {
             component_spec(it, project)
             
             sources {

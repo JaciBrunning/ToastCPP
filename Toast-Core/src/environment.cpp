@@ -1,5 +1,9 @@
 #include "toast/environment.hpp"
 
+#ifndef OS_WIN
+#include <pwd.h>
+#endif
+
 using namespace Toast::Environment;
 using namespace Toast;
 using namespace std;
@@ -79,7 +83,7 @@ string Environment::user_home() {
 		} else {
 			return "/";
 		}
-	#else
+    #else
 		return string(getpwuid(getuid())->pw_dir);
 	#endif
 

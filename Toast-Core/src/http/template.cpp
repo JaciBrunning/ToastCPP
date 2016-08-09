@@ -2,7 +2,7 @@
 
 #include "toast/resources.hpp"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <streambuf>
 #include <fstream>
 #include <sstream>

@@ -16,7 +16,7 @@ namespace Toast {
         API void initialize();
         API char get_endian_bit();
         
-		API inline SharedPool *shared();
+		API SharedPool *shared();
 
         class Bridge {
             public:
