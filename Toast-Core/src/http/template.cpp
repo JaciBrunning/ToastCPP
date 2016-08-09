@@ -25,6 +25,8 @@ static void init_global_ctx() {
 		
 		GCTX_ADD("core/include/header", "templates/include/header.html");
 
+		GCTX_ADD("core/components/memory", "templates/components/memory.html");
+
 		GCTX_ADD("core/components/readout/motors", "templates/components/readout/motors.html");
 		GCTX_ADD("core/components/readout/relay", "templates/components/readout/relay.html");
 		GCTX_ADD("core/components/readout/analog_out", "templates/components/readout/analog_out.html");

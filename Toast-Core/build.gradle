@@ -32,10 +32,16 @@ model {
     }
 }
 
-// TODO: Copy build/js/bundle.js to resources on build
-
 task build_interchange() {
     doLast {
+        delete {
+            delete 'resources/js/vendor/toast_fwi.min.js'
+        }
+        copy {
+            from 'interchange/ToastFWI/build/js/bundle.js'
+            rename 'bundle.js', 'toast_fwi.min.js'
+            into 'resources/js/vendor'
+        }
         exec {
             workingDir 'interchange/ToastFWI'
             commandLine 'ruby', 'build_cpp.rb'

@@ -1,18 +1,4 @@
 var motor_readouts = (function() {
-    var loc = window.location, new_uri;
-    new_uri = "ws:"
-    new_uri += "//" + loc.host;
-    new_uri += "/socket/readout/motors";
-
-    // var socket = new WebSocket(new_uri);
-    // socket.onmessage = function(event) {
-    //     //TODO How to format this?
-    //     // b1 -> allocated length
-    //     // - b2 -> port
-    //     // - b3 -> interface
-    //     // - b4, b5, b6, b7 -> value
-    // };
-
     var readouts = [];
 
     var HEIGHT = 15;

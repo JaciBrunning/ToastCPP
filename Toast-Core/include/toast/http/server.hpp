@@ -5,6 +5,7 @@
 #include "toast/http/response.hpp"
 #include "toast/http/websocket.hpp"
 #include "toast/http/handler.hpp"
+#include "toast/http/encoding.hpp"
 #include "toast/concurrent/mutex.hpp"
 #include "mongoose.h"
 
@@ -21,6 +22,8 @@ namespace Toast {
 			API void start(int pollTiming = 500);
 			API void stop();
 			API void register_handler(Handler *handler);
+
+			API void enable_memory_socket();
 
 			API Response *handleRequest(Request *request);
 			API WebSocketContainer *get_web_sockets();

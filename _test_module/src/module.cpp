@@ -3,6 +3,7 @@
 #include "io/motor.hpp"
 #include "toast/http/server.hpp"
 #include "toast/http/template.hpp"
+#include "toast/http/websocket.hpp"
 #include "toast/resources.hpp"
 
 #include <iostream>
@@ -55,6 +56,7 @@ class MyModule : public Module {
 			ctx.add_template_file("index", Resources::get_resource_file("_test_module", "index.html"));
 
 			Server s(8001);
+			s.enable_memory_socket();
 			MyHttpHandler h;
 			s.register_handler(&h);
 			s.start();

@@ -1,5 +1,7 @@
 #include "toast/http/server.hpp"
 
+#include "toast/memory.hpp"
+
 using namespace Toast::Concurrent;
 using namespace Toast::HTTP;
 
@@ -66,6 +68,23 @@ string Toast::HTTP::htmlEntities(string data) {
 	return buffer;
 }
 
+class SHMSocket : public WebSocketHandler {
+public:
+	void on_ready(WebSocket *ws) { }
+	void on_message(WebSocket *ws, string data) {
+		ws->send(Encoding::base64_encode(Toast::Memory::shared()->get_store(), Toast::Memory::SharedPool::SIZE));
+	}
+	void on_closed(WebSocket *ws) { }
+};
+SHMSocket _socket;
+
+class SHMSocketHandler : public Handler {
+public:
+	void setup() {
+		register_web_socket("/socket/shared_memory", &_socket);
+	}
+};
+
 // Server
 Server::Server(int port_) : stopped(false), mgr(), websockets(), port(port_) {
 	register_handler(&globalResourceHandler);
@@ -98,6 +117,11 @@ void Server::register_handler(Handler *handler) {
 	handler->set_server(this);
 	handler->setup();
 	handlers.push_back(handler);
+}
+
+void Server::enable_memory_socket() {
+	SHMSocketHandler *_hand = new SHMSocketHandler();
+	register_handler(_hand);
 }
 
 int Server::_handleRequest(struct mg_connection *conn, struct http_message *msg) {
