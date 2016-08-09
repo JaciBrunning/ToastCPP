@@ -2,7 +2,7 @@
 
 #include "toast/internal/loader.hpp"
 #include "toast/environment.hpp"
-#include "toast/internal/shm.hpp"
+#include "toast/memory.hpp"
 #include <vector>
 #include <string>
 #include <thread>
@@ -28,10 +28,11 @@ namespace Toast {
                 
                 SHM_HANDLE private_mempool_handle;
                 char *private_mempool;
+				Memory::PrivatePool priv;
                 
                 void clear() {
                     name_cache.clear();
-                    memset(private_mempool, 0, TOAST_PRIVATE_MEMPOOL_SIZE);
+                    memset(private_mempool, 0, Memory::PrivatePool::SIZE);
                 }
                 
                 void dirty() {

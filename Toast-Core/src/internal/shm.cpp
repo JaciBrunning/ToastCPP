@@ -8,7 +8,7 @@ SHM_HANDLE SHM::create_shm_file(string name, int size) {
     #ifdef OS_WIN
         return CreateFileMapping(
             INVALID_HANDLE_VALUE,
-            NULL,
+            nullptr,
             PAGE_READWRITE,
             0,
             size,

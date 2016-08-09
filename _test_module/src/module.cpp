@@ -46,7 +46,7 @@ class MyModule : public Module {
 			Victor v(1);
 
             ofstream outfile("shared.txt", ios::binary);
-			outfile.write(Memory::Shared::get(), TOAST_SHARED_MEMPOOL_SIZE);
+			outfile.write(Memory::shared()->get_store(), Memory::SharedPool::SIZE);
 
 			ctx["test_str"] = "Hello World";
 

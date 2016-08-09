@@ -1,6 +1,7 @@
 #pragma once
 
 #include "toast/library.hpp"
+#include "shared.fwi.hpp"
 #include <string>
 #include <vector>
 
@@ -10,36 +11,41 @@
 #define STATE_TEST 3
 
 namespace Toast {
+	typedef Memory::RobotState RobotState;
     class State { 
         public:
-            State(int id) {
-                _id = id; // 0 = DISABLED, 1 = AUTO, 2 = TELEOP, 3 = TEST
+            State(RobotState rs) {
+                _rs = rs;
             }
             
             // Is this state controlled by an operator? This is true for TELEOP and TEST
             // States.
-            API bool is_operator() {
-                return _id == 2 || _id == 3;
+            API inline bool is_operator() {
+				return _rs == RobotState::TELEOP || _rs == RobotState::TEST;
             }
             
             // Is the robot disabled? This is true for the DISABLED State.
-            API bool disabled() {
-                return _id == 0;
+            API inline  bool disabled() {
+                return _rs == RobotState::DISABLED;
             }
             
             // Is the robot autonomous? This is true for the AUTONOMOUS State.
-            API bool autonomous() {
-                return _id == 1;
+            API inline bool autonomous() {
+                return _rs == RobotState::AUTO;
             }
             
             // Is the robot teleoperated? This is true for the TELEOP State
-            API bool teleop() {
-                return _id == 2;
+            API inline bool teleop() {
+                return _rs == RobotState::TELEOP;
             }
             
             // Is the robot in test mode? This is true for the TEST State.
-            API bool test() {
-                return _id == 3;
+            API inline bool test() {
+                return _rs == RobotState::TEST;
+            }
+
+			API inline RobotState robot_state() {
+				return _rs;
             }
             
             // Convert the state to a string. This is one of either "Disabled",
@@ -50,12 +56,8 @@ namespace Toast {
                 if (teleop()) return "Teleop";
                 if (test()) return "Test";
             }
-            
-            API int ordinal() {
-                return _id;
-            }
         private:
-            int _id;
+			RobotState _rs;
     };
     
     class IterativeBase {
@@ -80,7 +82,7 @@ namespace Toast {
             API void set_tick_timing(int ms);
             API int get_tick_timing();
             
-            API void set_state(int id);
+            API void set_state(RobotState rs);
         }
         
         API State DISABLED();
@@ -88,11 +90,11 @@ namespace Toast {
         API State TELEOP();
         API State TEST();
         
-        API State from_ordinal(int id);
+        API State from_robotstate(RobotState rs);
         
-        API int current_state_ordinal();
-        API int last_state_ordinal();
-        
+		API RobotState current_robotstate();
+		API RobotState last_robotstate();
+
         API State current_state();
         API State last_state();
         

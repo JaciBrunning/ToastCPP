@@ -99,11 +99,11 @@ void Crash::handle_exception(string type, string msg) {
         __logger.raw("\t" + module.file);
         __logger.raw("\t\tName: " + module.name);
         __logger.raw("\t\tId: " + to_string(module.module_idx));
-        __logger.raw("\t\tStatus: " + to_string(module.status) + 
+        __logger.raw("\t\tStatus: " + to_string((int)module.status) + 
                 " (" + 
-                    (module.status == 0x1 ? "Discovered" : 
-                        (module.status == 0x2 ? "Loaded" : 
-                            (module.status == 0x3 ? "Crashed" : "Restarted"))) + 
+                    (module.status == Memory::ModuleActState::DISCOVERED ? "Discovered" :
+                        (module.status == Memory::ModuleActState::ACTIVE ? "Loaded" : 
+                            (module.status == Memory::ModuleActState::CRASHED ? "Crashed" : "Restarted"))) + 
                 ")\n");
     }
     

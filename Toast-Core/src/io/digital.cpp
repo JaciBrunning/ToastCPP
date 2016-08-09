@@ -3,16 +3,10 @@
 using namespace IO;
 using namespace Toast::Memory;
 
-char *IO::get_dio_block(int port) {
-	PORT_CHECK(port, 26);
-	return Shared::get() + ADDR_DIO_OFFSET + (port * LEN_DIO);
-}
-
 DIO::DIO(int port, DIO::Mode mode) : _port(port) {
-	_shm = get_dio_block(port);
-
-	_shm[ADDR_DIO_MODE] = (char)mode;
-	SET_BIT(_shm[ADDR_DIO_BOOTINIT], 0);
+	_mem = shared()->dio(port);
+	_mem->set_init(true);
+	_mem->set_mode(mode);
 }
 
 int DIO::get_port() {
@@ -20,43 +14,43 @@ int DIO::get_port() {
 }
 
 DIO::Mode DIO::get_mode() {
-	return (DIO::Mode)((int)_shm[ADDR_DIO_MODE]);
+	return _mem->get_mode();
 }
 
 bool DIO::get() {
-	return bool(_shm[ADDR_DIO_VALUE]);
+	return _mem->get_value();
 }
 
 void DIO::set(bool state) {
-	_shm[ADDR_DIO_VALUE] = (char)state;
+	_mem->set_value(state);
 }
 
 void DIO::set_pulse(float length) {
-	MEM_VAL(float, _shm, ADDR_DIO_PULSE_LENGTH) = length;
-	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 3);
+	_mem->set_pulse_length(length);
+	_mem->set_pulse_pending(true);
 }
 
 bool DIO::is_pulsing() {
-	return IS_BIT_SET(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 2);
+	return _mem->is_pulsing();
 }
 
 void DIO::set_pwm_rate(float rate) {
-	MEM_VAL(float, _shm, ADDR_DIO_PWM_RATE) = rate;
-	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 4);
+	_mem->set_pwm_rate(rate);
+	_mem->set_pwm_rate_pending(true);
 }
 
 void DIO::set_pwm_enable(float initial_duty_cycle) {
-	MEM_VAL(float, _shm, ADDR_DIO_PWM_DUTY_CYCLE) = initial_duty_cycle;
-	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 0);
-	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 1);
+	_mem->set_pwm_duty_cycle(initial_duty_cycle);
+	_mem->set_pwm_enabled(true);
+	_mem->set_pwm_enabled_pending(true);
 }
 
 void DIO::set_pwm_disable() {
-	UNSET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 0);
-	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 1);
+	_mem->set_pwm_enabled(false);
+	_mem->set_pwm_enabled_pending(true);
 }
 
 void DIO::set_pwm_duty_cycle(float duty_cycle) {
-	MEM_VAL(float, _shm, ADDR_DIO_PWM_DUTY_CYCLE) = duty_cycle;
-	SET_BIT(_shm[ADDR_DIO_PWM_PULSE_ENABLE], 5);
+	_mem->set_pwm_duty_cycle(duty_cycle);
+	_mem->set_pwm_duty_cycle_pending(true);
 }

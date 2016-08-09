@@ -10,21 +10,29 @@ using namespace std;
 
 static SHM_HANDLE __shm_handle_shared;
 static char *__shared_block;
+static Memory::SharedPool _shared;
+
+void init_shared() {
+	_shared.map_to(__shared_block);
+}
 
 void Memory::initialize_bootstrap() {
-    __shm_handle_shared = Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, TOAST_SHARED_MEMPOOL_SIZE);
-    __shared_block = Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
+    __shm_handle_shared = Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, Memory::SharedPool::SIZE);
+    __shared_block = Internal::SHM::map_shm_file(__shm_handle_shared, Memory::SharedPool::SIZE);
 
-    Memory::Shared::zero();
+	memset(__shared_block, 0, Memory::SharedPool::SIZE);
+	init_shared();
     
     // Write the PID to the Shared Pool for client processes to work with
-    Memory::Shared::set_bootstrap_pid(get_pid());
-    Memory::Shared::get()[ADDR_ENDIAN] = Memory::get_endian_bit();
+	_shared.set_bootstrap_pid(get_pid());
+	_shared.set_endian(Memory::get_endian_bit());
 }
 
 void Memory::initialize() {
-    __shm_handle_shared = Toast::Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, TOAST_SHARED_MEMPOOL_SIZE);
-    __shared_block = Toast::Internal::SHM::map_shm_file(__shm_handle_shared, TOAST_SHARED_MEMPOOL_SIZE);
+    __shm_handle_shared = Toast::Internal::SHM::create_shm_file(TOAST_SHARED_MEMPOOL_NAME, Memory::SharedPool::SIZE);
+    __shared_block = Toast::Internal::SHM::map_shm_file(__shm_handle_shared, Memory::SharedPool::SIZE);
+
+	init_shared();
 }
 
 char Memory::get_endian_bit() {
@@ -37,7 +45,7 @@ char Memory::get_endian_bit() {
 }
 
 void Memory::copy_private_pool(int module_idx, char *buffer) {
-    Memory::Bridge b("module_private_" + to_string(module_idx), TOAST_PRIVATE_MEMPOOL_SIZE);
+    Memory::Bridge b("module_private_" + to_string(module_idx), Memory::PrivatePool::SIZE);
     b.open();
     memcpy(buffer, b.get(), b.size());
     b.destroy();
@@ -45,28 +53,8 @@ void Memory::copy_private_pool(int module_idx, char *buffer) {
 
 // -- SHARED MEMORY BLOCK STUFF -- //
 
-void Memory::Shared::zero() {
-    memset(__shared_block, 0, TOAST_SHARED_MEMPOOL_SIZE);
-}
-
-char *Memory::Shared::get() {
-    return __shared_block;
-}
-
-void Memory::Shared::set_debug(bool is_debug) {
-    __shared_block[ADDR_DEBUG] = is_debug ? 0x01 : 0x00;
-}
-
-bool Memory::Shared::get_debug() {
-    return __shared_block[ADDR_DEBUG] == 0x01 ? true : false;
-}
-
-void Memory::Shared::set_bootstrap_pid(int pid) {
-    Net::Transport::intToBytes(pid, __shared_block, ADDR_BOOTSTRAP_PID);
-}
-
-int Memory::Shared::get_bootstrap_pid() {
-    return Net::Transport::bytesToInt(__shared_block, ADDR_BOOTSTRAP_PID);
+Memory::SharedPool *Memory::shared() {
+	return &_shared;
 }
 
 // -- BRIDGED MEMORY STUFF -- //

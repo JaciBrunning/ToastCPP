@@ -5,98 +5,98 @@
 using namespace IO;
 using namespace Toast::Memory;
 
-char *IO::get_power_block() {
-	return Shared::get() + ADDR_PWR_OFFSET;
+static inline Shared::IO::Power *_power() {
+	return shared()->power();
 }
 
 // Power Distribution Panel (PDP)
 
 void PDP::set_can_id(int id) {
-	get_power_block()[ADDR_PWR_CAN_ID] = (char)id;
+	_power()->set_pdp_can_id(id);
 }
 
-float PDP::get_voltage() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_PDP_VOLTAGE);
+double PDP::get_voltage() {
+	return _power()->get_pdp_voltage();
 }
 
 float PDP::get_temperature() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_PDP_TEMP);
+	return _power()->get_pdp_temperature();
 }
 
-float PDP::get_current(int channel) {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_PDP_CUR_OFFSET + (channel * 4));
+double PDP::get_current(int channel) {
+	return _power()->get_pdp_current(channel);
 }
 
-float PDP::get_total_current() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_PDP_TOTAL_CUR);
+double PDP::get_total_current() {
+	return _power()->get_pdp_total_current();
 }
 
-float PDP::get_total_power() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_PDP_TOTAL_PWR);
+double PDP::get_total_power() {
+	return _power()->get_pdp_total_power();
 }
 
-float PDP::get_total_energy() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_PDP_TOTAL_ENG);
+double PDP::get_total_energy() {
+	return _power()->get_pdp_total_energy();
 }
 
 // Controller (RoboRIO power rails)
 
-float Controller::get_input_voltage() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_IN_VOLT);
+double Controller::get_input_voltage() {
+	return _power()->get_rio_input_voltage();
 }
 
-float Controller::get_input_current() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_IN_CUR);
+double Controller::get_input_current() {
+	return _power()->get_rio_input_current();
 }
 
-float Controller::get_voltage_3V3() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_VOLT_3V3);
+double Controller::get_voltage_3V3() {
+	return _power()->get_rio_voltage_3V3();
 }
 
-float Controller::get_current_3V3() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_CUR_3V3);
+double Controller::get_current_3V3() {
+	return _power()->get_rio_current_3V3();
 }
 
 bool Controller::get_enabled_3V3() {
-	return IS_BIT_SET(get_power_block()[ADDR_PWR_CONTR_BUS_ENABLE], 0);
+	return _power()->get_rio_3V3_enabled();
 }
 
 int Controller::get_fault_count_3V3() {
-	return (int)MEM_VAL(uint16_t, get_power_block(), ADDR_PWR_CONTR_FAULTS_3V3);
+	return _power()->get_rio_faults_3V3();
 }
 
-float Controller::get_voltage_5V() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_VOLT_5V);
+double Controller::get_voltage_5V() {
+	return _power()->get_rio_voltage_5V();
 }
 
-float Controller::get_current_5V() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_CUR_5V);
+double Controller::get_current_5V() {
+	return _power()->get_rio_current_5V();
 }
 
 bool Controller::get_enabled_5V() {
-	return IS_BIT_SET(get_power_block()[ADDR_PWR_CONTR_BUS_ENABLE], 1);
+	return _power()->get_rio_5V_enabled();
 }
 
 int Controller::get_fault_count_5V() {
-	return (int)MEM_VAL(uint16_t, get_power_block(), ADDR_PWR_CONTR_FAULTS_5V);
+	return _power()->get_rio_faults_5V();
 }
 
-float Controller::get_voltage_6V() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_VOLT_6V);
+double Controller::get_voltage_6V() {
+	return _power()->get_rio_voltage_6V();
 }
 
-float Controller::get_current_6V() {
-	return MEM_VAL(float, get_power_block(), ADDR_PWR_CONTR_CUR_6V);
+double Controller::get_current_6V() {
+	return _power()->get_rio_current_6V();
 }
 
 bool Controller::get_enabled_6V() {
-	return IS_BIT_SET(get_power_block()[ADDR_PWR_CONTR_BUS_ENABLE], 2);
+	return _power()->get_rio_6V_enabled();
 }
 
 int Controller::get_fault_count_6V() {
-	return (int)MEM_VAL(uint16_t, get_power_block(), ADDR_PWR_CONTR_FAULTS_6V);
+	return _power()->get_rio_faults_6V();
 }
 
 bool Controller::is_brownout() {
-	return get_power_block()[ADDR_PWR_IS_BROWNOUT] == 1;
+	return _power()->get_rio_brownout();
 }

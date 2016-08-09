@@ -3,6 +3,7 @@
 #include <string.h>
 #include "toast/library.hpp"
 #include "toast/state.hpp"
+#include "toast/memory.hpp"
 
 #include <vector>
 #include <string>
@@ -29,7 +30,7 @@ namespace Toast {
         std::string name;
         std::string file;
         int module_idx;
-        int status;
+        Memory::ModuleActState status;
     } ModuleData;
     
     class Module {

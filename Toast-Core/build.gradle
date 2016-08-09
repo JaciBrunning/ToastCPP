@@ -19,11 +19,11 @@ model {
                     source {
                         srcDirs = []
                         srcDirs += libraries.src()
-                        srcDirs += ['src']
+                        srcDirs += ['src', 'interchange/ToastFWI/build/cpp/src']
                         includes = ['**/*.cpp', '**/*.c']
                     }
                     exportedHeaders {
-                        srcDirs = ['include']
+                        srcDirs = ['include', 'interchange', 'interchange/ToastFWI/build/cpp/include']
                         srcDirs += libraries.headers()
                     }
                 }
@@ -31,3 +31,20 @@ model {
         }
     }
 }
+
+// TODO: Copy build/js/bundle.js to resources on build
+
+task build_interchange() {
+    doLast {
+        exec {
+            workingDir 'interchange/ToastFWI'
+            commandLine 'ruby', 'build_cpp.rb'
+        }
+        exec {
+            workingDir 'interchange/ToastFWI'
+            commandLine 'ruby', 'build_js.rb'
+        }
+    }
+}
+
+build.dependsOn build_interchange

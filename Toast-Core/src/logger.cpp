@@ -21,7 +21,7 @@ Log::Level _INFO      = {"INFO", false, false};
 Log::Level _WARN      = {"WARN", false, false};
 Log::Level _ERR       = {"ERROR", true, false};
 Log::Level _SEVERE    = {"SEVERE", true, false};
-Log::Level _DEBUG     = {"DEBUG", false, true};
+Log::Level _DEBUGL     = {"DEBUG", false, true};
 
 Log::Level Log::INFO() {
     return _INFO;
@@ -40,7 +40,7 @@ Log::Level Log::SEVERE() {
 }
 
 Log::Level Log::DEBUG() {
-    return _DEBUG;
+    return _DEBUGL;
 }
 
 static char buf[80];
@@ -104,7 +104,7 @@ void Log::log(string name, string msg, Log::Level level) {
 }
 
 void Log::log_raw(string msg, bool error, bool debug) {
-    if (!debug || _debug || Memory::Shared::get_debug()) {
+    if (!debug || _debug || Memory::shared()->get_debug()) {
         if (error) {
             cerr << msg << endl;
         } else {
@@ -138,7 +138,7 @@ void Log::info(string name, string msg) {
 }
 
 void Log::debug(string name, string msg) {
-    Log::log(name, msg, _DEBUG);
+    Log::log(name, msg, _DEBUGL);
 }
 
 Logger::Logger(string n) {

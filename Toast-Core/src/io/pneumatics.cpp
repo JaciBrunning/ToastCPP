@@ -3,32 +3,21 @@
 using namespace IO;
 using namespace Toast::Memory;
 
-int IO::get_PCM_shm_id(int module_id) {
+int IO::get_pcm_id(int module_id) {
 	int i;
 	for (i = 0; i < 2; i++) {
-		char *block = get_PCM_block(i);
-		int bl_mod_id = (int)(block[ADDR_PCM_CAN_ID]);
-		if (bl_mod_id == module_id) return i;
-		if (!IS_BIT_SET(block[ADDR_PCM_BOOTINIT], 0)) return i;
+		Shared::IO::Pneumatics *_p = shared()->pneumatics(i);
+		if (module_id == _p->get_pcm_can_id()) return i;
+		if (!_p->get_init()) return i;
 	}
-	throw IO::CouldNotAllocateBlockException("Could not allocate block for PCM (have you registered more than 2 PCMs?)");
 	return -1;
 }
 
-char *IO::get_PCM_block(int id) {
-	BLOCK_CHECK(id, 2);
-	return Shared::get() + ADDR_PCM_OFFSET + (id * LEN_PCM);
-}
-
 PCM::PCM(int module_id) : _mod_id(module_id) {
-	_shm_id = get_PCM_shm_id(module_id);
-	_shm = get_PCM_block(_shm_id);
-	_shm[ADDR_PCM_CAN_ID] = module_id;
-	SET_BIT(_shm[ADDR_PCM_BOOTINIT], 0);
-}
-
-int PCM::get_shm_id() {
-	return _shm_id;
+	_internal_id = IO::get_pcm_id(module_id);
+	_mem = shared()->pneumatics(_internal_id);
+	_mem->set_pcm_can_id(_internal_id);
+	_mem->set_init(true);
 }
 
 int PCM::get_module_id() {
@@ -36,82 +25,82 @@ int PCM::get_module_id() {
 }
 
 bool PCM::get_solenoid(int solenoid) {
-	return IS_BIT_SET(_shm[ADDR_PCM_SOLENOID_GET], solenoid);
+	return _mem->get_solenoid(solenoid);
 }
 
 bool PCM::solenoid_blacklisted(int solenoid) {
-	return IS_BIT_SET(_shm[ADDR_PCM_SOLENOID_BLACK], solenoid);
+	return _mem->get_solenoid_black(solenoid);
 }
 
 void PCM::set_solenoid(int solenoid, bool value) {
-	SET_BIT_TO(_shm[ADDR_PCM_SOLENOID_SET], solenoid, value);
+	_mem->set_solenoid(solenoid, value);
 }
 
 void PCM::start_compressor() {
-	SET_BIT(_shm[ADDR_PCM_CONTROL_FLAGS], 3);
+	_mem->set_start_pending(true);
 }
 
 void PCM::stop_compressor() {
-	SET_BIT(_shm[ADDR_PCM_CONTROL_FLAGS], 4);
+	_mem->set_stop_pending(true);
 }
 
 bool PCM::compressor_enabled() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CONTROL_FLAGS], 2);
+	return _mem->get_is_enabled();
 }
 
 void PCM::set_closed_loop_control(bool state) {
-	SET_BIT_TO(_shm[ADDR_PCM_CONTROL_FLAGS], 1, 1);
-	SET_BIT(_shm[ADDR_PCM_CONTROL_FLAGS], 5);
+	_mem->set_closed_loop(true);
+	_mem->set_closed_loop_mode_pending(true);
 }
 
 bool PCM::closed_loop_control() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CONTROL_FLAGS], 1);
+	return _mem->get_closed_loop();
 }
 
 float PCM::compressor_current() {
-	return MEM_VAL(float, _shm, ADDR_PCM_COMPRESSOR_CURRENT);
+	return _mem->get_comp_current();
 }
 
 bool PCM::pressure_switch_low() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CONTROL_FLAGS], 0);
+	return _mem->get_pressure_switch();
 }
 
 void PCM::clear_sticky_faults() {
-	SET_BIT(_shm[ADDR_PCM_CMP_FAULT_STATUS], 6);
+	_mem->set_comp_sticky_clear_pending(true);
 }
 
 void PCM::clear_solenoid_sticky_faults() {
-	SET_BIT(_shm[ADDR_PCM_SOLENOID_FAULT_STATUS], 2);
+	_mem->set_sol_sticky_clear_pending(true);
 }
 
 bool PCM::compressor_current_too_high_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CMP_FAULT_STATUS], 0);
+	return _mem->get_fault_comp_too_high();
 }
 
 bool PCM::compressor_current_too_high_sticky_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CMP_FAULT_STATUS], 1);
+	return _mem->get_fault_comp_too_high_sticky();
 }
 
 bool PCM::compressor_shorted_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CMP_FAULT_STATUS], 2);
+	return _mem->get_fault_comp_shorted();
 }
 
 bool PCM::compressor_shorted_sticky_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CMP_FAULT_STATUS], 3);
+	return _mem->get_fault_comp_shorted_sticky();
 }
 
 bool PCM::compressor_not_connected_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CMP_FAULT_STATUS], 4);
+	return _mem->get_fault_comp_not_conn();
 }
 
 bool PCM::compressor_not_connected_sticky_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_CMP_FAULT_STATUS], 5);
+	return _mem->get_fault_comp_not_conn_sticky();
 }
 
 bool PCM::solenoid_voltage_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_SOLENOID_FAULT_STATUS], 0);
+	return _mem->get_fault_sol_volt();
 }
 
 bool PCM::solenoid_voltage_sticky_fault() {
-	return IS_BIT_SET(_shm[ADDR_PCM_SOLENOID_FAULT_STATUS], 1);
+	return _mem->get_fault_sol_volt_sticky();
 }

@@ -2,11 +2,9 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
-#include "io/common.hpp"
 
 namespace IO {
-	API int get_PCM_shm_id(int module_id);
-	API char *get_PCM_block(int id);
+	API int get_pcm_id(int module_id);
 
 	class PCM {
 	public:
@@ -17,7 +15,6 @@ namespace IO {
 			return p2._mod_id == _mod_id;
 		}
 
-		API int get_shm_id();
 		API int get_module_id();
 
 		API bool get_solenoid(int solenoid);
@@ -46,8 +43,8 @@ namespace IO {
 		API bool solenoid_voltage_fault();
 		API bool solenoid_voltage_sticky_fault();
 	private:
-		int _shm_id;
 		int _mod_id;
-		char *_shm;
+		int _internal_id;
+		Toast::Memory::Shared::IO::Pneumatics *_mem;
 	};
 }

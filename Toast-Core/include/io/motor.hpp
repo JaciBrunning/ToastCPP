@@ -2,7 +2,6 @@
 
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
-#include "io/common.hpp"
 
 #include <inttypes.h>
 
@@ -30,43 +29,30 @@ enum MotorType {
 	}
 
 namespace IO {
-	API int get_motor_shm_id(int port, int motor_interface);
-	API char *get_motor_block(int id);
-	API char *get_pwm_block(int port);
-	API char *get_servo_block();
+	API int get_motor_id(int port, Toast::Memory::Shared::IO::MotorInterface motor_interface);
 
 	class Motor {
 	public:
-		enum Interface {
-			PWM = 0x01, CAN = 0x02
-		};
-
-		enum Type {
-			Talon = 0x01, TalonSRX = 0x02, CANTalon = 0x03,
-			Victor = 0x10, VictorSP = 0x11,
-			SD540 = 0x20,
-			Spark = 0x30
-		};
+		typedef Toast::Memory::Shared::IO::MotorInterface Interface;
+		typedef Toast::Memory::Shared::IO::MotorType Type;
 
 		API Motor(int port, Interface motor_interface = Interface::PWM, Type type = Type::Talon);
 		API virtual ~Motor() = default;
 
-		API bool operator==(Motor &m2) {
-			return (m2._interface == _interface) && (m2._port == _port);
-		}
-
-		API int get_shm_id();
 		API int get_port();
 		API Interface get_interface();
 		API Type get_type();
 
 		API float get();
 		API void set(float value);
+		
+		API bool operator==(Motor &m2) {
+			return (m2.get_interface() == get_interface()) && (m2._port == _port);
+		}
 	private:
-		int _shm_id;
 		int _port;
-		int _interface;
-		char *_shm;
+		int _internal_id;
+		Toast::Memory::Shared::IO::Motor *_mem;
 	};
 
 	MOTOR_CHILD_CLASS(Talon, PWM, Talon);
@@ -103,7 +89,7 @@ namespace IO {
 		API void set_bounds(double max, double deadband_max, double center, double deadband_min, double min);
 	private:
 		int _port;
-		char *_shm;
+		Toast::Memory::Shared::IO::PWM *_mem;
 	};
 
 	class Servo {
@@ -126,5 +112,6 @@ namespace IO {
 		API void set_offline();
 	private:
 		int _port;
+		Toast::Memory::Shared::IO::Servo *_mem;
 	};
 }
