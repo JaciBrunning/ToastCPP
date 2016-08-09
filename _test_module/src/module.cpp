@@ -1,6 +1,11 @@
 #include "toast.hpp"
 
 #include "io/motor.hpp"
+#include "io/relay.hpp"
+#include "io/pneumatics.hpp"
+#include "io/digital.hpp"
+#include "io/analog.hpp"
+
 #include "toast/http/server.hpp"
 #include "toast/http/template.hpp"
 #include "toast/http/websocket.hpp"
@@ -42,7 +47,37 @@ class MyModule : public Module {
     public:
         virtual void construct() {
 			Talon t(1);
-			t.set(0.5);
+			t.set(0.47);
+
+			Talon t2(2);
+			t2.set(-0.88);
+
+			Relay r(0);
+			r.set_forward(true);
+			r.set_reverse(false);
+
+			Relay r2(1);
+			r2.set_forward(false);
+			r2.set_reverse(true);
+			r2.set_reverse(false);
+
+			PCM pcm(12);
+			pcm.set_solenoid(0, true);
+			pcm.set_solenoid(1, false);
+			pcm.set_solenoid(3, true);
+			pcm.set_solenoid(4, true);
+			Memory::shared()->pneumatics(0)->set_comp_current(31.32);
+			Memory::shared()->pneumatics(0)->set_solenoid_black(2, true);
+
+			DIO dio(0);
+
+			DIO doo(1, DIO::Mode::OUTPUT);
+			doo.set(true);
+			doo.set_pwm_enable(53.33);
+			doo.set_pwm_rate(56.63);
+
+			AnalogOutput ao(0);
+			ao.set(4.613);
 
 			Victor v(1);
 

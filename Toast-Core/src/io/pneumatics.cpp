@@ -16,7 +16,7 @@ int IO::get_pcm_id(int module_id) {
 PCM::PCM(int module_id) : _mod_id(module_id) {
 	_internal_id = IO::get_pcm_id(module_id);
 	_mem = shared()->pneumatics(_internal_id);
-	_mem->set_pcm_can_id(_internal_id);
+	_mem->set_pcm_can_id(module_id);
 	_mem->set_init(true);
 }
 

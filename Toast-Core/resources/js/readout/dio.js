@@ -67,7 +67,7 @@ var dio_readouts = (function() {
                 this.pwm_rate = pwm_rate;
                 
                 if (this.pwm) {
-                    this._td_pwm_pulse.innerHTML = "PWM [DC: " + pwm_duty + ", RT: " + pwm_rate.toFixed(2) + "]";
+                    this._td_pwm_pulse.innerHTML = "PWM [DC: " + pwm_duty.toFixed(2) + ", RT: " + pwm_rate.toFixed(2) + "]";
                 } else if (this.pulse) {
                     this._td_pwm_pulse.innerHTML = "PULS [" + pulse_len.toFixed(5) + "]";
                 } else {
@@ -77,6 +77,23 @@ var dio_readouts = (function() {
 
             readouts[i] = d;
         }
+
+        Memory.listen(function (shm) {
+            for (var i = 0; i < 26; i++) {
+                // TODO
+                var r = readouts[i];
+                var m = shm.dio(i);
+                if (m.get_init()) {
+                    r.setpwmpulse(m.get_pwm_enabled(),
+                        m.is_pulsing(),
+                        m.get_pulse_length(),
+                        m.get_pwm_duty_cycle(),
+                        m.get_pwm_rate());
+                    r.setmode(i, m.get_mode() == Memory.ns.Shared.IO.DIO_Mode.OUTPUT ? "OUT" : "IN");
+                    r.set(m.get_value());
+                }
+            }
+        });
     });
 
     function draw(obj) {

@@ -27,6 +27,12 @@ var an_out_readouts = (function() {
             r.draw();
             readouts[i] = r;
         }
+
+        Memory.listen(function (shm) {
+            for (var i = 0; i < 2; i++) {
+                readouts[i].update(shm.analog_out(i).get_voltage());
+            }
+        });
     });
 
     function draw(obj) {
@@ -40,7 +46,7 @@ var an_out_readouts = (function() {
         obj.ctx.font = FONT;
         obj.ctx.fillStyle = "#000";
         obj.ctx.fillText(obj.port, 0, HEIGHT - 2);
-        obj.ctx.fillText(obj.voltage.toFixed(2) + "V", 35, HEIGHT - 2);
+        obj.ctx.fillText(obj.voltage.toFixed(3) + "V", 35, HEIGHT - 2);
     }
 
     return readouts;

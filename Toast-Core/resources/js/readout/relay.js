@@ -44,6 +44,15 @@ var relay_readouts = (function() {
 
             readouts[i] = r;
         }
+        Memory.listen(function (shm) {
+            for (var i = 0; i < 4; i++) {
+                var r = readouts[i];
+                var m = shm.relay(i);
+                if (m.get_init()) {
+                    r.update(m.get_fwd(), m.get_rvs());
+                }
+            }
+        });
     });
 
     return readouts;

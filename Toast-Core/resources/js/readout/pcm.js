@@ -67,6 +67,20 @@ var pcm_readouts = (function() {
             p.draw();
             readouts[i] = p;
         }
+        Memory.listen(function (shm) {
+            for (var i = 0; i < 2; i++) {
+                var r = readouts[i];
+                var m = shm.pneumatics(i);
+                if (m.get_init()) {
+                    r.setport(m.get_pcm_can_id());
+                    r.setcompressor(m.get_comp_current());
+                    for (var j = 0; j < 8; j++) {
+                        r.set(j, m.get_solenoid(j), m.get_solenoid_black(j));
+                    }
+                    r.draw();
+                }
+            }
+        });
     });
 
     function draw(obj) {

@@ -37,7 +37,7 @@ var motor_readouts = (function() {
             r.setport = function(port, intf) {
                 var str = port;
                 var intf_str = "PWM";
-                if (intf == 1) {
+                if (intf == Memory.ns.Shared.IO.MotorInterface.CAN) {
                     str = str + "c";
                     intf_str = "CAN";
                 }
@@ -48,6 +48,17 @@ var motor_readouts = (function() {
             r.draw();
             readouts[i] = r;
         }
+
+        Memory.listen(function (shm) {
+            for (var i = 0; i < 16; i++) {
+                var r = readouts[i];
+                var m = shm.motor(i);
+                if (m.get_init()) {
+                    r.update(m.get_value());
+                    r.setport(m.get_port(), m.get_interface());
+                }
+            }
+        });
     });
 
     function draw(obj) {
