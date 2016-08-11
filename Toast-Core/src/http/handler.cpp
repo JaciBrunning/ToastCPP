@@ -126,7 +126,7 @@ Response *DirHandler::process(Request *req) {
 	std::string uri = req->get_url().substr(1);
 	if (!starts_with(uri, _uri_base + "/")) return NULL;
 
-	std::string target = _dir + "/" + uri.substr(4);
+	std::string target = _dir + "/" + uri.substr(_uri_base.length() + 1);
 
 	ifstream is;
 	is.open(target.c_str(), ios::binary);

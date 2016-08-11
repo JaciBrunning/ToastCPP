@@ -130,6 +130,14 @@ void WebSocket::send(string data, int opcode) {
 	mutex.unlock();
 }
 
+void WebSocket::send_raw(char *data, int length, int opcode) {
+	if (is_closed()) return;
+
+	mutex.lock();
+	mg_send_websocket_frame(connection, opcode, data, length);
+	mutex.unlock();
+}
+
 void WebSocket::append_data(string data_) {
 	data += data_;
 }

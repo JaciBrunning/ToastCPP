@@ -37,10 +37,10 @@ var an_out_readouts = (function() {
 
     function draw(obj) {
         obj.ctx.clearRect(0, 0, WIDTH, HEIGHT);
-        obj.ctx.fillStyle = COMMON.COL_GRY_10;
+        obj.ctx.fillStyle = Common.COL_GRY_10;
         obj.ctx.fillRect(WIDTH / 3, 0, 2 * WIDTH / 3.5, HEIGHT);
 
-        obj.ctx.fillStyle = COMMON.COL_GRN;
+        obj.ctx.fillStyle = Common.COL_GRN;
         obj.ctx.fillRect(WIDTH / 3, 0, 2 * WIDTH / 3.5 * (obj.voltage / MAXVOLT), HEIGHT);
 
         obj.ctx.font = FONT;

@@ -1,0 +1,33 @@
+#using core/base
+#define TITLE Toast - Readouts
+
+{{ include core/components/memory }}
+
+<div class="container">
+    <h1> Toast C++ - Readouts </h1>
+    <div class="row">
+        <div class="column">
+            <div class="row">
+                {{ include core/components/readout/motors }}
+            </div>
+            <br />
+            <div class="row">
+                {{ include core/components/readout/relay }}
+            </div>
+        </div>
+        <div class="column">
+            <div class="row">
+                {{ include core/components/readout/dio }}
+            </div>
+        </div>
+        <div class="column">
+            <div class="row">
+                {{ include core/components/readout/pcm }}
+            </div>
+
+            <div class="row">
+                {{ include core/components/readout/analog_out }}
+            </div>
+        </div>
+    </div>
+</div>

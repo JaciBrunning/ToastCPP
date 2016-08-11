@@ -14,10 +14,10 @@ var relay_readouts = (function() {
             td_port.innerHTML = "#" + i;
             tr.appendChild(td_port);
             var td_fwd = document.createElement("td");
-            td_fwd.style.backgroundColor = COMMON.COL_GRY_10;
+            td_fwd.style.backgroundColor = Common.COL_GRY_10;
             tr.appendChild(td_fwd);
             var td_rvs = document.createElement("td");
-            td_rvs.style.backgroundColor = COMMON.COL_GRY_10;
+            td_rvs.style.backgroundColor = Common.COL_GRY_10;
             tr.appendChild(td_rvs);
 
             parent.appendChild(tr);
@@ -33,8 +33,8 @@ var relay_readouts = (function() {
             };
 
             r.draw = function() {
-                this._td_fwd.style.backgroundColor = this.fwd ? COMMON.COL_GRN : COMMON.COL_RED;
-                this._td_rvs.style.backgroundColor = this.rvs ? COMMON.COL_GRN : COMMON.COL_RED;
+                this._td_fwd.style.backgroundColor = this.fwd ? Common.COL_GRN : Common.COL_RED;
+                this._td_rvs.style.backgroundColor = this.rvs ? Common.COL_GRN : Common.COL_RED;
             };
 
             r.update = function(fwd, rvs) {

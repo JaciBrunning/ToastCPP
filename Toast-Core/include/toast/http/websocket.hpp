@@ -32,6 +32,7 @@ namespace Toast {
 			API struct mg_connection *get_connection();
 			
 			API void send(string data, int opcode = WEBSOCKET_OPCODE_TEXT);
+			API void send_raw(char *data, int length, int opcode = WEBSOCKET_OPCODE_TEXT);
 			API void append_data(string data);
 			API string flush_data();
 

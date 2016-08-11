@@ -1,0 +1,30 @@
+#using core/base
+#define TITLE Toast - Config
+
+<script type="text/javascript" src="/res/Toast-Bootstrap/js/config.js"> </script>
+<link rel="stylesheet" href="/res/Toast-Bootstrap/css/styles.css">
+<div class="container">
+    <h1> Toast C++ - Configurations </h1>
+
+    <div class="row">
+        <div class="column column-75">
+            <label id="config_label"> Configuration </label>
+            <textarea id="config_area" onkeyup="if (event.keyCode == 13 && event.ctrlKey) BootstrapConfig.updateConfig();"> </textarea>
+            <a class="button" onclick="updateConfig();" style="width: 100%;"> Save Config </a>
+        </div>
+
+        <div class="column column-25">
+            <label> Configurations </label>
+            <table id="configList">
+                <thead>
+                <tr>
+                    <th> Name </th>
+                </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

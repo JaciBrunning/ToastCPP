@@ -64,15 +64,15 @@ var motor_readouts = (function() {
     function draw(obj) {
         obj.ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-        obj.ctx.fillStyle = COMMON.COL_GRY_10;
+        obj.ctx.fillStyle = Common.COL_GRY_10;
         obj.ctx.fillRect(2 * WIDTH / 3 - WIDTH / 3.5, 0, 2 * WIDTH / 3.5, HEIGHT);
 
         var delta = obj.value - obj.lastvalue;
         var prefix = delta > 0.0 ? "+" : "";
         if (obj.value > 0) {
-            obj.ctx.fillStyle = COMMON.COL_GRN;
+            obj.ctx.fillStyle = Common.COL_GRN;
         } else {
-            obj.ctx.fillStyle = COMMON.COL_RED;
+            obj.ctx.fillStyle = Common.COL_RED;
         }
         if (obj.value > 0) {
             obj.ctx.fillRect(2 * WIDTH / 3, 0, WIDTH / 3.5 * obj.value + 1, HEIGHT);
@@ -80,11 +80,11 @@ var motor_readouts = (function() {
             obj.ctx.fillRect(2 * WIDTH / 3 + (WIDTH / 3.5 * obj.value + 1), 0, WIDTH / 3.5 * -obj.value + 1, HEIGHT);
         }
         if (delta > 0) {
-            obj.ctx.fillStyle = COMMON.COL_GRN;
+            obj.ctx.fillStyle = Common.COL_GRN;
         } else if (delta < 0) {
-            obj.ctx.fillStyle = COMMON.COL_RED;
+            obj.ctx.fillStyle = Common.COL_RED;
         } else {
-            obj.ctx.fillStyle = COMMON.COL_GRY_60;
+            obj.ctx.fillStyle = Common.COL_GRY_60;
         }
         obj.ctx.font = FONT2;
         obj.ctx.fillText(prefix + delta.toFixed(2), 75, HEIGHT - 2);
@@ -94,7 +94,7 @@ var motor_readouts = (function() {
         obj.ctx.fillText(obj.port, 0, HEIGHT - 2);
         obj.ctx.fillText(obj.value.toFixed(2), 35, HEIGHT - 2);
 
-        obj.ctx.fillStyle = COMMON.COL_GRY_70;
+        obj.ctx.fillStyle = Common.COL_GRY_70;
         obj.ctx.fillRect(2 * WIDTH / 3 - 2, 0, 2, HEIGHT);
     }
 

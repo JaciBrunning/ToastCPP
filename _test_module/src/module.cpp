@@ -90,11 +90,14 @@ class MyModule : public Module {
 			ctx.add_template("base", "<html><title>{{TITLE}}</title>{{include core/include/css}}</html>\n{{#}}\nGET => {{get}}");
 			ctx.add_template_file("index", Resources::get_resource_file("_test_module", "index.html"));
 
-			Server s(8001);
-			s.enable_memory_socket();
-			MyHttpHandler h;
-			s.register_handler(&h);
-			s.start();
+			Config c("test_module");
+			c.load();
+			c.get_bool("is_me", true);
+//
+//			Server s(8001);
+//			MyHttpHandler h;
+//			s.register_handler(&h);
+//			s.start();
         }
 };
 

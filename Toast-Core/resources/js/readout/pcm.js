@@ -94,20 +94,20 @@ var pcm_readouts = (function() {
                 var sol = obj.solenoids[i];
 
                 if (sol == -2) {            // Not Registered
-                    obj.ctx.fillStyle = COMMON.COL_GRY_10;
+                    obj.ctx.fillStyle = Common.COL_GRY_10;
                 } else if (sol == -1) {     // Blacklist
-                    obj.ctx.fillStyle = COMMON.COL_GRY_80;
+                    obj.ctx.fillStyle = Common.COL_GRY_80;
                 } else if (sol == 0) {      // Off
-                    obj.ctx.fillStyle = COMMON.COL_RED;
+                    obj.ctx.fillStyle = Common.COL_RED;
                 } else if (sol == 1) {      // On
-                    obj.ctx.fillStyle = COMMON.COL_GRN;
+                    obj.ctx.fillStyle = Common.COL_GRN;
                 }
 
                 obj.ctx.fillRect(x, y, SQ_SIZE, SQ_SIZE);
                 
                 obj.ctx.font = FONT;
                 if (sol == -2) {
-                    obj.ctx.fillStyle = COMMON.COL_GRY_50;
+                    obj.ctx.fillStyle = Common.COL_GRY_50;
                 } else {
                     obj.ctx.fillStyle = "#FFF";
                 }

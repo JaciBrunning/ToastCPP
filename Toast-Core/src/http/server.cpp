@@ -6,6 +6,7 @@ using namespace Toast::Concurrent;
 using namespace Toast::HTTP;
 
 static DirHandler globalResourceHandler("res", "resources");
+static DirHandler globalConfigHandler("api/config", "toast/config");
 
 static Server *get_server(struct mg_connection *nc) {
 	return (Server *)nc->mgr->user_data;
@@ -72,22 +73,39 @@ class SHMSocket : public WebSocketHandler {
 public:
 	void on_ready(WebSocket *ws) { }
 	void on_message(WebSocket *ws, string data) {
-		ws->send(Encoding::base64_encode(Toast::Memory::shared()->get_store(), Toast::Memory::SharedPool::SIZE));
+		ws->send_raw(Toast::Memory::shared()->get_store(), Toast::Memory::SharedPool::SIZE, WEBSOCKET_OPCODE_BINARY);
+//		ws->send(Encoding::base64_encode(Toast::Memory::shared()->get_store(), Toast::Memory::SharedPool::SIZE));
 	}
 	void on_closed(WebSocket *ws) { }
 };
 SHMSocket _socket;
 
-class SHMSocketHandler : public Handler {
+class ServerDefaultHandler : public Handler {
 public:
+	void dirlist(Request *req, StreamResponse *resp) {
+		resp->set_header("Content-Type", "text/json");
+		*resp << "[";
+		std::vector<std::string> list = Toast::Filesystem::ls_local(req->get("path", ""));
+		for (auto iter = list.begin(); iter != list.end(); ++iter) {
+			*resp << "\"" << (*iter) << "\"";
+			if (iter != list.end() - 1) *resp << ",";
+		}
+		*resp << "]";
+	}
+
 	void setup() {
+		route("GET", "/api/dirlist", ServerDefaultHandler, dirlist);
 		register_web_socket("/socket/shared_memory", &_socket);
 	}
 };
 
+static ServerDefaultHandler globalDefaultHandler;
+
 // Server
 Server::Server(int port_) : stopped(false), mgr(), websockets(), port(port_) {
 	register_handler(&globalResourceHandler);
+	register_handler(&globalConfigHandler);
+	register_handler(&globalDefaultHandler);
 }
 Server::~Server() {
 	stop();
@@ -117,11 +135,6 @@ void Server::register_handler(Handler *handler) {
 	handler->set_server(this);
 	handler->setup();
 	handlers.push_back(handler);
-}
-
-void Server::enable_memory_socket() {
-	SHMSocketHandler *_hand = new SHMSocketHandler();
-	register_handler(_hand);
 }
 
 int Server::_handleRequest(struct mg_connection *conn, struct http_message *msg) {

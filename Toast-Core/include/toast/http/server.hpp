@@ -23,8 +23,6 @@ namespace Toast {
 			API void stop();
 			API void register_handler(Handler *handler);
 
-			API void enable_memory_socket();
-
 			API Response *handleRequest(Request *request);
 			API WebSocketContainer *get_web_sockets();
 			API bool handles(string method, string url);

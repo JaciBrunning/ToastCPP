@@ -13,10 +13,10 @@
 using namespace std;
 
 #define route(httpMethod, url, handlerType, method) \
-    register_route(httpMethod, url, new RequestHandler<handlerType, StreamResponse>(this, &handlerType::method ));
+    register_route(httpMethod, url, new Toast::HTTP::RequestHandler<handlerType, Toast::HTTP::StreamResponse>(this, &handlerType::method ));
 
 #define route_type(httpMethod, url, handlerType, method, responseType) \
-    register_route(httpMethod, url, new RequestHandler<handlerType, responseType>(this, &handlerType::method ));
+    register_route(httpMethod, url, new Toast::HTTP::RequestHandler<handlerType, responseType>(this, &handlerType::method ));
 
 namespace Toast {
 	namespace HTTP {

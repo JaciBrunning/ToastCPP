@@ -58,7 +58,6 @@ void Loader::create_subprocesses() {
         Loader::create_module_process(module);
 		Memory::shared()->set_module_activity_state(module->idx, Memory::ModuleActState::CRASHED);
     }
-	sleep_ms(10000);
 }
 
 static void create_process(Loader::ModuleAdapter *adapter) {
