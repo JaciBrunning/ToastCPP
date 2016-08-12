@@ -91,3 +91,15 @@ h1 {
 .pointer {
     cursor: pointer;
 }
+
+.readout-big {
+    font-size: 24px;
+}
+
+.readout-med {
+    font-size: 20px;
+}
+
+.readout-sml {
+    font-size: 14px;
+}

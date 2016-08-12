@@ -1,0 +1,32 @@
+<script type="text/javascript" src="/res/Toast-Core/js/readout/power.js"> </script>
+
+<div style="width: 100%">
+    <h5> Power Readout </h5>
+    <div class="row">
+        <div class="column center readout-big" id="pwr_pdp_volts"> 12.78V </div>
+        <div class="column center readout-big" id="pwr_pdp_temp"> 38 &deg; </div>
+    </div>
+    <div class="row">
+        <div class="column center readout-med" id="pwr_total_pwr"> 18W </div>
+        <div class="column center readout-med" id="pwr_total_nrg"> 1800J </div>
+        <div class="column center readout-med" id="pwr_total_cur"> 30A </div>
+    </div>
+    <div class="row">
+        <div class="column center readout-sml" id="pwr_3v3"> 3.30V / 10.0A </div>
+        <div class="column center readout-sml" id="pwr_5v" > 5V DISABLED </div>
+        <div class="column center readout-sml" id="pwr_6v" > 6.00V / 10.0A </div>
+    </div>
+    <br />
+    <table>
+        <thead>
+            <tr>
+                <th> # </th>
+                <th> Current </th>
+                <th> # </th>
+                <th> Current </th>
+            </tr>
+        </thead>
+        <tbody id="pwr_cur_table">
+        </tbody>
+    </table>
+</div>

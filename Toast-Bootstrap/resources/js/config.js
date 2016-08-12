@@ -17,7 +17,7 @@ window.BootstrapConfig = (function() {
                     row.insertCell(0).innerHTML = "<a class=\"pointer\" onclick=\"BootstrapConfig.setConfig('" + name + "');\"> " + name + " </a>"
                 }
             }
-        })
+        });
     });
 
     exports.setConfig = function(name) {

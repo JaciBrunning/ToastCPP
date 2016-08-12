@@ -32,6 +32,7 @@ static void init_global_ctx() {
 		GCTX_ADD("core/components/readout/analog_out", "templates/components/readout/analog_out.html");
 		GCTX_ADD("core/components/readout/pcm", "templates/components/readout/pcm.html");
 		GCTX_ADD("core/components/readout/dio", "templates/components/readout/dio.html");
+		GCTX_ADD("core/components/readout/power", "templates/components/readout/power.html");
 
 		GCTX_ADD("core/base", "templates/base.html");
 	}
