@@ -1,14 +1,12 @@
 #include "thp/provider.hpp"
 
-using namespace std;
-
 static ProviderInfo info = {
     "Simulation",
     true, false
 };
 
-static void (*_state_callback_periodic)(bool,bool,bool,bool);
-static void (*_state_callback_transition)(bool,bool,bool,bool);
+static RawStateCallback _state_callback_periodic;
+static RawStateCallback _state_callback_transition;
 
 ProviderInfo *provider_info() {
     return &info;
@@ -18,7 +16,7 @@ void provider_preinit() { }
 void provider_init() { }
 void provider_free() { }
 
-void thp_state_set_callback(void (*callback_periodic)(bool,bool,bool,bool), void (*callback_transition)(bool,bool,bool,bool)) {
+void thp_state_set_callback(RawStateCallback callback_periodic, RawStateCallback callback_transition) {
     _state_callback_periodic = callback_periodic;
     _state_callback_transition = callback_transition;
 }

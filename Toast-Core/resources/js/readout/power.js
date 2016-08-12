@@ -50,7 +50,7 @@ var power_readouts = (function() {
             }
 
             elems.volts.innerHTML = p.get_pdp_voltage().toFixed(2) + "V";
-            elems.temp.innerHTML = p.get_pdp_temperature().toFixed(1) + "&deg;";
+            elems.temp.innerHTML = p.get_pdp_temperature().toFixed(1) + "&deg;C";
             elems.total_pwr.innerHTML = p.get_pdp_total_power().toFixed(2) + "W";
             elems.total_nrg.innerHTML = p.get_pdp_total_energy().toFixed(2) + "J";
             elems.total_cur.innerHTML = p.get_pdp_total_current().toFixed(2) + "A";

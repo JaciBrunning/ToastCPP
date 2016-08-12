@@ -4,6 +4,7 @@
 #include "WPILib.h"
 
 #include "toast/logger.hpp"
+#include <string>
 
 using namespace std;
 using namespace Toast;
@@ -13,8 +14,8 @@ static ProviderInfo info = {
     false, true
 };
 
-static void (*_state_callback_periodic)(bool,bool,bool,bool);
-static void (*_state_callback_transition)(bool,bool,bool,bool);
+static RawStateCallback _state_callback_periodic;
+static RawStateCallback _state_callback_transition;
 
 static Logger _provider_logger("THP - WPILib (2016)");
 static THP_Base_Robot *robot;
@@ -40,9 +41,9 @@ void provider_free() {
     free(robot);
 }
 
-void thp_state_set_callback(void (*callback_periodic)(bool,bool,bool,bool), void (*callback_transition)(bool,bool,bool,bool)) {
-    _state_callback_periodic = callback_periodic;
-    _state_callback_transition = callback_transition;
+void thp_state_set_callback(RawStateCallback callback_periodic, RawStateCallback callback_transition) {
+	_state_callback_periodic = callback_periodic;
+	_state_callback_transition = callback_transition;
 }
 
 void thp_state_call_periodic(bool disabled, bool auton, bool teleop, bool test) {
