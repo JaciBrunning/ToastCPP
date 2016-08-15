@@ -7,6 +7,7 @@
 
 // The Toast Shared Memory Internals
 #define TOAST_SHARED_MEMPOOL_NAME "shared_public"
+#define TOAST_SHARED_MEMPOOL_MTX_NAME "shared_public_MTX"
 
 #ifdef OS_WIN
     #include <windows.h>

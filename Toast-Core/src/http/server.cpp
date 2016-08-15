@@ -119,7 +119,7 @@ void Server::start(int pollTiming) {
 	mg_set_protocol_http_websocket(conn);
 
 	stopped = false;
-	for (;;) {
+	while (!stopped) {
 		mg_mgr_poll(&mgr, pollTiming);
 	}
 

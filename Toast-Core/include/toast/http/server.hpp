@@ -9,6 +9,8 @@
 #include "toast/concurrent/mutex.hpp"
 #include "mongoose.h"
 
+#include <atomic>
+
 using namespace Toast::Concurrent;
 
 namespace Toast {
@@ -32,8 +34,8 @@ namespace Toast {
 			API void _webSocketReady(struct mg_connection *conn, struct http_message *msg);
 			API int _webSocketData(struct mg_connection *conn, string data);
 			API void _webSocketClosed(struct mg_connection *conn);
-		private:
-			bool stopped;
+		protected:
+			atomic<bool> stopped;
 			int port;
 			Mutex mutex;
 			map<struct mg_connection*, Request *> currentRequests;

@@ -38,6 +38,11 @@ public:
 
 static HTTP::Server *_server;
 static BootstrapHTTPHandler _handler;
+static std::thread _thread;
+
+static void _start_func() {
+	_server->start(1000 / get_config()->get_int("http.poll_frequency", 30));
+}
 
 void Web::prepare() {
 	ctx.add_template_file("index", Resources::get_resource_file("Toast-Bootstrap", "index.html"));
@@ -54,10 +59,18 @@ void Web::prepare() {
 }
 
 void Web::start() {
-	// TODO thread all of this
-	_server->start(1000 / get_config()->get_int("http.poll_frequency", 30));
+	_thread = std::thread(_start_func);
+	_thread.detach();
+}
+
+void Web::stop() {
+	_server->stop();
 }
 
 HTTP::Server *Web::get_server() {
 	return _server;
+}
+
+std::thread *Web::get_server_thread() {
+	return &_thread;
 }

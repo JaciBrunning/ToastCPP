@@ -6,6 +6,8 @@
 #include "shared.fwi.hpp"
 #include "private.fwi.hpp"
 
+#include "toast/concurrent/mutex.hpp"
+
 #include <string>
 #include <stdlib.h>
 
@@ -17,6 +19,13 @@ namespace Toast {
         API char get_endian_bit();
         
 		API SharedPool *shared();
+
+		struct SharedMutex {
+		public:
+			Concurrent::IPCMutex *motors;
+		};
+
+		API SharedMutex *shared_mutex();
 
         class Bridge {
             public:

@@ -6,14 +6,21 @@
 #include "toast/logger.hpp"
 
 using namespace Toast;
+using namespace Toast::Concurrent;
 using namespace std;
 
 static SHM_HANDLE __shm_handle_shared;
 static char *__shared_block;
 static Memory::SharedPool _shared;
 
+static Memory::SharedMutex _mtx;
+
 void init_shared() {
 	_shared.map_to(__shared_block);
+}
+
+void init_mutexes(bool doIOwn) {
+	_mtx.motors = new IPCMutex("core_motors", 26, doIOwn);
 }
 
 void Memory::initialize_bootstrap() {
@@ -22,8 +29,9 @@ void Memory::initialize_bootstrap() {
 
 	memset(__shared_block, 0, Memory::SharedPool::SIZE);
 	init_shared();
+	init_mutexes(true);
     
-    // Write the PID to the Shared Pool for client processes to work with
+    // Write the Process ID to the Shared Pool for client processes to work with
 	_shared.set_bootstrap_pid(get_pid());
 	_shared.set_endian(Memory::get_endian_bit());
 }
@@ -33,6 +41,7 @@ void Memory::initialize() {
     __shared_block = Toast::Internal::SHM::map_shm_file(__shm_handle_shared, Memory::SharedPool::SIZE);
 
 	init_shared();
+	init_mutexes(false);
 }
 
 char Memory::get_endian_bit() {
@@ -55,6 +64,10 @@ void Memory::copy_private_pool(int module_idx, char *buffer) {
 
 Memory::SharedPool *Memory::shared() {
 	return &_shared;
+}
+
+Memory::SharedMutex *Memory::shared_mutex() {
+	return &_mtx;
 }
 
 // -- BRIDGED MEMORY STUFF -- //
