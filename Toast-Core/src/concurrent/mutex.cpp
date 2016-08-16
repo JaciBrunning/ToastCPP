@@ -5,8 +5,7 @@ using namespace Toast::Concurrent;
 #ifdef OS_WIN
 static int pthread_mutex_init(pthread_mutex_t *mutex, void *unused) {
 	(void)unused;
-	auto temp_mtx = CreateMutex(NULL, FALSE, NULL);
-	mutex = &temp_mtx;
+	*mutex = CreateMutex(NULL, FALSE, NULL);
 	return *mutex == NULL ? -1 : 0;
 }
 
@@ -24,9 +23,7 @@ static int pthread_mutex_unlock(pthread_mutex_t *mutex) {
 #endif
 
 Mutex::Mutex() {
-#ifndef OS_WIN
 	_mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
-#endif
 	pthread_mutex_init(_mutex, NULL);
 	mine = true;
 }
@@ -56,6 +53,7 @@ IPCMutex::IPCMutex(std::string name, int size, bool owner) {
 	_name = name;
 	if (owner) {
 #ifdef OS_WIN
+		_mutex_ptr = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * size);
 		for (int id = 0; id < size; id++)
 			*(_mutex_ptr + id) = CreateMutex(NULL, FALSE, ("Global\\TOAST_IPC_MUTEX_" + name + "_" + std::to_string(id)).c_str());
 #else
@@ -72,6 +70,7 @@ IPCMutex::IPCMutex(std::string name, int size, bool owner) {
 	}
 	else {
 #ifdef OS_WIN
+		_mutex_ptr = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * size);
 		for (int id = 0; id < size; id++)
 			*(_mutex_ptr + id) = OpenMutex(SYNCHRONIZE, FALSE, ("Global\\TOAST_IPC_MUTEX_" + name + "_" + std::to_string(id)).c_str());
 #else

@@ -20,8 +20,12 @@ namespace Toast {
         
 		API SharedPool *shared();
 
+		// This stores all of Toast's IPC Mutexes (Process-Shared Mutexes)
+		// These make sure we don't try to access the same resource at once
 		struct SharedMutex {
 		public:
+			Concurrent::IPCMutex *logger_mutex;
+
 			Concurrent::IPCMutex *motors;
 		};
 

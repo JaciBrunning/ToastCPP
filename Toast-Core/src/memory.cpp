@@ -19,8 +19,10 @@ void init_shared() {
 	_shared.map_to(__shared_block);
 }
 
-void init_mutexes(bool doIOwn) {
-	_mtx.motors = new IPCMutex("core_motors", 26, doIOwn);
+void init_mutexes(bool own) {
+	_mtx.logger_mutex = new IPCMutex("logger", 1, own);
+
+	_mtx.motors = new IPCMutex("core_motors", 26, own);
 }
 
 void Memory::initialize_bootstrap() {

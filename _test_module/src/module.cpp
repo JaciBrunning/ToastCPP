@@ -96,14 +96,6 @@ class MyModule : public Module {
 
 			Logger l("test_module");
 
-			l << "Attempting to create module IPCMutex";
-			auto mtx = IPCMutex("shared_name", 1, true);
-			mtx.lock(0);
-			l << "Mutex 5 sec lock started";
-			sleep_ms(5100);
-			mtx.unlock(0);
-			l << "Mutex 5 sec unlocked";
-
 //			Server s(8001);
 //			MyHttpHandler h;
 //			s.register_handler(&h);

@@ -8,6 +8,7 @@ using namespace Toast;
 using namespace std;
 
 static string _process_name;
+static Concurrent::Mutex local_mutex;
 static bool _debug;
 
 // 32 KB ought to be enough
@@ -104,12 +105,15 @@ void Log::log(string name, string msg, Log::Level level) {
 }
 
 void Log::log_raw(string msg, bool error, bool debug) {
+	Concurrent::IPCMutex *logger_mutex = Memory::shared_mutex()->logger_mutex;
     if (!debug || _debug || Memory::shared()->get_debug()) {
+		logger_mutex->lock(0);
         if (error) {
             cerr << msg << endl;
         } else {
-            cerr << msg << endl;
+            cout << msg << endl;
         }
+		logger_mutex->unlock(0);
     }
     
     int total_length = 30 + msg.length();
@@ -129,7 +133,9 @@ void Log::log_raw(string msg, bool error, bool debug) {
     memcpy(&buffer[0xF], msg.c_str(), msg.length());
     
     if (file_out.is_open()) {
+		local_mutex.lock();
         file_out.write(buffer, total_length);
+		local_mutex.unlock();
     }
 }
 

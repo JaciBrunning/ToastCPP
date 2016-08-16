@@ -48,14 +48,6 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     Bootstrap::States::init();
 	Bootstrap::Web::start();
 
-	sleep_ms(2000);
-
-	auto mtx = IPCMutex("shared_name", 1, false);
-	_b_log << "Waiting for shared mutex...";
-	mtx.lock(0);
-	_b_log << "Mutex Available!!";
-	mtx.unlock(0);
-
     provider_init();
     
 	CRASH_HANDLE_END
