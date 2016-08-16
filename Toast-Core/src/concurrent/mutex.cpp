@@ -6,7 +6,6 @@ using namespace Toast::Concurrent;
 static int pthread_mutex_init(pthread_mutex_t *mutex, void *unused) {
 	(void)unused;
 	auto temp_mtx = CreateMutex(NULL, FALSE, NULL);
-//	*mutex = CreateMutex(NULL, FALSE, NULL);
 	mutex = &temp_mtx;
 	return *mutex == NULL ? -1 : 0;
 }
@@ -21,11 +20,13 @@ static int pthread_mutex_lock(pthread_mutex_t *mutex) {
 
 static int pthread_mutex_unlock(pthread_mutex_t *mutex) {
 	return ReleaseMutex(*mutex) == 0 ? -1 : 0;
-//	return CloseHandle(*mutex) == 0 ? -1 : 0;
 }
 #endif
 
 Mutex::Mutex() {
+#ifndef OS_WIN
+	_mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
+#endif
 	pthread_mutex_init(_mutex, NULL);
 	mine = true;
 }
@@ -37,35 +38,6 @@ Mutex::Mutex(pthread_mutex_t *_mtx, bool isnew) {
 		pthread_mutex_init(_mutex, NULL);
 	}
 }
-
-//Mutex::Mutex(std::string name) {
-//	mine = true;
-//
-//#ifdef OS_WIN
-//	auto tmp = CreateMutex(NULL, TRUE, ("Global\\toast_shared_mutex_" + name).c_str());
-//	_mutex = &tmp;
-//#else
-//	_mutex = (pthread_mutex_t *) malloc(sizeof(pthread_mutex_t));
-//	pthread_mutexattr_t mutex_attr;
-//	pthread_mutexattr_init(&mutex_attr);
-//	pthread_mutexattr_setpshared(&mutex_attr, PTHREAD_PROCESS_SHARED);
-//	pthread_mutex_init(_mutex, &mutex_attr);
-//#endif
-//}
-//
-//Mutex::Mutex(pthread_mutex_t *_mtx, std::string name) {
-//	_mutex = _mtx;
-//	mine = false;
-//
-//#ifdef OS_WIN
-//	*_mutex = CreateMutex(NULL, FALSE, ("Global\\toast_shared_mutex_" + name).c_str());
-//#else
-//	pthread_mutexattr_t mutex_attr;
-//	pthread_mutexattr_init(&mutex_attr);
-//	pthread_mutexattr_setpshared(&mutex_attr, PTHREAD_PROCESS_SHARED);
-//	pthread_mutex_init(_mutex, &mutex_attr);
-//#endif
-//}
 
 Mutex::~Mutex() {
 	if (mine) pthread_mutex_destroy(_mutex);
