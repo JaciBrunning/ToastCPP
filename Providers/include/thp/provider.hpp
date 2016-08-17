@@ -18,6 +18,9 @@ CAPI void provider_preinit();
 // Called after Toast loading
 CAPI void provider_init();
 
+// Called after provider_init() to start looping.
+CAPI void provider_loop();
+
 CAPI void thp_state_set_callback(RawStateCallback callback_periodic, RawStateCallback callback_transition);
 CAPI void thp_state_call_periodic(bool disabled, bool auton, bool teleop, bool test);
 CAPI void thp_state_call_init(bool disabled, bool auton, bool teleop, bool test);

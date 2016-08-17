@@ -17,10 +17,12 @@
 
 using namespace Toast;
 
-Logger _b_log("Toast-Bootstrap");
+Logger _b_log("Toast");
 Config _b_cfg("Toast-Bootstrap");
 
 void init_toast_bootstrap(int argc, char *argv[]) {
+    long start_time = current_time_millis();
+    long start_cpu_time = current_cpu_time();
     ProviderInfo *info = provider_info();
     Crash::initialize();
     
@@ -49,7 +51,13 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	Bootstrap::Web::start();
 
     provider_init();
-    
+    sleep_ms(2000); // Test for CPU Time
+    long end_time = current_time_millis();
+    long end_cpu_time = current_cpu_time();
+    _b_log << "Total Bootstrap Startup Time: " + to_string(end_time - start_time) + "ms";
+    _b_log << "Total Bootstrap CPU Time: " + to_string(end_cpu_time - start_cpu_time) + "ms";
+    provider_loop();
+
 	CRASH_HANDLE_END
 }
 

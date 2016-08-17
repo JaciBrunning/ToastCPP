@@ -26,6 +26,7 @@ void toast_module_shutdown() {
 }
 
 void init_toast_module(string module_name, string private_mempool_id, int module_idx) {
+    long start_time = current_time_millis();
     if (Memory::Module::initialize(private_mempool_id, module_idx) != 0) return;
     
     Crash::initialize();
@@ -71,6 +72,8 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     Memory::Module::finalize_load();
     _logger << "Module Loaded: " + string(info->name) + " [" + to_string(Memory::shared()->get_bootstrap_pid()) + " -> " + to_string(get_pid()) + "]";
     
+    long end_time = current_time_millis();
+    _logger << "Total Module Startup Time: " + to_string(end_time - start_time) + "ms";
     // MAIN LOOP
     States::start_tracker();
     // SHUTDOWN 

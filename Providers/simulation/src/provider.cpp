@@ -22,11 +22,15 @@ void provider_preinit() { }
 void provider_init() {
 	_logger.info("Simulation Provider Loaded and Running");
 	_config.load();
-	int update_freq = _config.get_int("update_frequency", 50);
+}
+
+void provider_loop() {
+    int update_freq = _config.get_int("update_frequency", 50);
 	while (true) {
 		sleep_ms(1000 / update_freq);
 	}
 }
+
 void provider_free() { }
 
 void thp_state_set_callback(RawStateCallback callback_periodic, RawStateCallback callback_transition) {

@@ -41,6 +41,9 @@ API void sleep_ms(int milliseconds);
 // Get the current system time since UNIX epoch in Milliseconds
 API long current_time_millis();
 
+// Get the current CPU time in milliseconds (for process; multiple threads may cause this to be higher than wall clock speed)
+API long current_cpu_time();
+
 // Get the Process ID of the current process
 API int get_pid();
 

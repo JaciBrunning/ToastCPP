@@ -34,6 +34,9 @@ void provider_init() {
               HALUsageReporting::kLanguage_CPlusPlus);
 
     robot = new THP_Base_Robot();
+}
+
+void provider_loop() {
     RobotBase::robotSetup(robot);
 }
 

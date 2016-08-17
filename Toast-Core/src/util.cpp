@@ -34,6 +34,21 @@ long current_time_millis() {
 #endif
 }
 
+long current_cpu_time() {
+#ifdef WIN32
+    FILETIME a,b,c,d;
+    if (GetProcessTimes(GetCurrentProcess(),&a,&b,&c,&d) != 0){
+        return
+            (long)((double)(d.dwLowDateTime |
+            ((unsigned long long)d.dwHighDateTime << 32)) * 0.001);
+    } else {
+        return 0;
+    }
+#else
+    return (long)((double)clock() / CLOCKS_PER_SEC * 1000);
+#endif
+}
+
 int get_pid() {
     #ifdef OS_WIN
         return GetCurrentProcessId();
