@@ -5,11 +5,15 @@
 using namespace IO;
 using namespace Toast::Memory;
 
+static inline Toast::Concurrent::IPCMutex *mtx() {
+	return shared_mutex()->joy;
+}
+
 // Joysticks
 
 Joystick::Joystick(int port) : _port(port) {
 	_mem = shared()->joystick(port);
-	_mem->set_init(true);
+	MTX_WRAP(mtx(), port, _mem->set_init(true));
 }
 
 int Joystick::get_port() {
@@ -17,23 +21,23 @@ int Joystick::get_port() {
 }
 
 int Joystick::get_num_axis() {
-	return _mem->get_num_axis();
+	MTX_RETURN(mtx(), _port, _mem->get_num_axis());
 }
 
 int Joystick::get_num_button() {
-	return _mem->get_num_button();
+	MTX_RETURN(mtx(), _port, _mem->get_num_button());
 }
 
 int Joystick::get_num_pov() {
-	return _mem->get_num_pov();
+	MTX_RETURN(mtx(), _port, _mem->get_num_pov());
 }
 
 bool Joystick::get_raw_button(int id) {
-	return FWI_IS_BIT_SET(_mem->get_button_mask(), id);
+	MTX_RETURN(mtx(), _port, FWI_IS_BIT_SET(_mem->get_button_mask(), id));
 }
 
 float Joystick::get_raw_axis(int id) {
-	int8_t val = _mem->get_axis(id);
+	MTX_WRAP(mtx(), _port, int8_t val = _mem->get_axis(id));
 	if (val < 0) {
 		return val / 128.0f;
 	} else {
@@ -42,48 +46,50 @@ float Joystick::get_raw_axis(int id) {
 }
 
 int Joystick::get_pov(int id) {
-	return _mem->get_pov(id);
+	MTX_RETURN(mtx(), _port, _mem->get_pov(id));
 }
 
 void Joystick::set_rumble_left(float mag) {
 	if (mag > 1)		mag = 1.0;
 	else if (mag < 0)	mag = 0.0;
-	_mem->set_rumble_l((uint16_t)(mag * 65535));
+	MTX_WRAP(mtx(), _port, _mem->set_rumble_l((uint16_t)(mag * 65535)));
 }
 
 float Joystick::get_rumble_left() {
-	return _mem->get_rumble_l() / 65535.0f;
+	MTX_RETURN(mtx(), _port, _mem->get_rumble_l() / 65535.0f);
 }
 
 void Joystick::set_rumble_right(float mag) {
 	if (mag > 1)		mag = 1.0;
 	else if (mag < 0)	mag = 0.0;
-	_mem->set_rumble_r((int16_t)(mag * 65535));
+	MTX_WRAP(mtx(), _port, _mem->set_rumble_r((int16_t)(mag * 65535)));
 }
 
 float Joystick::get_rumble_right() {
-	return _mem->get_rumble_r() / 65535.0f;
+	MTX_RETURN(mtx(), _port, _mem->get_rumble_r() / 65535.0f);
 }
 
 void Joystick::set_output(int id, bool value) {
+	MTX_LOCK(mtx(), _port);
 	uint32_t op = _mem->get_outputs_mask();
 	FWI_SET_BIT_TO(op, id, value);
 	_mem->set_outputs_mask(op);
+	MTX_UNLOCK(mtx(), _port);
 }
 
 void Joystick::set_outputs(uint32_t outputs) {
-	_mem->set_outputs_mask(outputs);
+	MTX_WRAP(mtx(), _port, _mem->set_outputs_mask(outputs));
 }
 
 bool Joystick::get_output(int id) {
-	return FWI_IS_BIT_SET(_mem->get_outputs_mask(), id);
+	MTX_RETURN(mtx(), _port, FWI_IS_BIT_SET(_mem->get_outputs_mask(), id));
 }
 
 uint32_t Joystick::get_outputs() {
-	return _mem->get_outputs_mask();
+	MTX_RETURN(mtx(), _port, _mem->get_outputs_mask());
 }
 
-// Driver Station Comms
+// Driver Station Comms (Note these don't need a mutex because they are single-write)
 
 bool DS::is_ds_attached() {
 	return shared()->ds_info()->get_ds_attached();

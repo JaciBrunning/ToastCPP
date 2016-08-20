@@ -39,8 +39,8 @@ long current_cpu_time() {
     FILETIME a,b,c,d;
     if (GetProcessTimes(GetCurrentProcess(),&a,&b,&c,&d) != 0){
         return
-            (long)((double)(d.dwLowDateTime |
-            ((unsigned long long)d.dwHighDateTime << 32)) * 0.001);
+            (long)((d.dwLowDateTime |
+            ((unsigned long long)d.dwHighDateTime << 32)) / 10000);
     } else {
         return 0;
     }

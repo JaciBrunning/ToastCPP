@@ -20,9 +20,19 @@ void init_shared() {
 }
 
 void init_mutexes(bool own) {
-	_mtx.logger_mutex = new IPCMutex("logger", 1, own);
+	_mtx.logger = new IPCMutex("logger", 1, own);
 
-	_mtx.motors = new IPCMutex("core_motors", 26, own);
+	_mtx.onboard_accel = new IPCMutex("core_ob_accel", 1, own);
+	_mtx.analog_out = new IPCMutex("core_an_out", 2, own);
+	_mtx.analog_in = new IPCMutex("core_an_in", 8, own);
+	_mtx.dio = new IPCMutex("core_dio", 26, own);
+	_mtx.relay = new IPCMutex("core_relay", 4, own);
+	_mtx.pcm = new IPCMutex("core_pcm", 2, own);
+	_mtx.motor = new IPCMutex("core_motors", 26, own);
+	_mtx.pwm = new IPCMutex("core_pwm", 20, own);
+	_mtx.servo = new IPCMutex("core_servo", 20, own);
+	_mtx.joy = new IPCMutex("core_joystick", 6, own);
+	_mtx.power = new IPCMutex("core_power", 2, own);	// ID 0: PDP, ID 1: Controller
 }
 
 void Memory::initialize_bootstrap() {

@@ -105,8 +105,8 @@ void Log::log(string name, string msg, Log::Level level) {
 }
 
 void Log::log_raw(string msg, bool error, bool debug) {
-	Concurrent::IPCMutex *logger_mutex = Memory::shared_mutex()->logger_mutex;
     if (!debug || _debug || Memory::shared()->get_debug()) {
+		Concurrent::IPCMutex *logger_mutex = Memory::shared_mutex()->logger;
 		logger_mutex->lock(0);
         if (error) {
             cerr << msg << endl;
@@ -119,17 +119,15 @@ void Log::log_raw(string msg, bool error, bool debug) {
     int total_length = 30 + msg.length();
     buffer[0] = 0x00; // Code
     
-    int now = (int)current_time_millis();
-    
-    Net::Transport::intToBytes(now, buffer, 0x01);
+	*(int *)(&buffer[0x01]) = (int)current_time_millis();
     //memcpy(&buffer[0x05], );           TODO MatchTime here
-    //                                   TODO RobotState here
+	buffer[0x09] = (char)Memory::shared()->get_state_current();
     char flags = 0x00;
     if (error) flags = flags | 1;
     if (debug) flags = flags | (1 << 1);
     
     buffer[0xA] = flags;
-    Net::Transport::intToBytes(msg.length(), buffer, 0xB);
+	*(int *)(&buffer[0x0B]) = msg.length();
     memcpy(&buffer[0xF], msg.c_str(), msg.length());
     
     if (file_out.is_open()) {

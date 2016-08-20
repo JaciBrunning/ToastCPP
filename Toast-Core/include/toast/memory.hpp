@@ -24,9 +24,19 @@ namespace Toast {
 		// These make sure we don't try to access the same resource at once
 		struct SharedMutex {
 		public:
-			Concurrent::IPCMutex *logger_mutex;
+			Concurrent::IPCMutex *logger;
 
-			Concurrent::IPCMutex *motors;
+			Concurrent::IPCMutex *onboard_accel;
+			Concurrent::IPCMutex *analog_out;
+			Concurrent::IPCMutex *analog_in;
+			Concurrent::IPCMutex *dio;
+			Concurrent::IPCMutex *relay;
+			Concurrent::IPCMutex *pcm;
+			Concurrent::IPCMutex *motor;
+			Concurrent::IPCMutex *servo;
+			Concurrent::IPCMutex *pwm;
+			Concurrent::IPCMutex *joy;
+			Concurrent::IPCMutex *power;
 		};
 
 		API SharedMutex *shared_mutex();

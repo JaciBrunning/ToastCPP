@@ -3,6 +3,8 @@
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
 
+#include "io/common.hpp"
+
 namespace IO {
 	API int get_pcm_id(int module_id);
 

@@ -3,6 +3,8 @@
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
 
+#include "io/common.hpp"
+
 namespace IO {
 	namespace PDP {
 		API void set_can_id(int id);
