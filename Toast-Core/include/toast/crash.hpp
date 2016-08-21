@@ -31,6 +31,7 @@ namespace Toast {
         API void on_unknown();
         API void on_signal(int sigid);
         
+		API void shutdown();
         API void on_shutdown(void (*arg)());
         
         API void handle_exception(std::string type, std::string msg);

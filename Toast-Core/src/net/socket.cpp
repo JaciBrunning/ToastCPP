@@ -24,8 +24,42 @@ Socket::SOCKET Socket::socket_udp_create() {
     return s;
 }
 
+Socket::SocketAddress::SocketAddress(string host, int port) {
+	inaddr_struct.sin_addr.s_addr = inet_addr((char *)host.c_str());
+	inaddr_struct.sin_family = AF_INET;
+	inaddr_struct.sin_port = htons(port);
+	inaddr_length = sizeof(inaddr_struct);
+}
+
+string Socket::SocketAddress::host() {
+	return string(inet_ntoa(inaddr_struct.sin_addr));
+}
+
+int Socket::SocketAddress::port() {
+	return ntohs(inaddr_struct.sin_port);
+}
+
+void Socket::SocketAddress::set_host(string host) {
+	inaddr_struct.sin_addr.s_addr = inet_addr((char *)host.c_str());
+	inaddr_struct.sin_family = AF_INET;
+	inaddr_length = sizeof(inaddr_struct);
+}
+
+void Socket::SocketAddress::set_port(int port) {
+	inaddr_struct.sin_port = htons(port);
+	inaddr_length = sizeof(inaddr_struct);
+}
+
+Socket::SocketAddress Socket::socket_address(std::string host, int port) {
+	struct sockaddr_in addr;
+	addr.sin_addr.s_addr = inet_addr((char *)host.c_str());
+	addr.sin_family = AF_INET;
+	addr.sin_port = htons(port);
+	return SocketAddress(addr);
+}
+
 int Socket::socket_connect(Socket::SOCKET s, string host, int port) {
-    Socket::SocketAddress host_addr;
+    struct sockaddr_in host_addr;
     host_addr.sin_addr.s_addr = inet_addr((char *)host.c_str());
     host_addr.sin_family = AF_INET;
     host_addr.sin_port = htons(port);
@@ -33,7 +67,7 @@ int Socket::socket_connect(Socket::SOCKET s, string host, int port) {
 }
 
 int Socket::socket_bind(Socket::SOCKET s, int port) {
-    Socket::SocketAddress addr;
+	struct sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port);
@@ -46,12 +80,7 @@ void Socket::socket_listen(Socket::SOCKET s) {
 }
 
 Socket::SOCKET Socket::socket_accept(SOCKET s, Socket::SocketAddress *addr) {
-    #ifdef OS_WIN
-        int len = sizeof(&addr);
-    #else
-        unsigned int len = sizeof(&addr);
-    #endif
-    return accept(s, (struct sockaddr *)addr, &len);
+    return accept(s, (struct sockaddr *)addr->raw_address(), addr->raw_address_len_ptr());
 }
 
 int Socket::socket_quit() {
@@ -92,15 +121,6 @@ string Socket::hostname_to_ip(string hostname) {
     }
      
     return NULL;
-}
-
-int Socket::socket_port(Socket::SocketAddress *addr) {
-    return ntohs(addr->sin_port);
-}
-
-string Socket::socket_host(Socket::SocketAddress *addr) {
-    struct in_addr addr_in = addr->sin_addr;
-    return string(inet_ntoa(addr_in));
 }
 
 int Socket::ClientSocket::connect() {
@@ -155,11 +175,25 @@ int Socket::ServerSocket::close() {
 Socket::ClientSocket Socket::ServerSocket::accept() {
     Socket::SocketAddress addr;
     Socket::SOCKET sid = Socket::socket_accept(_socket, &addr);
-    string host = Socket::socket_host(&addr);
-    int port = Socket::socket_port(&addr);
     
     ClientSocket socket(sid);
-    socket.host = host;
-    socket.port = port;
+    socket.host = addr.host();
+	socket.port = addr.port();
     return socket;
+}
+
+int Socket::DatagramSocket::bind() {
+	return Socket::socket_bind(_socket, port);
+}
+
+int Socket::DatagramSocket::read(char *buf, size_t length, Socket::SocketAddress *addr) {
+	return ::recvfrom(_socket, buf, length, 0, (struct sockaddr *)addr->raw_address(), addr->raw_address_len_ptr());
+}
+
+int Socket::DatagramSocket::send(const char *buf, size_t length, Socket::SocketAddress *addr) {
+	return sendto(_socket, buf, length, 0, (struct sockaddr *)addr->raw_address(), addr->raw_address_length());
+}
+
+int Socket::DatagramSocket::close() {
+	return Socket::socket_close(_socket);
 }

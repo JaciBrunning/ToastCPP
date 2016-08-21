@@ -75,6 +75,10 @@ void Crash::on_signal(int sigid) {
     Crash::handle_exception(type, msg);
 }
 
+void Crash::shutdown() {
+	::shutdown();
+}
+
 void Crash::on_shutdown(void (*arg)()) {
     shutdown_ptr = arg;
 }

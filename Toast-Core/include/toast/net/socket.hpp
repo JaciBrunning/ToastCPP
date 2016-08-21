@@ -37,11 +37,43 @@ namespace Toast {
             #else
                 typedef int SOCKET;
             #endif
-            typedef struct sockaddr_in SocketAddress;
+//            typedef struct sockaddr_in SocketAddress;
+			class SocketAddress {
+			public:
+				API SocketAddress() {
+					inaddr_length = sizeof(inaddr_struct);
+				}
+				API SocketAddress(std::string host, int port);
+				API SocketAddress(struct sockaddr_in inaddr) {
+					inaddr_struct = inaddr;
+					inaddr_length = sizeof(inaddr);
+				}
+
+				API void from(struct sockaddr_in inaddr) {
+					inaddr_struct = inaddr;
+					inaddr_length = sizeof(inaddr);
+				}
+
+				API std::string host();
+				API int port();
+
+				API void set_port(int port);
+				API void set_host(std::string host);
+
+				API struct sockaddr_in *raw_address() { return &inaddr_struct; }
+				API int raw_address_length() { return inaddr_length;  }
+				
+				API int *raw_address_len_ptr() { return &inaddr_length; }
+
+			private:
+				struct sockaddr_in inaddr_struct;
+				int inaddr_length;
+			};
             
             API int socket_init();
             API SOCKET socket_create();
             API SOCKET socket_udp_create();
+			API SocketAddress socket_address(std::string host, int port);
             API int socket_connect(SOCKET s, std::string host, int port);
             API int socket_bind(SOCKET s, int port);
             API void socket_listen(SOCKET s);
@@ -49,8 +81,6 @@ namespace Toast {
             API int socket_quit();
             API int socket_close(SOCKET sock);
             API std::string hostname_to_ip(std::string hostname);
-            API int socket_port(SocketAddress *addr);
-            API std::string socket_host(SocketAddress *addr);
             
             class ClientSocket {
                 public:
@@ -83,8 +113,8 @@ namespace Toast {
                     
                     std::string host;
                     int port;
-                private:
-                    Toast::Net::Socket::SOCKET _socket;
+
+					Toast::Net::Socket::SOCKET _socket;
             };
             
             class ServerSocket {
@@ -102,9 +132,28 @@ namespace Toast {
                     API int get_port() { return port; }
                     
                     int port;
-                private:
-                    Toast::Net::Socket::SOCKET _socket;
+
+					Toast::Net::Socket::SOCKET _socket;
             };
+
+			class DatagramSocket {
+			public:
+				API DatagramSocket(int sock_port) {
+					port = sock_port;
+					_socket = Toast::Net::Socket::socket_udp_create();
+				};
+
+				API int bind();
+
+				API int read(char *buf, size_t length, SocketAddress *addr);
+				API int send(const char *buffer, size_t length, SocketAddress *addr);
+
+				API int close();
+
+				int port;
+
+				Toast::Net::Socket::SOCKET _socket;
+			};
         }
     }
 }
