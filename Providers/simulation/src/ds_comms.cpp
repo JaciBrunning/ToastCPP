@@ -41,15 +41,15 @@ static void init_mdns_payload() {
 	int thnl = target_host_name.size();
 
 	std::string my_ip_address = get_simulation_config()->get_string("mdns.my_ip_address", "127.0.0.1");
-	char *ip = new char[4];
+	unsigned char *ip = new unsigned char[4];
 	sscanf(my_ip_address.c_str(), "%d.%d.%d.%d", ip, ip + 1, ip + 2, ip + 3);
 
-	char payload_1[] = {
+	unsigned char payload_1[] = {
 		0x00, 0x00, 0x84, 0x00,		// ID, Response Query
 		0x00, 0x00, 0x00, 0x03,		// No Question, 3 Answers
 		0x00, 0x00, 0x00, 0x01,		// No Authority, 1 Additional RR
 	};
-	char payload_2[] = {
+	unsigned char payload_2[] = {
 		// Record 1: PTR
 		0x03,							// Len: 3
 		0x5f, 0x6e, 0x69,				// _ni
@@ -61,26 +61,26 @@ static void init_mdns_payload() {
 
 		0x00, 0x0c, 0x00, 0x01,			// Type: PTR (domain name PoinTeR), Class: IN, Cache flush: false
 		0x00, 0x00, 0x1c, 0x20,			// TTL: 7200
-		0x00, 0x03 + snl,				// Data Length: 3 + snl
-		snl								// Name Length: snl
+		0x00, (unsigned char)(0x03 + snl),		// Data Length: 3 + snl
+		(unsigned char)snl						// Name Length: snl
 	};
 	char *payload_3 = (char *)service_name.c_str();
 
-	char payload_4[] = {
+	unsigned char payload_4[] = {
 		0xc0, 0x0c,					// Name Offset (0xc0, 0x0c => 12 =>._ni._tcp.local)
 
 		// Record 2: SRV
 		0xc0, 0x26, 0x00, 0x21,		// Name Offset (mdns.service_name), Type: SRV (Server Selection)
 		0x80, 0x01,					// Class: IN, Cache flush: true
 		0x00, 0x00, 0x1c, 0x20,		// TTL: 7200
-		0x00, 0xE + thnl,			// Data Length: 14 + thnl
+		0x00, (unsigned char)(0xE + thnl),	// Data Length: 14 + thnl
 		0x00, 0x00, 0x00, 0x00,		// Priority: 0, Weight: 0
 		0x0d, 0xfc,					// Port: 3580
-		thnl						// Len: thnl
+		(unsigned char)thnl					// Len: thnl
 	};
 	char *payload_5 = (char *)target_host_name.c_str();
 
-	char payload_6[] = {
+	unsigned char payload_6[] = {
 		0x05,							// Len: 5
 		0x6c, 0x6f, 0x63, 0x61, 0x6c,	// local
 		0x00,							// end of string
@@ -92,7 +92,7 @@ static void init_mdns_payload() {
 		0x00, 0x01, 0x00,			// Data Length: 1, TXT Length: 0
 
 		// Additional Record: A
-		0xc0, 0x3b + snl,			// Name Offset (mdns.target_host_name)
+		0xc0, (unsigned char)(0x3b + snl),	// Name Offset (mdns.target_host_name)
 		0x00, 0x01, 0x80, 0x01,		// Type: A, Class: IN, Cache flush: true
 		0x00, 0x00, 0x1c, 0x20,		// TTL: 7200
 		0x00, 0x04,					// Data Length: 4
