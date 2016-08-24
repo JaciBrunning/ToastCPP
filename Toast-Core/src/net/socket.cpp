@@ -80,7 +80,12 @@ void Socket::socket_listen(Socket::SOCKET s) {
 }
 
 Socket::SOCKET Socket::socket_accept(SOCKET s, Socket::SocketAddress *addr) {
-    return accept(s, (struct sockaddr *)addr->raw_address(), addr->raw_address_len_ptr());
+	#ifdef OS_WIN
+		int *ptr = addr->raw_address_len_ptr();
+	#else
+		unsigned int *ptr = (unsigned int *)addr->raw_address_len_ptr();
+	#endif
+    return accept(s, (struct sockaddr *)addr->raw_address(), ptr);
 }
 
 int Socket::socket_quit() {
@@ -187,7 +192,12 @@ int Socket::DatagramSocket::bind() {
 }
 
 int Socket::DatagramSocket::read(char *buf, size_t length, Socket::SocketAddress *addr) {
-	return ::recvfrom(_socket, buf, length, 0, (struct sockaddr *)addr->raw_address(), addr->raw_address_len_ptr());
+	#ifdef OS_WIN
+		int *ptr = addr->raw_address_len_ptr();
+	#else
+		unsigned int *ptr = (unsigned int *)addr->raw_address_len_ptr();
+	#endif
+	return ::recvfrom(_socket, buf, length, 0, (struct sockaddr *)addr->raw_address(), ptr);
 }
 
 int Socket::DatagramSocket::send(const char *buf, size_t length, Socket::SocketAddress *addr) {
