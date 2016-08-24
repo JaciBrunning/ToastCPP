@@ -60,7 +60,7 @@ static void init_mdns_payload() {
 		0x00,							// end of string
 
 		0x00, 0x0c, 0x00, 0x01,			// Type: PTR (domain name PoinTeR), Class: IN, Cache flush: false
-		0x00, 0x00, 0x1c, 0x20,			// TTL: 7200
+		0x00, 0x00, 0x00, 0x3C,			// TTL: 60 Sec
 		0x00, (unsigned char)(0x03 + snl),		// Data Length: 3 + snl
 		(unsigned char)snl						// Name Length: snl
 	};
@@ -72,7 +72,7 @@ static void init_mdns_payload() {
 		// Record 2: SRV
 		0xc0, 0x26, 0x00, 0x21,		// Name Offset (mdns.service_name), Type: SRV (Server Selection)
 		0x80, 0x01,					// Class: IN, Cache flush: true
-		0x00, 0x00, 0x1c, 0x20,		// TTL: 7200
+		0x00, 0x00, 0x00, 0x3C,		// TTL: 60 sec
 		0x00, (unsigned char)(0xE + thnl),	// Data Length: 14 + thnl
 		0x00, 0x00, 0x00, 0x00,		// Priority: 0, Weight: 0
 		0x0d, 0xfc,					// Port: 3580
@@ -88,13 +88,13 @@ static void init_mdns_payload() {
 		// Record 3: TXT
 		0xc0, 0x26, 0x00, 0x10,		// Name Offset (mdns.service_name), Type: TXT
 		0x80, 0x01,					// Class: IN, Cache flush: true
-		0x00, 0x00, 0x1c, 0x20,		// TTL: 7200
+		0x00, 0x00, 0x00, 0x3C,		// TTL: 60 sec
 		0x00, 0x01, 0x00,			// Data Length: 1, TXT Length: 0
 
 		// Additional Record: A
 		0xc0, (unsigned char)(0x3b + snl),	// Name Offset (mdns.target_host_name)
 		0x00, 0x01, 0x80, 0x01,		// Type: A, Class: IN, Cache flush: true
-		0x00, 0x00, 0x1c, 0x20,		// TTL: 7200
+		0x00, 0x00, 0x00, 0x3C,		// TTL: 60 sec
 		0x00, 0x04,					// Data Length: 4
 		ip[0], ip[1], ip[2], ip[3]	// IP Bytes
 	};
