@@ -32,23 +32,28 @@ model {
     }
 }
 
+task build_interchange_js() {
+	doLast {
+		exec {
+			workingDir 'interchange/ToastFWI'
+			commandLine 'ruby', 'build_js.rb'
+		}
+		delete {
+			delete 'resources/js/vendor/toast_fwi.min.js'
+		}
+		copy {
+			from 'interchange/ToastFWI/build/js/bundle.js'
+			rename 'bundle.js', 'toast_fwi.min.js'
+			into 'resources/js/vendor'
+		}
+	}
+}
+
 task build_interchange() {
     doLast {
-        delete {
-            delete 'resources/js/vendor/toast_fwi.min.js'
-        }
-        copy {
-            from 'interchange/ToastFWI/build/js/bundle.js'
-            rename 'bundle.js', 'toast_fwi.min.js'
-            into 'resources/js/vendor'
-        }
         exec {
             workingDir 'interchange/ToastFWI'
             commandLine 'ruby', 'build_cpp.rb'
-        }
-        exec {
-            workingDir 'interchange/ToastFWI'
-            commandLine 'ruby', 'build_js.rb'
         }
     }
 }

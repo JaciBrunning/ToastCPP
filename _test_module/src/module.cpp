@@ -109,13 +109,6 @@ class MyModule : public Module {
 			States::register_tracker(&trackfunc);
 			States::register_ticker(&tickfunc);
 
-			for (int i = 0; i < Toast::Net::Util::get_adapter_count(); i++) {
-				Toast::Net::Util::Adapter *a = Toast::Net::Util::get_adapter(i);
-				l << a->name;
-				l << "\t" + a->description;
-				l << "\t" + a->ip_addr;
-			}
-
 //			Server s(8001);
 //			MyHttpHandler h;
 //			s.register_handler(&h);
