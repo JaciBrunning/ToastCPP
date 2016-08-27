@@ -21,6 +21,11 @@ Logger _b_log("Toast");
 Config _b_cfg("Toast-Bootstrap");
 
 void init_toast_bootstrap(int argc, char *argv[]) {
+	bool loop = true;
+	for (int i = 0; i < argc; i++) {
+		if (strcmp(argv[i], "--no-loop") == 0) loop = false;
+	}
+
     long start_time = current_time_millis();
     ProviderInfo *info = provider_info();
     Crash::initialize();
@@ -52,8 +57,9 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     provider_init();
     long end_time = current_time_millis();
     _b_log << "Total Bootstrap Startup Time: " + to_string(end_time - start_time) + "ms";
-    provider_loop();
 
+    if (loop) provider_loop();
+	_b_log << "Bootstrap Stopping Normally...";
 	CRASH_HANDLE_END
 }
 
