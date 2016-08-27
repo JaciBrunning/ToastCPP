@@ -22,7 +22,7 @@ static void (*shutdown_ptr)() = NULL;
 static void shutdown() {
     if (shutdown_ptr != NULL) shutdown_ptr();
     // abort();
-    exit(-1);
+    exit(0);
 }
 
 static void catch_fatal_signal(int sig) {

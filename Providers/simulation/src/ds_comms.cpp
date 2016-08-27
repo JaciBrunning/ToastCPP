@@ -110,6 +110,8 @@ static void init_mdns_payload() {
 
 	mdns_payload_len = 96 + snl + thnl;
 	mdns_payload_init = true;
+	
+	free(ip);
 
 	logger << "Initialized mDNS. IP: " + Toast::Net::Util::ip_to_string(ip);
 }
