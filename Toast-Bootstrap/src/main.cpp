@@ -27,6 +27,7 @@ void bootstrap_shutdown() {
 
 	provider_free();
 	Toast::Memory::free_memory(true);
+	Toast::Bootstrap::Loader::free();
 }
 
 void init_toast_bootstrap(int argc, char *argv[]) {

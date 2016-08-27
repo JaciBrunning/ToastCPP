@@ -47,9 +47,10 @@ namespace Toast {
             private:
                 std::string name_cache;
             };
-            
+
             void initialize();
-            
+			void free();
+
             void search_modules();
             void create_subprocesses();
             

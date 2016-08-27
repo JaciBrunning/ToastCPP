@@ -30,6 +30,13 @@ void Loader::initialize() {
     Loader::create_subprocesses();
 }
 
+void Loader::free() {
+	for (std::vector< Loader::ModuleAdapter * >::iterator it = __modules.begin(); it != __modules.end(); ++it) {
+		Loader::free_private_mempool(*it);
+		delete (*it);
+	}
+}
+
 void Loader::search_modules() {
     vector<string> module_files = Filesystem::ls_local(Filesystem::path("modules"));
     for (auto module : module_files) {
