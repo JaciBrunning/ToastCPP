@@ -47,5 +47,9 @@ window.Common = window.Common || (function() {
         $.getJSON("/api/dirlist", { path: directory }, callback);
     };
 
+    exports.optional = function(variable) {
+        return (typeof variable != 'undefined' && variable);
+    }
+
     return exports;
 })();

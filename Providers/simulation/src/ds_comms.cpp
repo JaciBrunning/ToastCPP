@@ -1,4 +1,6 @@
 #include "toast/net/socket.hpp"
+#include "toast/net/util.hpp"
+
 #include "thp/sim/ds_comms.hpp"
 #include "thp/sim/sim_provider.hpp"
 
@@ -37,12 +39,12 @@ static void init_mdns_payload() {
 	std::string service_name = get_simulation_config()->get_string("mdns.service_name", "roborio-9999-frc");
 	int snl = service_name.size();
 
-	std::string target_host_name = get_simulation_config()->get_string("mdns.target_host_name", "toast-mdns-resolve");
+	std::string target_host_name = get_simulation_config()->get_string("mdns.host_name", "roborio-9999-frc");
 	int thnl = target_host_name.size();
 
-	std::string my_ip_address = get_simulation_config()->get_string("mdns.my_ip_address", "127.0.0.1");
+	std::string ip_address = get_simulation_config()->get_string("mdns.ip_address", "auto");
 	unsigned char *ip = new unsigned char[4];
-	sscanf(my_ip_address.c_str(), "%d.%d.%d.%d", ip, ip + 1, ip + 2, ip + 3);
+	Toast::Net::Util::get_ip(ip_address, ip);
 
 	unsigned char payload_1[] = {
 		0x00, 0x00, 0x84, 0x00,		// ID, Response Query
@@ -108,6 +110,8 @@ static void init_mdns_payload() {
 
 	mdns_payload_len = 96 + snl + thnl;
 	mdns_payload_init = true;
+
+	logger << "Initialized mDNS. IP: " + Toast::Net::Util::ip_to_string(ip);
 }
 
 static void mdns_broadcast_func() {

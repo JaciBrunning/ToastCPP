@@ -1,15 +1,19 @@
 #include "toast.hpp"
+#include "toast/net/util.hpp"
 
 #include "io/motor.hpp"
 #include "io/relay.hpp"
 #include "io/pneumatics.hpp"
 #include "io/digital.hpp"
 #include "io/analog.hpp"
+#include "io/ds.hpp"
 
 #include "toast/http/server.hpp"
 #include "toast/http/template.hpp"
 #include "toast/http/websocket.hpp"
 #include "toast/resources.hpp"
+
+#include "toast/math/buffer.hpp"
 
 #include <iostream>
 #include <thread>
@@ -43,11 +47,27 @@ public:
 	}
 };
 
+Logger l("test_module");
+Joystick *joy;
+Talon *talon;
+PCM *pcm;
+
+static void trackfunc(Toast::State old, Toast::State cur) {
+	l << "State: " + cur.to_string();
+}
+
+static void tickfunc(Toast::State state) {
+	talon->set(joy->get_raw_axis(0));
+	pcm->set_solenoid(0, joy->get_raw_button(0));
+}
+
 class MyModule : public Module {
     public:
         virtual void construct() {
 			Talon t(1);
 			t.set(0.47);
+
+			talon = new Talon(3);
 
 			Talon t2(2);
 			t2.set(-0.88);
@@ -61,13 +81,7 @@ class MyModule : public Module {
 			r2.set_reverse(true);
 			r2.set_reverse(false);
 
-			PCM pcm(12);
-			pcm.set_solenoid(0, true);
-			pcm.set_solenoid(1, false);
-			pcm.set_solenoid(3, true);
-			pcm.set_solenoid(4, true);
-			Memory::shared()->pneumatics(0)->set_comp_current(31.32);
-			Memory::shared()->pneumatics(0)->set_solenoid_black(2, true);
+			pcm = new PCM(12);
 
 			DIO dio(0);
 
@@ -81,20 +95,26 @@ class MyModule : public Module {
 
 			Victor v(1);
 
+			joy = new Joystick(0);
+
             ofstream outfile("shared.txt", ios::binary);
 			outfile.write(Memory::shared()->get_store(), Memory::SharedPool::SIZE);
 
 			ctx["test_str"] = "Hello World";
 
-			ctx.add_template("out", "#using base\n#define TITLE myTitle\nHello: {{ test_str }}");
-			ctx.add_template("base", "<html><title>{{TITLE}}</title>{{include core/include/css}}</html>\n{{#}}\nGET => {{get}}");
-			ctx.add_template_file("index", Resources::get_resource_file("_test_module", "index.html"));
-
 			Config c("test_module");
 			c.load();
 			c.get_bool("is_me", true);
 
-			Logger l("test_module");
+			States::register_tracker(&trackfunc);
+			States::register_ticker(&tickfunc);
+
+			for (int i = 0; i < Toast::Net::Util::get_adapter_count(); i++) {
+				Toast::Net::Util::Adapter *a = Toast::Net::Util::get_adapter(i);
+				l << a->name;
+				l << "\t" + a->description;
+				l << "\t" + a->ip_addr;
+			}
 
 //			Server s(8001);
 //			MyHttpHandler h;

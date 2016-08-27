@@ -116,7 +116,7 @@ string Socket::hostname_to_ip(string hostname) {
     int i;
          
     if ((he = gethostbyname((char *)hostname.c_str())) == NULL) {
-        return NULL;
+        return string();
     }
  
     addr_list = (struct in_addr **) he->h_addr_list;
@@ -125,7 +125,7 @@ string Socket::hostname_to_ip(string hostname) {
         return string(inet_ntoa(*addr_list[i]));
     }
      
-    return NULL;
+    return string();
 }
 
 int Socket::ClientSocket::connect() {
