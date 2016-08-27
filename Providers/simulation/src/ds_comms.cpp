@@ -61,7 +61,7 @@ static void init_mdns_payload() {
 		0x6c, 0x6f, 0x63, 0x61, 0x6c,	// local
 		0x00,							// end of string
 
-		0x00, 0x0c, 0x00, 0x01,			// Type: PTR (domain name PoinTeR), Class: IN, Cache flush: false
+		0x00, 0x0c, 0x80, 0x01,			// Type: PTR (domain name PoinTeR), Class: IN, Cache flush: false
 		0x00, 0x00, 0x00, 0x3C,			// TTL: 60 Sec
 		0x00, (unsigned char)(0x03 + snl),		// Data Length: 3 + snl
 		(unsigned char)snl						// Name Length: snl
