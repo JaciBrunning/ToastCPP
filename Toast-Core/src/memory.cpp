@@ -36,19 +36,19 @@ static void init_mutexes(bool own) {
 }
 
 static void free_mutexes() {
-	_mtx.logger->free();
+	delete _mtx.logger;
 
-	_mtx.onboard_accel->free();
-	_mtx.analog_out->free();
-	_mtx.analog_in->free();
-	_mtx.dio->free();
-	_mtx.relay->free();
-	_mtx.pcm->free();
-	_mtx.motor->free();
-	_mtx.pwm->free();
-	_mtx.servo->free();
-	_mtx.joy->free();
-	_mtx.power->free();
+	delete _mtx.onboard_accel;
+	delete _mtx.analog_out;
+	delete _mtx.analog_in;
+	delete _mtx.dio;
+	delete _mtx.relay;
+	delete _mtx.pcm;
+	delete _mtx.motor;
+	delete _mtx.pwm;
+	delete _mtx.servo;
+	delete _mtx.joy;
+	delete _mtx.power;
 }
 
 void Memory::initialize_bootstrap() {
