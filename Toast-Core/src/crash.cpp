@@ -29,10 +29,15 @@ static void catch_fatal_signal(int sig) {
     Crash::on_signal(sig);
 }
 
+static void catch_nonfatal_signal(int sig) {
+	::shutdown();
+}
+
 void Crash::initialize() {
     signal(SIGFPE, catch_fatal_signal);
     signal(SIGILL, catch_fatal_signal);
     signal(SIGSEGV, catch_fatal_signal);
+	signal(SIGINT, catch_nonfatal_signal);
     #ifndef OS_WIN
         signal(SIGBUS, catch_fatal_signal);
         signal(SIGSYS, catch_fatal_signal);
