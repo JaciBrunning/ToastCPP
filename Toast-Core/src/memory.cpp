@@ -19,7 +19,7 @@ void init_shared() {
 	_shared.map_to(__shared_block);
 }
 
-void init_mutexes(bool own) {
+static void init_mutexes(bool own) {
 	_mtx.logger = new IPCMutex("logger", 1, own);
 
 	_mtx.onboard_accel = new IPCMutex("core_ob_accel", 1, own);
@@ -33,6 +33,22 @@ void init_mutexes(bool own) {
 	_mtx.servo = new IPCMutex("core_servo", 20, own);
 	_mtx.joy = new IPCMutex("core_joystick", 6, own);
 	_mtx.power = new IPCMutex("core_power", 2, own);	// ID 0: PDP, ID 1: Controller
+}
+
+static void free_mutexes() {
+	_mtx.logger->free();
+
+	_mtx.onboard_accel->free();
+	_mtx.analog_out->free();
+	_mtx.analog_in->free();
+	_mtx.dio->free();
+	_mtx.relay->free();
+	_mtx.pcm->free();
+	_mtx.motor->free();
+	_mtx.pwm->free();
+	_mtx.servo->free();
+	_mtx.joy->free();
+	_mtx.power->free();
 }
 
 void Memory::initialize_bootstrap() {
@@ -54,6 +70,13 @@ void Memory::initialize() {
 
 	init_shared();
 	init_mutexes(false);
+}
+
+void Memory::free_memory(bool bootstrap) {
+	if (bootstrap) {
+		free_mutexes();
+		Toast::Internal::SHM::close_shm_file(TOAST_SHARED_MEMPOOL_NAME, __shm_handle_shared);
+	}
 }
 
 char Memory::get_endian_bit() {

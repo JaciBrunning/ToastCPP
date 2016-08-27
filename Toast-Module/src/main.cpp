@@ -23,6 +23,8 @@ void toast_module_shutdown() {
     _logger << "Shutting Down Module...";
     Log::flush();
     Log::close();
+
+	Toast::Memory::free_memory(false);
 }
 
 void init_toast_module(string module_name, string private_mempool_id, int module_idx) {

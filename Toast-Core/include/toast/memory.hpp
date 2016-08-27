@@ -16,6 +16,7 @@ namespace Toast {
     namespace Memory {
         API void initialize_bootstrap();
         API void initialize();
+		API void free_memory(bool bootstrap);
         API char get_endian_bit();
         
 		API SharedPool *shared();

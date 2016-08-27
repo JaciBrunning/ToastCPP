@@ -20,15 +20,27 @@ using namespace Toast;
 Logger _b_log("Toast");
 Config _b_cfg("Toast-Bootstrap");
 
+void bootstrap_shutdown() {
+	_b_log << "Bootstrap Stopped. Freeing Resources.";
+	Log::flush();
+	Log::close();
+
+	provider_free();
+	Toast::Memory::free_memory(true);
+}
+
 void init_toast_bootstrap(int argc, char *argv[]) {
-	bool loop = true;
+	bool loop = true, load = true;
 	for (int i = 0; i < argc; i++) {
-		if (strcmp(argv[i], "--no-loop") == 0) loop = false;
+		char *a = argv[i];
+		if (strcmp(a, "--no-loop") == 0) loop = false;
+		else if (strcmp(a, "--no-load") == 0) load = false;
 	}
 
     long start_time = current_time_millis();
     ProviderInfo *info = provider_info();
     Crash::initialize();
+	Crash::on_shutdown(bootstrap_shutdown);
     
     CRASH_HANDLE_START
     provider_preinit();
@@ -48,8 +60,10 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     int tick_frequency = (int)(1000.0 / _b_cfg.get_double("timings.states.frequency", 50.0));
     States::Internal::set_tick_timing(tick_frequency);
     
-    _b_log << "Initializing Loader";
-    Bootstrap::Loader::initialize();
+	if (load) {
+		_b_log << "Initializing Loader";
+		Bootstrap::Loader::initialize();
+	}
 
     Bootstrap::States::init();
 	Bootstrap::Web::start();
@@ -59,7 +73,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     _b_log << "Total Bootstrap Startup Time: " + to_string(end_time - start_time) + "ms";
 
     if (loop) provider_loop();
-	_b_log << "Bootstrap Stopping Normally...";
+	bootstrap_shutdown();
 	CRASH_HANDLE_END
 }
 
