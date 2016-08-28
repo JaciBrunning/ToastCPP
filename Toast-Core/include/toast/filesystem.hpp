@@ -18,7 +18,13 @@ namespace Toast {
 		API bool exists(std::string path);
 		API bool is_directory(std::string path);
 		API void rm(std::string path);
+
 		API std::string extension(std::string path);
+		API std::vector<std::string> split_path(std::string path);
+		API std::string name(std::string path);
+		API std::string basename(std::string path);
+		API std::string parent(std::string path);
+		
 		API std::vector<std::string> ls(std::string path);
 		API std::vector<std::string> ls_local(std::string path);
 

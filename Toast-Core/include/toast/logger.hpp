@@ -33,7 +33,7 @@ namespace Toast {
         API void copyTo(std::string path);
         
         API void log(std::string name, std::string msg, Level level);
-        API void log_raw(std::string msg, bool error, bool debug);
+		API void log_raw(std::string sender, std::string level, std::string raw, std::string console, bool error, bool debug);
         API void info(std::string name, std::string msg);
         API void debug(std::string name, std::string msg);
     }

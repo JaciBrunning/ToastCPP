@@ -1,6 +1,7 @@
 #include "toast/logger.hpp"
 #include "toast/filesystem.hpp"
 #include "toast/memory.hpp"
+#include "toast/state.hpp"
 
 #include <string.h>
 
@@ -10,9 +11,6 @@ using namespace std;
 static string _process_name;
 static Concurrent::Mutex local_mutex;
 static bool _debug;
-
-// 32 KB ought to be enough
-static char buffer[1024 * 32];
 
 static string _log_file;
 
@@ -101,10 +99,11 @@ void Log::copyTo(string path) {
 
 void Log::log(string name, string msg, Log::Level level) {
     string formatted = "[" + timeFormat() + "] [" + name + "] [" + level.name + "] " + msg;
-    Log::log_raw(formatted, level.is_error, level.is_debug);
+    Log::log_raw(name, level.name, msg, formatted, level.is_error, level.is_debug);
 }
 
-void Log::log_raw(string msg, bool error, bool debug) {
+void Log::log_raw(string sender, string level, string raw, string msg, bool error, bool debug) {
+	long sysmillis = current_time_millis();
     if (!debug || _debug || Memory::shared()->get_debug()) {
 		Concurrent::IPCMutex *logger_mutex = Memory::shared_mutex()->logger;
 		if (logger_mutex != nullptr) logger_mutex->lock(0);
@@ -116,9 +115,20 @@ void Log::log_raw(string msg, bool error, bool debug) {
 		if (logger_mutex != nullptr) logger_mutex->unlock(0);
     }
 
+	// TODO Async this
     if (file_out.is_open()) {
 		local_mutex.lock();
-		file_out << msg << endl;
+		stringstream ss(raw);
+		string tmp;
+		while (getline(ss, tmp, '\n')) {
+			file_out <<
+				sysmillis << ";" <<
+				(int)error << ";" << (int)debug << ";" <<
+				(int)States::current_robotstate() << ";" <<
+				sender << ";" <<
+				level << " " <<
+				tmp << endl;
+		}
 		local_mutex.unlock();
     }
 }
@@ -160,7 +170,7 @@ void Logger::severe(string msg) {
 }
 
 void Logger::raw(string msg, bool error, bool debug) {
-    Log::log_raw(msg, error, debug);
+    Log::log_raw(name, "RAW", msg, msg, error, debug);
 }
 
 void Logger::raw(string msg) {

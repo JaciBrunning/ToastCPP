@@ -13,6 +13,8 @@
 #include "toast/crash.hpp"
 #include "toast/config.hpp"
 
+#include "toast/bootstrap/utils/log.hpp"
+
 #include "thp/provider.hpp"
 
 using namespace Toast;
@@ -26,17 +28,43 @@ void bootstrap_shutdown() {
 	Log::close();
 
 	provider_free();
-	Toast::Memory::free_memory(true);
 	Toast::Bootstrap::Loader::free();
+	Toast::Memory::free_memory(true);
 }
 
 void init_toast_bootstrap(int argc, char *argv[]) {
+	// Argument Parsing
 	bool loop = true, load = true;
 	for (int i = 0; i < argc; i++) {
 		char *a = argv[i];
-		if (strcmp(a, "--no-loop") == 0) loop = false;
+		char *b = (i != argc - 1) ? b = argv[i + 1] : nullptr;
+
+		if (strcmp(a, "-h") == 0 || strcmp(a, "--help") == 0) {
+			cout << "toast_launcher [options]\n\n"
+				"\t--no-loop\t Exit Toast immediately after initialization\n"
+				"\t--no-load\t Do not load Toast Modules\n"
+				"\n"
+				"\t--util <utility> [utility options]\t Load a Toast Utility (does not load robot code)\n"
+				"\t\tlog2csv \t<files> [-o OUTPUT]\tConvert .tlog (or a directory of .tlog) files to CSV files. Default output to directory containing log file.\n"
+				"\t\tlog_combine \t<files> [-o OUTPUT]\tCombine .tlog (or a directory of .tlog) files into one file, sorting messages by time. Default output to ./combined.csv\n";
+			return;
+		}
+		else if (strcmp(a, "--no-loop") == 0) loop = false;
 		else if (strcmp(a, "--no-load") == 0) load = false;
+		else if (strcmp(a, "--util") == 0 && b != nullptr) {
+			// Toast Runtime Utility, skip normal loading.
+			i++;
+			if (strncmp(b, "log2", 4) == 0) {
+				BootstrapUtil::Log::log2something(argc, argv, i);
+			} else if (strcmp(b, "log_combine") == 0) {
+				BootstrapUtil::Log::combine_logs(argc, argv, i);
+			} else {
+				cerr << "[ERR] You wanted to use a utility, but we can't find the one you're looking for!" << endl;
+			}
+			return;
+		}
 	}
+	// End Argument Parsing
 
     long start_time = current_time_millis();
     ProviderInfo *info = provider_info();

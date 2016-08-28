@@ -17,6 +17,11 @@
 using namespace Toast;
 using namespace std;
 
+static std::string fix_win_sep(std::string &str) {
+	std::replace(str.begin(), str.end(), '\\', '/');
+	return str;
+}
+
 string Filesystem::toast_dir() {
 	return Environment::toast_home();
 }
@@ -30,7 +35,7 @@ string Filesystem::join(string path1, string path2) {
     if (!path1.empty() && path1.back() != '/')
         total_path += "/";
     total_path += path2;
-    return total_path;
+    return fix_win_sep(total_path);
 }
 
 string Filesystem::path(string path) {
@@ -49,7 +54,7 @@ string Filesystem::absolute(string path) {
 		else if (path[0] == '~' && path[1] == '/') {
 			return Filesystem::join(Filesystem::user_dir(), path.substr(2));
 		} else if (path.length() > 2 && path[1] == ':') {	// Windows drive
-			return path;
+			return fix_win_sep(path);
 		}
 	}
 
@@ -110,6 +115,44 @@ void Filesystem::rm(string path) {
 
 string Filesystem::extension(string path) {
 	return path.substr(path.find_last_of(".") + 1);
+}
+
+vector<string> Filesystem::split_path(string path) {
+	std::vector<std::string> result;
+
+	char const* pch = path.c_str();
+	char const* start = pch;
+	for (; *pch; ++pch) {
+		if (*pch == '/') {
+			if (start != pch) {
+				std::string str(start, pch);
+				result.push_back(str);
+			} else {
+				result.push_back("");
+			}
+			start = pch + 1;
+		}
+	}
+	result.push_back(start);
+
+	return result;
+}
+
+string Filesystem::name(string path) {
+	return Filesystem::split_path(path).back();
+}
+
+string Filesystem::basename(string path) {
+	string name = Filesystem::name(path);
+	return name.substr(0, name.find_last_of("."));
+}
+
+string Filesystem::parent(string path) {
+	vector<string> spl = Filesystem::split_path(path);
+	spl.pop_back();
+	string total = spl[0];
+	for (int i = 1; i < spl.size(); i++) total += "/" + spl[i];
+	return total;
 }
 
 vector<string> Filesystem::ls(string path) {
