@@ -2,6 +2,7 @@ import org.gradle.internal.os.OperatingSystem
 
 ext.isArm = hasProperty("arm")
 ext.isRoboRIO = hasProperty("roborio")
+ext.isNoNTCore = hasProperty("no-network-tables")
 
 // Compiler-Optimize the binary. This may be potentially unsafe, but will make Toast faster and more
 // efficient
@@ -10,7 +11,9 @@ ext.isOptimizedBinary = hasProperty("opt")
 // responsibility for crashes that occur with this optimization level.
 ext.isHarshOptimize = hasProperty("harsh")
 
-def compilerPrefix = project.hasProperty('compilerPrefix') ? project.compilerPrefix : 'arm-frc-linux-gnueabi-'
+def compilerPrefix = project.hasProperty('compilerPrefix') ? 
+                            project.compilerPrefix : 
+                            (ext.isRoboRIO ? 'arm-frc-linux-gnueabi-' : '')
 
 ext.cross64 = hasProperty("cross64")
 ext.is32 = {

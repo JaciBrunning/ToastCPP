@@ -16,7 +16,6 @@ ext.apply_model = { project, callback ->
                             srcDirs = [_provider.file("include/"), "include"]
                             includes = ["**/*.hpp", "**/*.h"]
                         }
-                        lib project: ":wpi:nt", library: "ntcore", linkage: "shared"
                         lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
                         project.libraries.each { libr ->
                             lib project: libr.project, library: libr.library, linkage: libr.linkage
@@ -43,6 +42,8 @@ if (isRoboRIO) {
         ext.roborio_binary = true
         ext.libraries = [[
             project: ":wpi:wpilib", library: "wpilib", linkage: "static"
+        ],[
+            project: ":wpi:nt", library: "ntcore", linkage: "shared"
         ]]
 
         apply_model(project, null)

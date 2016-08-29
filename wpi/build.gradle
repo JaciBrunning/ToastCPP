@@ -3,32 +3,34 @@
 
 ext.wpi_project_dir = project.projectDir
 
-project(":wpi:nt") {
-    // apply plugin: 'cpp'
-    apply_cpp(project)
+if (!isNoNTCore) {
+    project(":wpi:nt") {
+        // apply plugin: 'cpp'
+        apply_cpp(project)
 
-    model {
-        components {
-            ntcore(NativeLibrarySpec) {
-                component_spec(it, project)
-                
-                sources {
-                    cpp {
-                        source {
-                            srcDirs = ['../ntcore/src']
-                            includes = ['**/*.cpp']
-                        }
-                        exportedHeaders {
-                            srcDirs = ['../ntcore/include', '../ntcore/src']
-                            includes = ['**/*.h']
+        model {
+            components {
+                ntcore(NativeLibrarySpec) {
+                    component_spec(it, project)
+                    
+                    sources {
+                        cpp {
+                            source {
+                                srcDirs = ['../ntcore/src']
+                                includes = ['**/*.cpp']
+                            }
+                            exportedHeaders {
+                                srcDirs = ['../ntcore/include', '../ntcore/src']
+                                includes = ['**/*.h']
+                            }
                         }
                     }
-                }
 
-                binaries.all {
-                    if (toolChain in VisualCpp) {
-                        cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
-                        linker.args '/DEF:ntcore.def'
+                    binaries.all {
+                        if (toolChain in VisualCpp) {
+                            cppCompiler.args '/EHsc', '/DNOMINMAX', '/D_SCL_SECURE_NO_WARNINGS', '/D_WINSOCK_DEPRECATED_NO_WARNINGS'
+                            linker.args '/DEF:ntcore.def'
+                        }
                     }
                 }
             }
