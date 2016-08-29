@@ -19,12 +19,13 @@ model {
                     source {
                         srcDirs = []
                         srcDirs += libraries.src()
-                        srcDirs += ['src', 'interchange/ToastFWI/build/cpp/src']
+                        srcDirs += ['src', 'interchange/prebuild/src']
                         includes = ['**/*.cpp', '**/*.c']
                     }
                     exportedHeaders {
-                        srcDirs = ['include', 'interchange', 'interchange/ToastFWI/build/cpp/include']
+                        srcDirs = ['include', 'interchange/include', 'interchange/prebuild/include']
                         srcDirs += libraries.headers()
+                        includes = ['**/*.hpp', '**/*.h']
                     }
                 }
             }
@@ -49,13 +50,20 @@ task build_interchange_js() {
 	}
 }
 
-task build_interchange() {
+task build_interchange_cpp() {
     doLast {
         exec {
             workingDir 'interchange/ToastFWI'
             commandLine 'ruby', 'build_cpp.rb'
         }
+        delete 'interchange/prebuild'
+        copy {
+            from 'interchange/ToastFWI/build/cpp'
+            into 'interchange/prebuild'
+        }
     }
 }
 
-build.dependsOn build_interchange
+task build_interchange() {}
+build_interchange.dependsOn(build_interchange_cpp)
+build_interchange.dependsOn(build_interchange_js)
