@@ -142,14 +142,15 @@ static void tcp_thread_func() {
 	
 	while (true) {
 		Toast::Net::Socket::ClientSocket client = sock.accept();
-		int ret = 0;
-		while (ret > -1) {
+		int ret = 1;
+		while (ret > 0) {
 			ret = client.read(tcp_buffer, 8192);
-			if (ret > -1) {
+			if (ret > 0) {
 				DriverStationComms::decode_ds_tcp_packet(tcp_buffer, ret);
 			}
 		}
 		client.close();
+		sleep_ms(100);
 	}
 
 	sock.close();
