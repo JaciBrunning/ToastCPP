@@ -1,4 +1,3 @@
-#include "toast/environment.hpp"
 #include "toast/internal/loader.hpp"
 
 #include <string>

@@ -3,6 +3,7 @@ import org.gradle.internal.os.OperatingSystem
 ext.isArm = hasProperty("arm")
 ext.isRoboRIO = hasProperty("roborio")
 ext.isNoNTCore = hasProperty("no-network-tables")
+ext.forceTestExport = hasProperty("export-test")
 
 // Compiler-Optimize the binary. This may be potentially unsafe, but will make Toast faster and more
 // efficient
@@ -89,7 +90,6 @@ allprojects {
                         }
                         
                         linker.withArguments { args ->
-                            args << '-shared'
                             args.remove('-m32')
                         }
                         
@@ -109,7 +109,6 @@ allprojects {
                         }
                         
                         linker.withArguments { args ->
-                            args << '-shared'
                             args.remove('-m32')
                         }
                         
@@ -157,6 +156,10 @@ ext.component_spec = { comp, project ->
 
             if (toolChain in Gcc) {
                 linker.args "-ldl", "-lrt", "-lm"
+            }
+
+            if (it in SharedLibraryBinarySpec) {
+                linker.args "-shared"
             }
             linker.args "-Wl,-rpath,.,-rpath,./toast/modules,-rpath,./toast/libs"
         }
@@ -253,7 +256,7 @@ allprojects {
         doLast {
             if (!project.ext.has("ignore_test")) {
                 binaries_files.each { binary ->
-                    if (!binary.targetPlatform.architecture.name.equals("x86-64") && !(binary.targetPlatform.architecture.name.equals("x86") && is32())) return;
+                    if (!forceTestExport && !binary.targetPlatform.architecture.name.equals("x86-64") && !(binary.targetPlatform.architecture.name.equals("x86") && is32())) return;
                     
                     def roborio_binary = project.ext.has("roborio_binary") && project.ext.roborio_binary
                     if (roborio_binary && !isRoboRIO) return;
