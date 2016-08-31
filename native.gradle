@@ -155,7 +155,7 @@ ext.component_spec = { comp, project ->
             }
 
             if (toolChain in Gcc) {
-                linker.args "-ldl", "-lrt", "-lm"
+                linker.args "-ldl", "-lrt", "-lm", "-rdynamic"
             }
 
             if (it in SharedLibraryBinarySpec) {
