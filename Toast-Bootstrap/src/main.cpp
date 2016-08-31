@@ -71,7 +71,6 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     Crash::initialize();
 	Crash::on_shutdown(bootstrap_shutdown);
     
-    CRASH_HANDLE_START
     provider_preinit();
     
     Net::Socket::socket_init();
@@ -103,7 +102,6 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 
     if (loop) provider_loop();
 	bootstrap_shutdown();
-	CRASH_HANDLE_END
 }
 
 Toast::Config *Bootstrap::get_config() {

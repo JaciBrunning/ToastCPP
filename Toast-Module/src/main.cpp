@@ -34,8 +34,6 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     Crash::initialize();
     Crash::on_shutdown(toast_module_shutdown);
     
-    CRASH_HANDLE_START
-    
     Net::Socket::socket_init();
     Log::initialize(module_name);
     _logger.set_name("Module-" + module_name);
@@ -81,6 +79,4 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     // SHUTDOWN 
     
     toast_module_shutdown();
-    
-    CRASH_HANDLE_END
 }

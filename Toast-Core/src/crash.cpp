@@ -13,6 +13,9 @@
     #include <typeinfo>
 #endif
 
+#include <exception>
+#include <stdexcept>
+
 using namespace Toast;
 using namespace std;
 
@@ -33,6 +36,15 @@ static void catch_nonfatal_signal(int sig) {
 	::shutdown();
 }
 
+static void catch_terminate() {
+    std::exception_ptr curr = std::current_exception();
+    if (curr != 0) {
+        CRASH_HANDLE_START
+        std::rethrow_exception(curr);
+        CRASH_HANDLE_END
+    }
+}
+
 void Crash::initialize() {
     signal(SIGFPE, catch_fatal_signal);
     signal(SIGILL, catch_fatal_signal);
@@ -42,6 +54,7 @@ void Crash::initialize() {
         signal(SIGBUS, catch_fatal_signal);
         signal(SIGSYS, catch_fatal_signal);
     #endif
+    std::set_terminate(catch_terminate);
 }
 
 void Crash::on_known(std::exception e) {
