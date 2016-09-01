@@ -16,3 +16,4 @@ export/
 !ToastCPP.vcxproj.user
 *.opendb
 .browse.VC.db-wal
+.BROWSE.VC.db-shm
