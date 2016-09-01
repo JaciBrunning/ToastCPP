@@ -31,7 +31,6 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     long start_time = current_time_millis();
     if (Memory::Module::initialize(private_mempool_id, module_idx) != 0) return;
     
-    Crash::initialize();
     Crash::on_shutdown(toast_module_shutdown);
     
     Net::Socket::socket_init();

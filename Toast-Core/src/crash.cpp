@@ -8,6 +8,7 @@
 #ifdef OS_WIN
     #include "compat/win32/backtrace.hpp"
     #include <windows.h>
+	#include <eh.h>
 #else
     #include "compat/unix/backtrace.hpp"
     #include <typeinfo>
@@ -17,7 +18,6 @@
 #include <stdexcept>
 
 using namespace Toast;
-using namespace std;
 
 static Logger __logger("Toast-Crash");
 static void (*shutdown_ptr)() = NULL;
@@ -39,10 +39,13 @@ static void catch_nonfatal_signal(int sig) {
 static void catch_terminate() {
     std::exception_ptr curr = std::current_exception();
     if (curr != 0) {
-        CRASH_HANDLE_START
+		CRASH_HANDLE_START
         std::rethrow_exception(curr);
-        CRASH_HANDLE_END
-    }
+		CRASH_HANDLE_END
+	}
+#ifdef OS_WIN
+	abort();
+#endif
 }
 
 void Crash::initialize() {
@@ -54,33 +57,32 @@ void Crash::initialize() {
         signal(SIGBUS, catch_fatal_signal);
         signal(SIGSYS, catch_fatal_signal);
     #endif
-    std::set_terminate(catch_terminate);
 }
 
 void Crash::on_known(std::exception e) {
-    string type(typeid(e).name());
-    string msg(e.what());
+    std::string type(typeid(e).name());
+    std::string msg(e.what());
     
     Crash::handle_exception(type, msg);
 }
 
 void Crash::on_known(const char *e) {
-    string type = "<string>";
-    string msg(e);
+    std::string type = "<string>";
+    std::string msg(e);
     
     Crash::handle_exception(type, msg);
 }
 
 void Crash::on_unknown() {
-    string type = "<unknown type>";
-    string msg = "<no message>";
+    std::string type = "<unknown type>";
+    std::string msg = "<no message>";
     
     Crash::handle_exception(type, msg);
 }
 
 void Crash::on_signal(int sigid) {
-    string type = "<signal>";
-    string msg;
+    std::string type = "<signal>";
+    std::string msg;
     
     if (sigid == SIGFPE) msg = "SIGFPE (Fatal Arithmetic Error)";
     else if (sigid == SIGILL) msg = "SIGILL (Illegal Instruction)";
@@ -101,7 +103,15 @@ void Crash::on_shutdown(void (*arg)()) {
     shutdown_ptr = arg;
 }
 
-void Crash::handle_exception(string type, string msg) {
+std::vector<std::string> _pending_backtrace;
+bool using_pending_bt = false;
+
+void Crash::handle_pending_unwind() {
+	_pending_backtrace = backtrace_get(2);
+	using_pending_bt = true;
+}
+
+void Crash::handle_exception(std::string type, std::string msg) {
     __logger.raw("\n**** CRASH LOG ****");
     __logger.raw(Splash::get_error_splash() + "\n");
     __logger.raw("Your robot has crashed. Following is a crash log and more details.");
@@ -111,7 +121,7 @@ void Crash::handle_exception(string type, string msg) {
     __logger.raw("\tMessage: " + msg);
     
     __logger.raw("\nBacktrace:");
-    vector<string> backtrace = backtrace_get(2);
+    std::vector<std::string> backtrace = using_pending_bt ? _pending_backtrace : backtrace_get(2);
     for (auto i : backtrace) {
         __logger.raw("\t" + i);
     }
@@ -120,8 +130,8 @@ void Crash::handle_exception(string type, string msg) {
     for (auto module : Toast::get_all_modules()) {
         __logger.raw("\t" + module.file);
         __logger.raw("\t\tName: " + module.name);
-        __logger.raw("\t\tId: " + to_string(module.module_idx));
-        __logger.raw("\t\tStatus: " + to_string((int)module.status) + 
+        __logger.raw("\t\tId: " + std::to_string(module.module_idx));
+        __logger.raw("\t\tStatus: " + std::to_string((int)module.status) + 
                 " (" + 
                     (module.status == Memory::ModuleActState::DISCOVERED ? "Discovered" :
                         (module.status == Memory::ModuleActState::ACTIVE ? "Loaded" : 

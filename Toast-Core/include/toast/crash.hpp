@@ -34,6 +34,7 @@ namespace Toast {
 		API void shutdown();
         API void on_shutdown(void (*arg)());
         
+		API void handle_pending_unwind();
         API void handle_exception(std::string type, std::string msg);
     }
 }

@@ -68,7 +68,6 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 
     long start_time = current_time_millis();
     ProviderInfo *info = provider_info();
-    Crash::initialize();
 	Crash::on_shutdown(bootstrap_shutdown);
     
     provider_preinit();

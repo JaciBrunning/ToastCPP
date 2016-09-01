@@ -124,7 +124,7 @@ ext.component_spec = { comp, project ->
     comp.binaries.all {
         
         if (toolChain in VisualCpp) {
-            cppCompiler.args "/Zi", "/FS"
+            cppCompiler.args "/Zi", "/FS", "/EHsc"
 
             if (isOptimizedBinary && !isHarshOptimize) {
                 // /O2 is known to eat up more stack space than we need for large memory blocks (i.e. the Shared pool),
