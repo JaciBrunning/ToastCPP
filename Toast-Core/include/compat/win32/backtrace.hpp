@@ -40,19 +40,20 @@ std::vector<std::string> backtrace_get(int skip) {
      for( i = skip; i < frames; i++ ){
          SymFromAddr( process, ( DWORD64 )( stack[ i ] ), 0, symbol );
 
-		 DWORD dwDisplacement;
-		 bool l64 = false;
-		 BOOL line_status = SymGetLineFromAddr(process, symbol->Address, &dwDisplacement, line);
-		 if (!line_status) {
-			 line_status = SymGetLineFromAddr64(process, symbol->Address, &dwDisplacement, line64);
-			 l64 = true;
-		 }
-
 		 bool m64 = false;
 		 BOOL mod_status = SymGetModuleInfo(process, symbol->Address, mod);
 		 if (!mod_status) {
 			 mod_status = SymGetModuleInfo64(process, symbol->Address, mod64);
 			 m64 = true;
+		 }
+
+		 DWORD dwDisplacement;
+		 bool l64 = false;
+
+		 BOOL line_status = SymGetLineFromAddr(process, (ULONG64)stack[i], &dwDisplacement, line);
+		 if (!line_status) {
+			 line_status = SymGetLineFromAddr64(process, (ULONG64)stack[i], &dwDisplacement, line64);
+			 l64 = true;
 		 }
 
 		 sprintf(buf, "%-3d %*p %s(%s +  0x%I64x)",
