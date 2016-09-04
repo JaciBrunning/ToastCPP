@@ -103,7 +103,7 @@ void Log::log(string name, string msg, Log::Level level) {
 }
 
 void Log::log_raw(string sender, string level, string raw, string msg, bool error, bool debug) {
-	long sysmillis = current_time_millis();
+	long long sysmillis = current_time_millis();
     if (!debug || _debug || Memory::shared()->get_debug()) {
 		Concurrent::IPCMutex *logger_mutex = Memory::shared_mutex()->logger;
 		if (logger_mutex != nullptr) logger_mutex->lock(0);
@@ -177,8 +177,9 @@ void Logger::raw(string msg) {
     Logger::raw(msg, false, false);
 }
 
-void Logger::operator<<(string msg) {
+Logger& Logger::operator<<(string msg) {
     Logger::info(msg);
+	return *this;
 }
 
 void Logger::set_name(string n) {

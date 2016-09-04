@@ -211,7 +211,7 @@ typedef struct {
 
 static uint8_t sq_1 = 0, sq_2 = 0, control = 0, req = 0;
 static _TempJoyData joys[6];
-static long last_decode_time;
+static long long last_decode_time;
 static double bat_voltage;
 
 void DriverStationComms::decode_ds_packet(char *data, int length) {

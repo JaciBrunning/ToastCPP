@@ -9,7 +9,7 @@ bool starts_with(std::string const & value, std::string const & starting) {
 	return !value.compare(0, starting.size(), starting);
 }
 
-void sleep_ms(int milliseconds) {
+void sleep_ms(long milliseconds) {
 #ifdef WIN32
     Sleep(milliseconds);
 #elif _POSIX_C_SOURCE >= 199309L
@@ -22,15 +22,15 @@ void sleep_ms(int milliseconds) {
 #endif
 }
 
-long current_time_millis() {
+long long current_time_millis() {
 #ifdef WIN32
-    SYSTEMTIME time;
-    GetSystemTime(&time);
-    return (long)((time.wSecond * 1000) + time.wMilliseconds);
+	FILETIME time;
+	GetSystemTimeAsFileTime(&time);
+	return (long long)(((LONGLONG)time.dwLowDateTime + ((LONGLONG)(time.dwHighDateTime) << 32LL) - 116444736000000000LL) / 10000LL);
 #else
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+	return (long long)((unsigned long long)(tv.tv_sec) * 1000 + (unsigned long long)(tv.tv_usec) / 1000);
 #endif
 }
 

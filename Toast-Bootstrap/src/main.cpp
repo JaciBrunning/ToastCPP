@@ -66,7 +66,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	}
 	// End Argument Parsing
 
-    long start_time = current_time_millis();
+    long long start_time = current_time_millis();
     ProviderInfo *info = provider_info();
 	Crash::on_shutdown(bootstrap_shutdown);
     
@@ -96,7 +96,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	Bootstrap::Web::start();
 
     provider_init();
-    long end_time = current_time_millis();
+    long long end_time = current_time_millis();
     _b_log << "Total Bootstrap Startup Time: " + to_string(end_time - start_time) + "ms";
 
     if (loop) provider_loop();

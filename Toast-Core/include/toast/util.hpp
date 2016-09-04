@@ -36,10 +36,10 @@ API bool starts_with(std::string const & value, std::string const & starting);
 
 // C++ doesn't provide a universal, cross-platform way to perform a sleep
 // call, so here's our own one.
-API void sleep_ms(int milliseconds);
+API void sleep_ms(long milliseconds);
 
-// Get the current system time since UNIX epoch in Milliseconds
-API long current_time_millis();
+// Get the current system time since epoch in Milliseconds
+API long long current_time_millis();
 
 // Get the current CPU time in milliseconds (for process; multiple threads may cause this to be higher than wall clock speed)
 API long current_cpu_time();

@@ -27,12 +27,23 @@ static struct BacktraceOnUnwindHack {
 #include <WinBase.h>
 #pragma comment(lib, "dbghelp.lib") 
 
+static int filter(unsigned int code) {
+	Crash::handle_exception("Windows SEH Exception", "<launcher>");
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+
+static void run_inner() {
+	CRASH_HANDLE_START
+		BacktraceOnUnwindHack hack;
+		load_func();
+	CRASH_HANDLE_END
+}
+
 static void run() {
 	if (!IsDebuggerPresent()) {
-		CRASH_HANDLE_START
-			BacktraceOnUnwindHack hack;
-			load_func();
-		CRASH_HANDLE_END
+		__try {
+			run_inner();
+		} __except (filter(GetExceptionCode())) { }
 	} else {
 		load_func();
 	}
