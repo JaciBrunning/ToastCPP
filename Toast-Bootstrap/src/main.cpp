@@ -15,19 +15,33 @@
 
 #include "toast/bootstrap/utils/log.hpp"
 
-#include "thp/provider.hpp"
+#include "toast/provider.hpp"
 
 using namespace Toast;
 
 Logger _b_log("Toast");
 Config _b_cfg("Toast-Bootstrap");
 
+static DYNAMIC dyn;
+static char *provider = "toast_hardware_provider";
+
+template <class ret = void>
+static ret thp_dynamic_call(DYNAMIC dyn, std::string name) {
+	if (dyn != NULL) {
+		SYMBOL sym = Internal::Loader::get_symbol(dyn, name);
+		return reinterpret_cast<ret(*)()>(sym)();
+	}
+	// This has to be a static cast, or else when ret=void, this does `return NULL` on a void function,
+	// resulting in a compilation error.
+	return static_cast<ret>(NULL);
+}
+
 void bootstrap_shutdown() {
 	_b_log << "Bootstrap Stopped. Freeing Resources.";
 	Log::flush();
 	Log::close();
 
-	provider_free();
+	thp_dynamic_call(dyn, "provider_free");
 	Toast::Bootstrap::Loader::free();
 	Toast::Memory::free_memory(true);
 }
@@ -37,7 +51,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	bool loop = true, load = true;
 	for (int i = 0; i < argc; i++) {
 		char *a = argv[i];
-		char *b = (i != argc - 1) ? b = argv[i + 1] : nullptr;
+		char *b = (i != argc - 1) ? b = argv[i + 1] : NULL;
 
 		if (strcmp(a, "-h") == 0 || strcmp(a, "--help") == 0) {
 			cout << "toast_launcher [options]\n\n"
@@ -48,6 +62,10 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 				"\t\tlog2csv \t<files> [-o OUTPUT]\tConvert .tlog (or a directory of .tlog) files to CSV files. Default output to directory containing log file.\n"
 				"\t\tlog_combine \t<files> [-o OUTPUT]\tCombine .tlog (or a directory of .tlog) files into one file, sorting messages by time. Default output to ./combined.csv\n";
 			return;
+		}
+		else if ((strcmp(a, "--provider") == 0 || strcmp(a, "-p") == 0) && b != NULL) {
+			i++;
+			provider = b;
 		}
 		else if (strcmp(a, "--no-loop") == 0) loop = false;
 		else if (strcmp(a, "--no-load") == 0) load = false;
@@ -67,10 +85,16 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	// End Argument Parsing
 
     long long start_time = current_time_millis();
-    ProviderInfo *info = provider_info();
+	dyn = Internal::Loader::load_dynamic_library(Internal::Loader::library_name(provider));
+	if (dyn == NULL) {
+		cerr << "ERROR: Toast Hardware Provider not present! Toast Cannot Run!" << endl;
+		exit(-1);
+	}
+
+    ProviderInfo *info = thp_dynamic_call<ProviderInfo *>(dyn, "provider_info");
 	Crash::on_shutdown(bootstrap_shutdown);
     
-    provider_preinit();
+    thp_dynamic_call(dyn, "provider_preinit");
     
     Net::Socket::socket_init();
     Filesystem::initialize();
@@ -95,11 +119,11 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     Bootstrap::States::init();
 	Bootstrap::Web::start();
 
-    provider_init();
+	thp_dynamic_call(dyn, "provider_init");
     long long end_time = current_time_millis();
     _b_log << "Total Bootstrap Startup Time: " + to_string(end_time - start_time) + "ms";
 
-    if (loop) provider_loop();
+    if (loop) thp_dynamic_call(dyn, "provider_loop");
 	bootstrap_shutdown();
 }
 
@@ -109,4 +133,8 @@ Toast::Config *Bootstrap::get_config() {
 
 Toast::Logger *Bootstrap::get_logger() {
 	return &_b_log;
+}
+
+DYNAMIC *Bootstrap::get_provider() {
+	return &dyn;
 }

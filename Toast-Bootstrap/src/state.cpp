@@ -1,4 +1,5 @@
 #include "toast/bootstrap/state.hpp"
+#include "toast/provider.hpp"
 
 using namespace Toast;
 
@@ -16,5 +17,7 @@ static void _transition_func(bool disabled, bool auton, bool teleop, bool test) 
 }
 
 void Bootstrap::States::init() {
-    thp_state_set_callback(&_periodic_func, &_transition_func);
+//    thp_state_set_callback(&_periodic_func, &_transition_func);
+	SYMBOL sym = Internal::Loader::get_symbol(*Bootstrap::get_provider(), "thp_state_set_callback");
+	reinterpret_cast<void(*)(RawStateCallback, RawStateCallback)>(sym)(&_periodic_func, &_transition_func);
 }

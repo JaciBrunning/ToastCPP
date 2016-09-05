@@ -18,12 +18,7 @@ model {
                     exportedHeaders {
                         srcDirs = ['include']
                     }
-
-                    if (isRoboRIO) {
-                        lib project: ":Providers:wpilib", library: "toast_hardware_provider", linkage: "shared"
-                    } else {
-                        lib project: ":Providers:simulation", library: "toast_hardware_provider", linkage: "shared"
-                    }
+                    
                     lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
                 }
             }

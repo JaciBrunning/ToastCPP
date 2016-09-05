@@ -7,6 +7,7 @@ using namespace Toast::Bootstrap;
 using namespace Toast;
 
 static HTTP::Template::Context ctx;
+static std::map<std::string, std::string> extra_routes;
 
 class BootstrapHTTPHandler : public HTTP::HTTPHandler {
 public:
@@ -28,10 +29,20 @@ public:
 		file_out.close();
 	}
 
+	void get_routes(HTTP::Request *req, HTTP::StreamResponse *resp) {
+		resp->set_header("Content-Type", "text/json");
+		*resp << "{";
+		for (auto i = extra_routes.begin(); i != extra_routes.end(); i++) {
+			*resp << "\"" << i->first << "\":\"" << i->second << (i == --extra_routes.end() ? "\"" : "\",");
+		}
+		*resp << "}";
+	}
+
 	void setup() {
 		route_type("GET", "/", BootstrapHTTPHandler, index, HTTP::TemplateResponse);
 		route_type("GET", "/readouts", BootstrapHTTPHandler, template_response, HTTP::TemplateResponse);
 		route_type("GET", "/config", BootstrapHTTPHandler, template_response, HTTP::TemplateResponse);
+		route("GET", "/routes", BootstrapHTTPHandler, get_routes);
 		route("POST", "/api/bootstrap/setconfig/(.*)", BootstrapHTTPHandler, set_config);
 	}
 };
@@ -67,10 +78,18 @@ void Web::stop() {
 	_server->stop();
 }
 
+void Web::add_route(std::string name, std::string dest) {
+	extra_routes[name] = dest;
+}
+
 HTTP::Server *Web::get_server() {
 	return _server;
 }
 
 std::thread *Web::get_server_thread() {
 	return &_thread;
+}
+
+HTTP::Template::Context *Web::get_context() {
+	return &ctx;
 }
