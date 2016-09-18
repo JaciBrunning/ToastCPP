@@ -1,0 +1,28 @@
+R"(#using core/base
+#define TITLE Toast - Simulation
+
+{{ include core/components/memory }}
+
+<script type="text/javascript" src="/simulation/sim.js"></script>
+<link rel="stylesheet" href="/simulation/style.css"/>
+<div class="container">
+    <h1> Toast C++ - Simulation </h1>
+    <div class="row">
+        <div class="column">
+            <h5> Plug in a USB Joystick to use this page as a Driver Station! </h5>
+            <p> Not showing up? Hit any button on your Joystick to force a rediscovery. </p>
+            <div id="driver-station">
+                <div id="joysticks">
+
+                </div>
+                <div id="state_selector">
+                    <a id="but_disabled"    class="button"                  onclick="Simulation.set_state('disabled');">Disabled</a>
+                    <a id="but_auto"        class="button button-outline"   onclick="Simulation.set_state('auto');"    >Autonomous</a>
+                    <a id="but_teleop"      class="button button-outline"   onclick="Simulation.set_state('teleop');"  >Teleop</a>
+                    <a id="but_test"        class="button button-outline"   onclick="Simulation.set_state('test');"    >Test</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+)"

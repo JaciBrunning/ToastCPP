@@ -22,17 +22,17 @@ void THP_Base_Robot::TestInit() {
 }
 
 void THP_Base_Robot::DisabledPeriodic() {
-    thp_state_call_periodic(true, false, false, false);
+    thp_state_call_periodic();
 }
 
 void THP_Base_Robot::AutonomousPeriodic() {
-    thp_state_call_periodic(false, true, false, false);
+	thp_state_call_periodic();
 }
 
 void THP_Base_Robot::TeleopPeriodic() {
-    thp_state_call_periodic(false, false, true, false);
+	thp_state_call_periodic();
 }
 
 void THP_Base_Robot::TestPeriodic() {
-    thp_state_call_periodic(false, false, false, true);
+	thp_state_call_periodic();
 }

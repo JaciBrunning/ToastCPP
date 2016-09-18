@@ -1,0 +1,15 @@
+R"(
+
+.gamepad {
+    height: 80px;
+    width: 100%;
+    padding: 7px;
+    background-color: #eaeaea;
+    margin-bottom: 10px;
+}
+
+#joysticks {
+    margin-bottom: 20px;
+}
+
+)"

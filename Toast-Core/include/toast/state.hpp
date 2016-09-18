@@ -99,6 +99,7 @@ namespace Toast {
         API State last_state();
         
         API void start_tracker();
+		API void _manual_trigger();
         
         // Register a tracker. Trackers are called when the robot transitions from 
         // one state to another. This accepts a function pointer of return type

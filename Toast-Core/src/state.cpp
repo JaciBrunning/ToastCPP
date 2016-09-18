@@ -73,45 +73,49 @@ State States::last_state() {
 
 void States::start_tracker() {
     while (is_process_alive(Memory::shared()->get_bootstrap_pid())) {
-        RobotState current_state = States::current_robotstate();
-        State _cur = States::from_robotstate(current_state);
-        
-        if (current_state != _last_internal_state) {
-            // Transition Occured
-            State _old = States::from_robotstate(_last_internal_state);
-            for (auto func : __trackers) {
-                func(_old, _cur);
-            }
-            for (auto it : __iterative) {
-                if (current_state == RobotState::DISABLED)
-                    it->disabledInit();
-                else if (current_state == RobotState::AUTO)
-                    it->autonomousInit();
-                else if (current_state == RobotState::TELEOP)
-                    it->teleopInit();
-                else if (current_state == RobotState::TEST)
-                    it->testInit();
-            }
-        }
-        
-        // Periodic
-        for (auto func : __tickers) {
-            func(_cur);
-        }
-        for (auto it : __iterative) {
-            if (current_state == RobotState::DISABLED)
-                it->disabledPeriodic();
-            else if (current_state == RobotState::AUTO)
-                it->autonomousPeriodic();
-            else if (current_state == RobotState::TELEOP)
-                it->teleopPeriodic();
-            else if (current_state == RobotState::TEST)
-                it->testPeriodic();
-        }
-        
-        sleep_ms(States::Internal::get_tick_timing());
-        _last_internal_state = current_state;
+		States::_manual_trigger();
     }
+}
+
+void States::_manual_trigger() {
+	RobotState current_state = States::current_robotstate();
+	State _cur = States::from_robotstate(current_state);
+
+	if (current_state != _last_internal_state) {
+		// Transition Occured
+		State _old = States::from_robotstate(_last_internal_state);
+		for (auto func : __trackers) {
+			func(_old, _cur);
+		}
+		for (auto it : __iterative) {
+			if (current_state == RobotState::DISABLED)
+				it->disabledInit();
+			else if (current_state == RobotState::AUTO)
+				it->autonomousInit();
+			else if (current_state == RobotState::TELEOP)
+				it->teleopInit();
+			else if (current_state == RobotState::TEST)
+				it->testInit();
+		}
+	}
+
+	// Periodic
+	for (auto func : __tickers) {
+		func(_cur);
+	}
+	for (auto it : __iterative) {
+		if (current_state == RobotState::DISABLED)
+			it->disabledPeriodic();
+		else if (current_state == RobotState::AUTO)
+			it->autonomousPeriodic();
+		else if (current_state == RobotState::TELEOP)
+			it->teleopPeriodic();
+		else if (current_state == RobotState::TEST)
+			it->testPeriodic();
+	}
+
+	sleep_ms(States::Internal::get_tick_timing());
+	_last_internal_state = current_state;
 }
 
 void States::register_tracker(void (*func)(State, State)) {

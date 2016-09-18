@@ -11,5 +11,6 @@ typedef struct {
 } ProviderInfo;
 
 typedef void(*RawStateCallback)(bool, bool, bool, bool);
+typedef void(*PeriodicStateCallback)();
 
 CAPI ProviderInfo *provider_info();

@@ -13,7 +13,7 @@ static ProviderInfo info = {
     true, false
 };
 
-static RawStateCallback _state_callback_periodic;
+static PeriodicStateCallback _state_callback_periodic;
 static RawStateCallback _state_callback_transition;
 
 static Toast::Config _config("Toast-Simulation");
@@ -41,6 +41,7 @@ void provider_loop() {
     int update_freq = _config.get_int("update_frequency", 50);
     while (true) {
         Sim::DriverStationComms::periodic_update();
+		thp_state_call_periodic();
         sleep_ms(1000 / update_freq);
     }
 }
@@ -49,13 +50,13 @@ void provider_free() {
     Sim::DriverStationComms::stop();
 }
 
-void thp_state_set_callback(RawStateCallback callback_periodic, RawStateCallback callback_transition) {
+void thp_state_set_callback(PeriodicStateCallback callback_periodic, RawStateCallback callback_transition) {
     _state_callback_periodic = callback_periodic;
     _state_callback_transition = callback_transition;
 }
 
-void thp_state_call_periodic(bool disabled, bool auton, bool teleop, bool test) {
-    _state_callback_periodic(disabled, auton, teleop, test);
+void thp_state_call_periodic() {
+    _state_callback_periodic();
 }
 
 void thp_state_call_init(bool disabled, bool auton, bool teleop, bool test) {

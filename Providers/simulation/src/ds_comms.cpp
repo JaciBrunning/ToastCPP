@@ -207,6 +207,7 @@ typedef struct {
 	uint16_t pov[4];
 	uint8_t axis[16];
 	uint32_t button_mask;
+	bool has_update;
 } _TempJoyData;
 
 static uint8_t sq_1 = 0, sq_2 = 0, control = 0, req = 0;
@@ -283,6 +284,7 @@ void DriverStationComms::decode_ds_packet(char *data, int length) {
 				joy->pov[pv] = (uint16_t)(a1 << 8 | a2);
 			}
 
+			joy->has_update = true;
 			joy_id++;
 			i += struct_size + 1;
 		}
@@ -374,6 +376,8 @@ void DriverStationComms::periodic_update() {
 		for (int x = 0; x < j->get_num_pov(); x++) {
 			j->set_pov(x, t->pov[x]);
 		}
+
+		t->has_update = false;
 		MTX_UNLOCK(shared_mutex()->joy, i);
 	}
 
