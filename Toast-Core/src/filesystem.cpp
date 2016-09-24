@@ -190,6 +190,7 @@ void Filesystem::initialize() {
         Filesystem::mkdir(Filesystem::path(""));
         Filesystem::mkdir(Filesystem::path("modules"));
         Filesystem::mkdir(Filesystem::path("libs"));
+		Filesystem::mkdir(Filesystem::path("drivers"));
         Filesystem::mkdir(Filesystem::path("internal"));
         Filesystem::mkdir(Filesystem::path("config"));
         
