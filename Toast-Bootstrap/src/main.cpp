@@ -87,8 +87,18 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     long long start_time = current_time_millis();
 	dyn = Internal::Loader::load_dynamic_library(Internal::Loader::library_name(provider));
 	if (dyn == NULL) {
-		cerr << "ERROR: Toast Hardware Provider not present! Toast Cannot Run!" << endl;
-		exit(-1);
+		for (std::string s : Filesystem::ls_local("")) {
+			if (starts_with(s, "provider_") || starts_with(s, "libprovider_")) {
+				provider = (char *)s.c_str();
+				dyn = Internal::Loader::load_dynamic_library(provider);
+				if (dyn != NULL) break;
+			}
+		}
+
+		if (dyn == NULL) {
+			cerr << "ERROR: Toast Hardware Provider not present! Toast Cannot Run!" << endl;
+			exit(-1);
+		}
 	}
 
     ProviderInfo *info = thp_dynamic_call<ProviderInfo *>(dyn, "provider_info");
