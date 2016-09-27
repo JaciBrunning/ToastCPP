@@ -35,7 +35,7 @@ class SHMSocket : public HTTP::WebSocketHandler {
 public:
 	void on_ready(HTTP::WebSocket *ws) {
 		sockets.push_back(ws);
-		char data[] = { (char)0x02, (uint8_t)Toast::States::current_robotstate() };
+		char data[] = { (char)0x02, (char)Toast::States::current_robotstate() };
 		ws->send_raw(&data[0], 2, WEBSOCKET_OPCODE_BINARY);
 	}
 
@@ -92,7 +92,7 @@ static SimulationHTTPHandler _handler;
 
 static void _trackfunc(Toast::State oldstate, Toast::State newstate) {
 	for (auto ws : sockets) {
-		char data[] = { (char)0x02, (uint8_t)(newstate.robot_state()) };
+		char data[] = { (char)0x02, (char)(newstate.robot_state()) };
 		ws->send_raw(&data[0], 2, WEBSOCKET_OPCODE_BINARY);
 	}
 }
