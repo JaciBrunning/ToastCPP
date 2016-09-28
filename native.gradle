@@ -12,6 +12,8 @@ ext.isOptimizedBinary = hasProperty("opt")
 // responsibility for crashes that occur with this optimization level.
 ext.isHarshOptimize = hasProperty("harsh")
 
+ext.gcc_compiler_pp = System.getenv("CXX")
+
 def compilerPrefix = project.hasProperty('compilerPrefix') ? 
                             project.compilerPrefix : 
                             (ext.isRoboRIO ? 'arm-frc-linux-gnueabi-' : '')
@@ -79,6 +81,12 @@ allprojects {
                     }
                 }
                 gcc(Gcc) {
+                    if (gcc_compiler_pp != null) {
+                        eachPlatform { tools ->
+                            tools.cppCompiler.executable = gcc_compiler_pp
+                        }
+                    }
+
                     target("arm") {
                         cppCompiler.executable = compilerPrefix + cppCompiler.executable
                         linker.executable = compilerPrefix + linker.executable
@@ -98,6 +106,12 @@ allprojects {
                 }
                 
                 clang(Clang) {
+                    if (gcc_compiler_pp != null) {
+                        eachPlatform { tools ->
+                            tools.cppCompiler.executable = gcc_compiler_pp
+                        }
+                    }
+
                     target("arm") {
                         cppCompiler.executable = compilerPrefix + "g++"
                         linker.executable = compilerPrefix + "g++"
@@ -143,7 +157,7 @@ ext.component_spec = { comp, project ->
             }
             linker.args "/DEBUG"
         } else {
-            cppCompiler.args "-std=c++11", "-g"
+            cppCompiler.args "-std=c++1y", "-g"
             
             // See above for debug info
             if (isOptimizedBinary && !isHarshOptimize) {
