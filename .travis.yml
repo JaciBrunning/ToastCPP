@@ -5,6 +5,11 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
+    compiler: clang
+  - os: linux
+    dist: trusty
+    sudo: required
+    compiler: gcc
   - os: linux
     dist: trusty
     sudo: required
@@ -20,7 +25,7 @@ before_install:
 - wpi/ntcore/.travis-scripts/install.sh
 
 script:
-- "./gradlew build $GRADLE_ARGS"
+- "./gradlew clean build $GRADLE_ARGS"
 
 notifications:
   email: false
