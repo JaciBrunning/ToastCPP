@@ -79,6 +79,7 @@ namespace Toast {
             API void socket_listen(SOCKET s);
             API SOCKET socket_accept(SOCKET s, Socket::SocketAddress *addr);
             API int socket_quit();
+			API int socket_last_error();
             API int socket_close(SOCKET sock);
             API std::string hostname_to_ip(std::string hostname);
             
@@ -119,6 +120,7 @@ namespace Toast {
             
             class ServerSocket {
                 public:
+					API ServerSocket() { }
                     API ServerSocket(int server_port) {
                         port = server_port;
                         _socket = Toast::Net::Socket::socket_create();
@@ -138,6 +140,7 @@ namespace Toast {
 
 			class DatagramSocket {
 			public:
+				API DatagramSocket() { }
 				API DatagramSocket(int sock_port) {
 					port = sock_port;
 					_socket = Toast::Net::Socket::socket_udp_create();

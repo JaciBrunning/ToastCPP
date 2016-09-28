@@ -23,6 +23,7 @@ namespace Toast {
 			};
 
 			API void get_ip(std::string notation, unsigned char *ip);
+			API std::string get_ip_str(std::string notation);
 			API std::string ip_to_string(unsigned char *ip);
 			API bool get_ip_for_adapter(std::string adapter, unsigned char *ip);
 

@@ -16,6 +16,7 @@
 #include "toast/command.hpp"
 
 #include "toast/math/buffer.hpp"
+#include "toast/math/vector.hpp"
 
 #include <iostream>
 #include <thread>
@@ -103,6 +104,8 @@ struct DriveCommand : Toast::Command::Command {
 private:
 	bool last_button = false;
 };
+
+using namespace Toast::Math;
 
 class MyModule : public Module {
     public:

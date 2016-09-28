@@ -46,6 +46,14 @@ void Util::get_ip(string notation, unsigned char *ip) {
 	}
 }
 
+string Util::get_ip_str(std::string notation) {
+	unsigned char *buf = new unsigned char[4];
+	Toast::Net::Util::get_ip(notation, buf);
+	std::string str = Util::ip_to_string(buf);
+	free(buf);
+	return str;
+}
+
 string Util::ip_to_string(unsigned char *ip) {
 	return	std::to_string(*ip) + "." + std::to_string(*(ip + 1)) + "." 
 			+ std::to_string(*(ip + 2)) + "." + std::to_string(*(ip + 3));

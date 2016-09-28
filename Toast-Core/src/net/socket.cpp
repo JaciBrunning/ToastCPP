@@ -1,5 +1,9 @@
 #include "toast/net/socket.hpp"
 
+#ifndef OS_WIN
+	#include <errno.h>
+#endif
+
 using namespace Toast::Net;
 using namespace std;
 
@@ -94,6 +98,14 @@ int Socket::socket_quit() {
   #else
     return 0;
   #endif
+}
+
+int Socket::socket_last_error() {
+#ifdef OS_WIN
+	return WSAGetLastError();
+#else
+	return errno;
+#endif
 }
 
 int Socket::socket_close(Socket::SOCKET sock) {

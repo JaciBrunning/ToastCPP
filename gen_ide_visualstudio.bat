@@ -1,1 +1,1 @@
-gradlew toast_hardware_providerVisualStudio toast_bootstrapVisualStudio test_moduleVisualStudio -Parm -Proborio 
+gradlew provider_simulationVisualStudio provider_wpilibVisualStudio toast_bootstrapVisualStudio test_moduleVisualStudio -Parm -Proborio 

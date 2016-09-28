@@ -14,7 +14,7 @@ static ProviderInfo info = {
     false, true
 };
 
-static RawStateCallback _state_callback_periodic;
+static PeriodicStateCallback _state_callback_periodic;
 static RawStateCallback _state_callback_transition;
 
 static Logger _provider_logger("THP - WPILib (2016)");
@@ -44,13 +44,13 @@ void provider_free() {
     free(robot);
 }
 
-void thp_state_set_callback(RawStateCallback callback_periodic, RawStateCallback callback_transition) {
+void thp_state_set_callback(PeriodicStateCallback callback_periodic, RawStateCallback callback_transition) {
 	_state_callback_periodic = callback_periodic;
 	_state_callback_transition = callback_transition;
 }
 
-void thp_state_call_periodic(bool disabled, bool auton, bool teleop, bool test) {
-    _state_callback_periodic(disabled, auton, teleop, test);
+void thp_state_call_periodic() {
+    _state_callback_periodic();
 }
 
 void thp_state_call_init(bool disabled, bool auton, bool teleop, bool test) {
