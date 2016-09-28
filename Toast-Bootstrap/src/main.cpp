@@ -91,8 +91,9 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     long long start_time = current_time_millis();
 	dyn = Internal::Loader::load_dynamic_library(Internal::Loader::library_name(provider));
 	if (dyn == NULL) {
-		for (std::string s : Filesystem::ls_local("")) {
-			if (starts_with(s, "provider_") || starts_with(s, "libprovider_")) {
+		for (std::string s : Filesystem::ls_local("./")) {
+			std::string name = Filesystem::name(s);
+			if (starts_with(name, "provider_") || starts_with(name, "libprovider_")) {
 				provider = (char *)s.c_str();
 				dyn = Internal::Loader::load_dynamic_library(provider);
 				if (dyn != NULL) break;

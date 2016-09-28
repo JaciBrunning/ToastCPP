@@ -61,6 +61,39 @@ window.Simulation = (function() {
                     }
                 } }
             ]
+        },
+        "xbox360_mac_driver": {
+            is_xbox: true,
+            type: ds_ns.JoystickType.XINPUT_GAMEPAD,
+            axis: [
+                { source: { a: 0 }, type: ds_ns.JoystickAxisType.X },
+                { source: { a: 1 }, type: ds_ns.JoystickAxisType.Y },
+                { source: { a: 2 }, type: ds_ns.JoystickAxisType.Z },
+                { source: { a: 5 }, type: ds_ns.JoystickAxisType.TWIST },
+                { source: { a: 3 }, type: ds_ns.JoystickAxisType.THROTTLE },
+                { source: { a: 4 }, type: ds_ns.JoystickAxisType.X }
+            ],
+            button: [
+                { source: { b: 0 } }, { source: { b: 1 } },
+                { source: { b: 2 } }, { source: { b: 3 } },
+                { source: { b: 4 } }, { source: { b: 5 } },
+                { source: { b: 6 } }, { source: { b: 7 } },
+                { source: { b: 8 } }, { source: { b: 9 } }
+            ],
+            pov: [
+                { source: { f: 
+                    function(gp) {
+                        var vert = 0;
+                        var horiz = 0;
+                        if (gp.buttons[11].pressed) vert += 1;  // Up
+                        if (gp.buttons[12].pressed) vert -= 1;  // Down
+                        if (gp.buttons[13].pressed) horiz -= 1; // Left
+                        if (gp.buttons[14].pressed) horiz += 1; // Right
+
+                        return buttons_to_pov(horiz, vert);
+                    }
+                } }
+            ]
         }
     };
 
@@ -71,8 +104,9 @@ window.Simulation = (function() {
             "<div class='gamepad' id='gamepad-" + gamepad.index + "'>" +
                 "<strong class='gamepad-header'> " + gamepad.id + " </strong><br />" +
                 "ID: <input gp=" + gamepad.index  + " last_gp=" + gamepad.index + " style='width: 50px; margin-right: 10px' type='number' min=0 max=5 step=1 value=0 onchange='return Simulation.update_gamepad_id(this)'/>" +
-                "Remap: <select gp=" + gamepad.index + " style='width: 100px' id='remap' onchange='return Simulation.update_gamepad_map(this)'>" +
+                "Remap: <select gp=" + gamepad.index + " style='width: 250px' id='remap' onchange='return Simulation.update_gamepad_map(this)'>" +
                 "<option value='xbox360' selected> Xbox 360 </option>" +
+                "<option value='xbox360_mac_driver'> Xbox 360 (Mac Driver) </option>" + 
                 "</select>" +
             "</div>";
 
@@ -156,63 +190,69 @@ window.Simulation = (function() {
             gamepads[i] = gps[i];
         }
 
-        for (var i = 0; i < 6; i++) {
-            var id = gamepad_map[i];
+        var ex = false;
+        try {
+            for (var i = 0; i < 6; i++) {
+                var id = gamepad_map[i];
 
-            if (gamepad_map.hasOwnProperty(i) && id != -1 && id != null) {
-                joys[id].allocate();
-                var gamepad = gamepads[id];
-                var extra = gamepad_extra[id];
-                var mapping = remaps[extra.mapping];
+                if (gamepad_map.hasOwnProperty(i) && id != -1 && id != null) {
+                    joys[id].allocate();
+                    var gamepad = gamepads[id];
+                    var extra = gamepad_extra[id];
+                    var mapping = remaps[extra.mapping];
 
-                if (gamepads.hasOwnProperty(id) && gamepad != null && gamepad.connected) {
-                    var anyPressed = false;
-                    var buttons = [];
-                    var axis = [];
-                    var pov = [];
-                    var but_byte = 0;
+                    if (gamepads.hasOwnProperty(id) && gamepad != null && gamepad.connected) {
+                        var anyPressed = false;
+                        var buttons = [];
+                        var axis = [];
+                        var pov = [];
+                        var but_byte = 0;
 
-                    for (var b = 0; b < mapping.button.length; b++) {
-                        buttons[b] = Math.round(resolve_map(mapping.button[b], gamepad)) !== 0;
-                        if (buttons[b]) {
-                            anyPressed = true;
-                            but_byte |= (1 << b);
+                        for (var b = 0; b < mapping.button.length; b++) {
+                            buttons[b] = Math.round(resolve_map(mapping.button[b], gamepad)) !== 0;
+                            if (buttons[b]) {
+                                anyPressed = true;
+                                but_byte |= (1 << b);
+                            }
                         }
+                        joys[id].set_button_mask(but_byte);
+
+                        for (var a = 0; a < mapping.axis.length; a++) {
+                            axis[a] = resolve_map(mapping.axis[a], gamepad);
+                            joys[id].set_axis(a, axis[a] < 0 ? axis[a] * 128 : axis[a] * 127);
+                            joys[id].get_descriptor().set_axis_type(a, mapping.axis[a].type);
+                        }
+                        for (var p = 0; p < mapping.pov.length; p++) {
+                            pov[p] = resolve_map(mapping.pov[p], gamepad);
+                            joys[id].set_pov(p, pov[p]);
+                        }
+                        extra.element.style.backgroundColor = anyPressed ? "#dcd" : "";
+
+                        joys[id].set_num_axis(mapping.axis.length);
+                        joys[id].set_num_button(mapping.button.length);
+                        joys[id].set_num_pov(mapping.pov.length);
+
+                        joys[id].get_descriptor().set_is_xbox(mapping.is_xbox);
+                        joys[id].get_descriptor().set_type(mapping.type);
+                        joys[id].get_descriptor().set_name_length(gamepad.id.length);
+                        joys[id].get_descriptor().set_name(gamepad.id);
+                        joys[id].get_descriptor().set_axis_count(mapping.axis.length);
+
+                        internal_map[i] = joys[id];
                     }
-                    joys[id].set_button_mask(but_byte);
+                }   
+            }
 
-                    for (var a = 0; a < mapping.axis.length; a++) {
-                        axis[a] = resolve_map(mapping.axis[a], gamepad);
-                        joys[id].set_axis(a, axis[a] < 0 ? axis[a] * 128 : axis[a] * 127);
-                        joys[id].get_descriptor().set_axis_type(a, mapping.axis[a].type);
-                    }
-                    for (var p = 0; p < mapping.pov.length; p++) {
-                        pov[p] = resolve_map(mapping.pov[p], gamepad);
-                        joys[id].set_pov(p, pov[p]);
-                    }
-                    extra.element.style.backgroundColor = anyPressed ? "#dcd" : "";
-
-                    joys[id].set_num_axis(mapping.axis.length);
-                    joys[id].set_num_button(mapping.button.length);
-                    joys[id].set_num_pov(mapping.pov.length);
-
-                    joys[id].get_descriptor().set_is_xbox(mapping.is_xbox);
-                    joys[id].get_descriptor().set_type(mapping.type);
-                    joys[id].get_descriptor().set_name_length(gamepad.id.length);
-                    joys[id].get_descriptor().set_name(gamepad.id);
-                    joys[id].get_descriptor().set_axis_count(mapping.axis.length);
-
-                    internal_map[i] = joys[id];
-                }
-            }   
-        }
-
-        for (var i = 0; i < 6; i++) {
-            if (socket.readyState === socket.OPEN)
-                socket.send(Uint8Array.from([0x01, i].concat(internal_map[i].get_bytes())));
+            for (var i = 0; i < 6; i++) {
+                if (socket.readyState === socket.OPEN)
+                    socket.send(Uint8Array.from([0x01, i].concat(internal_map[i].get_bytes())));
+            }
+        } catch (e) {
+            console.log(e);
+            ex = true;
         }
         var time = Math.floor(1000 / Common.config_sync("Toast-Simulation").http.joystick_update_frequency);
-        setTimeout(update_loop, time);
+        setTimeout(update_loop, ex ? 1000 : time);
     };
 
     $(window).on('load', function() {
