@@ -11,7 +11,7 @@ addons:
     - g++-4.8-multilib
     - libc6-dev-i386
     - linux-libc-dev:i386
-    - libstdc++6
+    - libstdc++-4.8
     - clang
 
 compiler:
