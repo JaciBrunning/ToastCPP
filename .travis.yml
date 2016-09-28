@@ -9,7 +9,7 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    env: GRADLE_ARGS='-Parm -Proborio'
+    env: GRADLE_ARGS='-Parm -Proborio --debug'
   - os: osx
     osx_image: xcode8
 
