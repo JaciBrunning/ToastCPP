@@ -97,7 +97,7 @@ allprojects {
                     }
                 }
                 
-                macGcc(Clang) {
+                clang(Clang) {
                     target("arm") {
                         cppCompiler.executable = compilerPrefix + "g++"
                         linker.executable = compilerPrefix + "g++"
@@ -143,7 +143,7 @@ ext.component_spec = { comp, project ->
             }
             linker.args "/DEBUG"
         } else {
-            cppCompiler.args "-std=c++1y", "-g"
+            cppCompiler.args "-std=c++11", "-g"
             
             // See above for debug info
             if (isOptimizedBinary && !isHarshOptimize) {
