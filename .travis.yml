@@ -9,7 +9,7 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    env: GRADLE_ARGS='-Parm -Proborio' CXX=arm-frc-linux-gnueabi-g++
+    env: GRADLE_ARGS='-Parm -Proborio' CUSTOM_CXX=arm-frc-linux-gnueabi-g++
   - os: osx
     osx_image: xcode8
 
@@ -20,6 +20,7 @@ addons:
       - lib32stdc++6
 
 before_install:
+- if [ -z "$CUSTOM_CXX" ]; then export CXX=$CUSTOM_CXX; fi
 - wpi/ntcore/.travis-scripts/install.sh
 
 script:
