@@ -5,15 +5,13 @@ matrix:
   - os: linux
     dist: trusty
     sudo: required
-    compiler: clang
-  - os: linux
-    dist: trusty
-    sudo: required
     compiler: gcc
   - os: linux
     dist: trusty
     sudo: required
     env: GRADLE_ARGS='-Parm -Proborio'
+  - os: osx
+    osx_image: xcode8
 
 addons:
   apt:
