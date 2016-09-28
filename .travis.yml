@@ -9,6 +9,8 @@ addons:
     - gcc-4.8-multilib
     - g++-4.8
     - g++-4.8-multilib
+    - libc6-dev-i386
+    - linux-libc-dev:i386
     - clang
 
 compiler:
