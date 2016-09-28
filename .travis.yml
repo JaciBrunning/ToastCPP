@@ -10,8 +10,6 @@ matrix:
     dist: trusty
     sudo: required
     env: GRADLE_ARGS='-Parm -Proborio' CUSTOM_CXX=arm-frc-linux-gnueabi-g++
-  - os: osx
-    osx_image: xcode8
 
 addons:
   apt:
