@@ -91,7 +91,7 @@ if (isRoboRIO) {
                             source {
                                 srcDirs = [
                                     new File(_wpi, "/wpilibc/shared/src"),
-                                    new File(_wpi, "/wpilibc/athena/src"),
+                                    new File(_wpi, "/wpilibc/Athena/src"),
                                     new File(_wpi, "/hal/lib/Athena"),
                                     new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
                                     new File(_wpi, "/hal/lib/Shared")
@@ -101,7 +101,7 @@ if (isRoboRIO) {
                             exportedHeaders {
                                 srcDirs = [
                                     new File(_wpi, "/wpilibc/shared/include"),
-                                    new File(_wpi, "/wpilibc/athena/include"),
+                                    new File(_wpi, "/wpilibc/Athena/include"),
                                     new File(_wpi, "/hal/include"),
                                     new File(_wpi, "/hal/lib/Athena"),
                                     new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),

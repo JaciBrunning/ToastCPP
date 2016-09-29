@@ -16,7 +16,7 @@ ext.apply_provider_model = { component, project, callback ->
 
             lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
             lib project: ":Toast-Bootstrap", library: "toast_bootstrap", linkage: "shared"
-            
+
             project.libraries.each { libr ->
                 lib project: libr.project, library: libr.library, linkage: libr.linkage
             }
