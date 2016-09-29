@@ -1,7 +1,6 @@
 #include "thp/sim/sim_memory.hpp"
 
 #include "toast/memory.hpp"
-#include "io/common.hpp"
 
 // Set a bunch of 'placeholder' values in the Shared Memory Pool.
 void Sim::Memory::init() {

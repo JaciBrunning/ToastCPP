@@ -8,7 +8,6 @@
 #include "toast/filesystem.hpp"
 #include "toast/memory.hpp"
 #include "toast/state.hpp"
-#include "io/common.hpp"
 
 #define STRINGIFY(x) #x
 

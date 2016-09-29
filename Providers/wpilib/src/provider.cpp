@@ -1,5 +1,6 @@
 #include "thp/provider.hpp"
 #include "thp/wpi/base_robot.hpp"
+#include "thp/wpi/interfaces.hpp"
 
 #include "WPILib.h"
 
@@ -34,10 +35,10 @@ void provider_init() {
               HALUsageReporting::kLanguage_CPlusPlus);
 
     robot = new THP_Base_Robot();
-	RobotBase::robotSetup(robot);
 }
 
 void provider_loop() {
+	RobotBase::robotSetup(robot);
 }
 
 void provider_free() {
@@ -50,6 +51,7 @@ void thp_state_set_callback(PeriodicStateCallback callback_periodic, RawStateCal
 }
 
 void thp_state_call_periodic() {
+	tick_interfaces();
     _state_callback_periodic();
 }
 

@@ -19,8 +19,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "_test_module_test_moduleDll
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wpi_wpilib_wpilibLib", "wpi\wpilib\wpi_wpilib_wpilibLib.vcxproj", "{CB48B01A-2190-3C9E-BA88-DD700190604C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Providers_remote_provider_remoteDll", "Providers\remote\Providers_remote_provider_remoteDll.vcxproj", "{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		debug|ARM = debug|ARM
@@ -216,28 +214,6 @@ Global
 		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|Native.Build.0 = debug|Win32
 		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|x86.ActiveCfg = debug|Win32
 		{CB48B01A-2190-3C9E-BA88-DD700190604C}.x86|x86.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.debug|ARM.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.debug|Native.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.debug|x86.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.debug|x86.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.Release|ARM.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.Release|ARM.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.Release|Native.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.Release|Native.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.Release|x86.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.Release|x86.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x64|ARM.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x64|ARM.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x64|Native.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x64|Native.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x64|x86.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x64|x86.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x86|ARM.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x86|ARM.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x86|Native.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x86|Native.Build.0 = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x86|x86.ActiveCfg = debug|Win32
-		{43E0D35A-EA20-3160-B45D-CFBA1D0898B7}.x86|x86.Build.0 = debug|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

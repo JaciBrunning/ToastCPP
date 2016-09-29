@@ -10,7 +10,6 @@
 #include "toast/util.hpp"
 #include "toast/crash.hpp"
 #include "toast/logger.hpp"
-#include "io/common.hpp"
 
 #include <thread>
 #include <iostream>
