@@ -6,6 +6,3 @@ skip_tags: true
 
 build_script:
 - "gradlew.bat clean build"
-
-artifacts:
-- path: build\**\*.*
