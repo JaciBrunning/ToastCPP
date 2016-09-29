@@ -8,4 +8,4 @@ build_script:
 - "gradlew.bat clean build"
 
 artifacts:
-- path: "build\*.*"
+- path: build\*.*
