@@ -18,7 +18,7 @@ addons:
       - lib32stdc++6
 
 before_install:
-- if [ -z "$CUSTOM_CXX" ]; then export CXX=$CUSTOM_CXX; fi
+- if [ -n "$CUSTOM_CXX" ]; then export CXX=$CUSTOM_CXX; fi
 - wpi/ntcore/.travis-scripts/install.sh
 
 script:
