@@ -7,13 +7,13 @@
 
 using namespace Toast;
 
-static struct InternalDIO {
+struct WPIInternalDIO {
 	Memory::Shared::IO::DIO_Mode mode;
 	DigitalInput *input;
 	DigitalOutput *output;
 };
 
-InternalDIO dios[26];
+WPIInternalDIO dios[26];
 
 void tick_itf_dio() {
 	Concurrent::IPCMutex *mtx = Memory::shared_mutex()->dio;
@@ -29,6 +29,7 @@ void tick_itf_dio() {
 				} else {
 					dios[i].output = new DigitalOutput(i);
 				}
+				dio->set_bootstrap(true);
 			}
 
 			if (mode == Memory::Shared::IO::DIO_Mode::INPUT) {
