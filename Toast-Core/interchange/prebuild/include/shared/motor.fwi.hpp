@@ -56,7 +56,7 @@ namespace Toast {
 
 				}; // struct: Motor
 				struct MotorSRXExtended : public FWI::Block {
-					static const int SIZE = 109;
+					static const int SIZE = 101;
 
 					FWIFUNC bool get_lim_fwd_closed();
 					FWIFUNC void set_lim_fwd_closed(bool value);
@@ -97,11 +97,11 @@ namespace Toast {
 					FWIFUNC float get_temperature();
 					FWIFUNC void set_temperature(float value);
 
-					FWIFUNC double get_position();
-					FWIFUNC void set_position(double value);
+					FWIFUNC float get_position();
+					FWIFUNC void set_position(float value);
 
-					FWIFUNC double get_speed();
-					FWIFUNC void set_speed(double value);
+					FWIFUNC float get_speed();
+					FWIFUNC void set_speed(float value);
 
 					FWIFUNC int32_t get_enc_position();
 					FWIFUNC void set_enc_position(int32_t value);
@@ -200,7 +200,7 @@ namespace Toast {
 
 				}; // struct: ServoStatic
 				struct PWM : public FWI::Block {
-					static const int SIZE = 53;
+					static const int SIZE = 33;
 
 					FWIFUNC bool get_init();
 					FWIFUNC void set_init(bool value);
@@ -244,20 +244,20 @@ namespace Toast {
 					FWIFUNC float get_speed();
 					FWIFUNC void set_speed(float value);
 
-					FWIFUNC double get_bounds_max();
-					FWIFUNC void set_bounds_max(double value);
+					FWIFUNC float get_bounds_max();
+					FWIFUNC void set_bounds_max(float value);
 
-					FWIFUNC double get_bounds_min();
-					FWIFUNC void set_bounds_min(double value);
+					FWIFUNC float get_bounds_min();
+					FWIFUNC void set_bounds_min(float value);
 
-					FWIFUNC double get_bounds_deadband_max();
-					FWIFUNC void set_bounds_deadband_max(double value);
+					FWIFUNC float get_bounds_deadband_max();
+					FWIFUNC void set_bounds_deadband_max(float value);
 
-					FWIFUNC double get_bounds_deadband_min();
-					FWIFUNC void set_bounds_deadband_min(double value);
+					FWIFUNC float get_bounds_deadband_min();
+					FWIFUNC void set_bounds_deadband_min(float value);
 
-					FWIFUNC double get_bounds_center();
-					FWIFUNC void set_bounds_center(double value);
+					FWIFUNC float get_bounds_center();
+					FWIFUNC void set_bounds_center(float value);
 
 					FWIFUNC bool get_bounds_int32();
 					FWIFUNC void set_bounds_int32(bool value);

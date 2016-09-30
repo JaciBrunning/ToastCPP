@@ -27,18 +27,18 @@ ProviderInfo *provider_info() {
 
 void provider_preinit() { }
 void provider_init() {
-    if (!HALInitialize()) {
+    if (!HAL_Initialize(0)) {
         _provider_logger.severe("HAL could not be initialized");
         throw "HAL could not be initialized";
     }
-    HALReport(HALUsageReporting::kResourceType_Language,
+    HAL_Report(HALUsageReporting::kResourceType_Language,
               HALUsageReporting::kLanguage_CPlusPlus);
 
     robot = new THP_Base_Robot();
 }
 
 void provider_loop() {
-	RobotBase::robotSetup(robot);
+	robot->StartCompetition();
 }
 
 void provider_free() {

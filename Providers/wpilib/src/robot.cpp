@@ -5,6 +5,10 @@ void THP_Base_Robot::RobotInit() {
 
 }
 
+void THP_Base_Robot::RobotPeriodic() {
+    
+}
+
 void THP_Base_Robot::DisabledInit() {
     thp_state_call_init(true, false, false, false);
 }

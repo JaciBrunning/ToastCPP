@@ -134,109 +134,109 @@ FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_temperature(float 
 	FWI_MEM_VAL(float, _store, 29) = value;
 }
 
-FWIFUNC double Toast::Memory::Shared::IO::MotorSRXExtended::get_position() {
-	return FWI_MEM_VAL(double, _store, 33);
+FWIFUNC float Toast::Memory::Shared::IO::MotorSRXExtended::get_position() {
+	return FWI_MEM_VAL(float, _store, 33);
 }
-FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_position(double value) {
-	FWI_MEM_VAL(double, _store, 33) = value;
+FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_position(float value) {
+	FWI_MEM_VAL(float, _store, 33) = value;
 }
 
-FWIFUNC double Toast::Memory::Shared::IO::MotorSRXExtended::get_speed() {
-	return FWI_MEM_VAL(double, _store, 41);
+FWIFUNC float Toast::Memory::Shared::IO::MotorSRXExtended::get_speed() {
+	return FWI_MEM_VAL(float, _store, 37);
 }
-FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_speed(double value) {
-	FWI_MEM_VAL(double, _store, 41) = value;
+FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_speed(float value) {
+	FWI_MEM_VAL(float, _store, 37) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_enc_position() {
-	return FWI_MEM_VAL(int32_t, _store, 49);
+	return FWI_MEM_VAL(int32_t, _store, 41);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_enc_position(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 49) = value;
+	FWI_MEM_VAL(int32_t, _store, 41) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_enc_velocity() {
-	return FWI_MEM_VAL(int32_t, _store, 53);
+	return FWI_MEM_VAL(int32_t, _store, 45);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_enc_velocity(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 53) = value;
+	FWI_MEM_VAL(int32_t, _store, 45) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_analog_in() {
-	return FWI_MEM_VAL(int32_t, _store, 57);
+	return FWI_MEM_VAL(int32_t, _store, 49);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_analog_in(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 57) = value;
+	FWI_MEM_VAL(int32_t, _store, 49) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_analog_in_raw() {
-	return FWI_MEM_VAL(int32_t, _store, 61);
+	return FWI_MEM_VAL(int32_t, _store, 53);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_analog_in_raw(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 61) = value;
+	FWI_MEM_VAL(int32_t, _store, 53) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_analog_in_vel() {
-	return FWI_MEM_VAL(int32_t, _store, 65);
+	return FWI_MEM_VAL(int32_t, _store, 57);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_analog_in_vel(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 65) = value;
+	FWI_MEM_VAL(int32_t, _store, 57) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_quad_a() {
-	return FWI_MEM_VAL(int32_t, _store, 69);
+	return FWI_MEM_VAL(int32_t, _store, 61);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_quad_a(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 69) = value;
+	FWI_MEM_VAL(int32_t, _store, 61) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_quad_b() {
-	return FWI_MEM_VAL(int32_t, _store, 73);
+	return FWI_MEM_VAL(int32_t, _store, 65);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_quad_b(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 73) = value;
+	FWI_MEM_VAL(int32_t, _store, 65) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_quad_idx() {
-	return FWI_MEM_VAL(int32_t, _store, 77);
+	return FWI_MEM_VAL(int32_t, _store, 69);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_quad_idx(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 77) = value;
+	FWI_MEM_VAL(int32_t, _store, 69) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_quad_idx_rises() {
-	return FWI_MEM_VAL(int32_t, _store, 81);
+	return FWI_MEM_VAL(int32_t, _store, 73);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_quad_idx_rises(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 81) = value;
+	FWI_MEM_VAL(int32_t, _store, 73) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_pulse_width_position() {
-	return FWI_MEM_VAL(int32_t, _store, 85);
+	return FWI_MEM_VAL(int32_t, _store, 77);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_pulse_width_position(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 85) = value;
+	FWI_MEM_VAL(int32_t, _store, 77) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_pulse_width_vel() {
-	return FWI_MEM_VAL(int32_t, _store, 89);
+	return FWI_MEM_VAL(int32_t, _store, 81);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_pulse_width_vel(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 89) = value;
+	FWI_MEM_VAL(int32_t, _store, 81) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_pulse_width_rtf() {
-	return FWI_MEM_VAL(int32_t, _store, 93);
+	return FWI_MEM_VAL(int32_t, _store, 85);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_pulse_width_rtf(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 93) = value;
+	FWI_MEM_VAL(int32_t, _store, 85) = value;
 }
 
 FWIFUNC int32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_pulse_width_rtr() {
-	return FWI_MEM_VAL(int32_t, _store, 97);
+	return FWI_MEM_VAL(int32_t, _store, 89);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_pulse_width_rtr(int32_t value) {
-	FWI_MEM_VAL(int32_t, _store, 97) = value;
+	FWI_MEM_VAL(int32_t, _store, 89) = value;
 }
 
 FWIFUNC bool Toast::Memory::Shared::IO::MotorSRXExtended::get_quad_idx_rises_pending() {
@@ -254,17 +254,17 @@ FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_pulse_width_positi
 }
 
 FWIFUNC uint16_t Toast::Memory::Shared::IO::MotorSRXExtended::get_faults() {
-	return FWI_MEM_VAL(uint16_t, _store, 101);
+	return FWI_MEM_VAL(uint16_t, _store, 93);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_faults(uint16_t value) {
-	FWI_MEM_VAL(uint16_t, _store, 101) = value;
+	FWI_MEM_VAL(uint16_t, _store, 93) = value;
 }
 
 FWIFUNC uint16_t Toast::Memory::Shared::IO::MotorSRXExtended::get_faults_sticky() {
-	return FWI_MEM_VAL(uint16_t, _store, 103);
+	return FWI_MEM_VAL(uint16_t, _store, 95);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_faults_sticky(uint16_t value) {
-	FWI_MEM_VAL(uint16_t, _store, 103) = value;
+	FWI_MEM_VAL(uint16_t, _store, 95) = value;
 }
 
 FWIFUNC bool Toast::Memory::Shared::IO::MotorSRXExtended::get_clear_sticky_pending() {
@@ -275,10 +275,10 @@ FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_clear_sticky_pendi
 }
 
 FWIFUNC uint32_t Toast::Memory::Shared::IO::MotorSRXExtended::get_firmware_version() {
-	return FWI_MEM_VAL(uint32_t, _store, 105);
+	return FWI_MEM_VAL(uint32_t, _store, 97);
 }
 FWIFUNC void Toast::Memory::Shared::IO::MotorSRXExtended::set_firmware_version(uint32_t value) {
-	FWI_MEM_VAL(uint32_t, _store, 105) = value;
+	FWI_MEM_VAL(uint32_t, _store, 97) = value;
 }
 
 
@@ -445,39 +445,39 @@ FWIFUNC void Toast::Memory::Shared::IO::PWM::set_speed(float value) {
 	FWI_MEM_VAL(float, _store, 9) = value;
 }
 
-FWIFUNC double Toast::Memory::Shared::IO::PWM::get_bounds_max() {
-	return FWI_MEM_VAL(double, _store, 13);
+FWIFUNC float Toast::Memory::Shared::IO::PWM::get_bounds_max() {
+	return FWI_MEM_VAL(float, _store, 13);
 }
-FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_max(double value) {
-	FWI_MEM_VAL(double, _store, 13) = value;
-}
-
-FWIFUNC double Toast::Memory::Shared::IO::PWM::get_bounds_min() {
-	return FWI_MEM_VAL(double, _store, 21);
-}
-FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_min(double value) {
-	FWI_MEM_VAL(double, _store, 21) = value;
+FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_max(float value) {
+	FWI_MEM_VAL(float, _store, 13) = value;
 }
 
-FWIFUNC double Toast::Memory::Shared::IO::PWM::get_bounds_deadband_max() {
-	return FWI_MEM_VAL(double, _store, 29);
+FWIFUNC float Toast::Memory::Shared::IO::PWM::get_bounds_min() {
+	return FWI_MEM_VAL(float, _store, 17);
 }
-FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_deadband_max(double value) {
-	FWI_MEM_VAL(double, _store, 29) = value;
-}
-
-FWIFUNC double Toast::Memory::Shared::IO::PWM::get_bounds_deadband_min() {
-	return FWI_MEM_VAL(double, _store, 37);
-}
-FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_deadband_min(double value) {
-	FWI_MEM_VAL(double, _store, 37) = value;
+FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_min(float value) {
+	FWI_MEM_VAL(float, _store, 17) = value;
 }
 
-FWIFUNC double Toast::Memory::Shared::IO::PWM::get_bounds_center() {
-	return FWI_MEM_VAL(double, _store, 45);
+FWIFUNC float Toast::Memory::Shared::IO::PWM::get_bounds_deadband_max() {
+	return FWI_MEM_VAL(float, _store, 21);
 }
-FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_center(double value) {
-	FWI_MEM_VAL(double, _store, 45) = value;
+FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_deadband_max(float value) {
+	FWI_MEM_VAL(float, _store, 21) = value;
+}
+
+FWIFUNC float Toast::Memory::Shared::IO::PWM::get_bounds_deadband_min() {
+	return FWI_MEM_VAL(float, _store, 25);
+}
+FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_deadband_min(float value) {
+	FWI_MEM_VAL(float, _store, 25) = value;
+}
+
+FWIFUNC float Toast::Memory::Shared::IO::PWM::get_bounds_center() {
+	return FWI_MEM_VAL(float, _store, 29);
+}
+FWIFUNC void Toast::Memory::Shared::IO::PWM::set_bounds_center(float value) {
+	FWI_MEM_VAL(float, _store, 29) = value;
 }
 
 FWIFUNC bool Toast::Memory::Shared::IO::PWM::get_bounds_int32() {

@@ -24,7 +24,7 @@ Logger _b_log("Toast");
 Config _b_cfg("Toast-Bootstrap");
 
 static DYNAMIC dyn;
-static char *provider = "toast_hardware_provider";
+static std::string provider = "toast_hardware_provider";
 
 template <class ret = void>
 static ret thp_dynamic_call(DYNAMIC dyn, std::string name) {
@@ -60,6 +60,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 				"\t--no-loop\t Exit Toast immediately after initialization\n"
 				"\t--no-driver\t Do not load Toast Bootstrap Drivers\n"
 				"\t--no-load\t Do not load Toast Modules\n"
+				"\t--provider <provider name>\t Select a hardware provider to use\n"
 				"\n"
 				"\t--util <utility> [utility options]\t Load a Toast Utility (does not load robot code)\n"
 				"\t\tlog2csv \t<files> [-o OUTPUT]\tConvert .tlog (or a directory of .tlog) files to CSV files. Default output to directory containing log file.\n"
@@ -68,7 +69,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 		}
 		else if ((strcmp(a, "--provider") == 0 || strcmp(a, "-p") == 0) && b != NULL) {
 			i++;
-			provider = b;
+			provider = std::string(b);
 		}
 		else if (strcmp(a, "--no-loop") == 0) loop = false;
 		else if (strcmp(a, "--no-driver") == 0) load_driver = false;
@@ -89,13 +90,13 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	// End Argument Parsing
 
     long long start_time = current_time_millis();
-	dyn = Internal::Loader::load_dynamic_library(Internal::Loader::library_name(provider));
+	std::string prov_library = Internal::Loader::library_name(provider);
+	dyn = Internal::Loader::load_dynamic_library(prov_library);
 	if (dyn == NULL) {
 		for (std::string s : Filesystem::ls_local("./")) {
 			std::string name = Filesystem::name(s);
 			if (starts_with(name, "provider_") || starts_with(name, "libprovider_")) {
-				provider = (char *)s.c_str();
-				dyn = Internal::Loader::load_dynamic_library(provider);
+				dyn = Internal::Loader::load_dynamic_library(name);
 				if (dyn != NULL) break;
 			}
 		}

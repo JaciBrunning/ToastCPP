@@ -10,7 +10,7 @@ ext.apply_provider_model = { component, project, callback ->
                 includes = ["**/*.cpp"]
             }
             exportedHeaders {
-                srcDirs = [_provider.file("include/"), "include"]
+                srcDirs = [_provider.file("include/"), "include"] + project.headers
                 includes = ["**/*.hpp", "**/*.h"]
             }
 
@@ -28,6 +28,7 @@ project(":Providers:simulation") {
     apply_cpp(project)
 
     ext.libraries = []
+    ext.headers = []
 
     model {
         components {
@@ -43,16 +44,20 @@ if (isRoboRIO) {
         apply_cpp(project)
 
         ext.roborio_binary = true
-        ext.libraries = [[
-            project: ":wpi:wpilib", library: "wpilib", linkage: "static"
-        ],[
-            project: ":wpi:nt", library: "ntcore", linkage: "shared"
-        ]]
+        ext.libraries = []
+        ext.headers = [new File("../../wpi/wpilib/build/include")]
 
         model {
             components {
                 provider_wpilib(NativeLibrarySpec) {
                     _provider.apply_provider_model(it, project, null)
+                
+                    binaries.all {
+                        tasks.withType(CppCompile) {
+                            linker.args << "-L../../wpi/wpilib/build/lib"
+                            linker.args << "-lwpi"
+                        }
+                    }
                 }
             }
         }
