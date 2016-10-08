@@ -32,7 +32,7 @@ namespace Toast {
 namespace Toast {
 	namespace Memory {
 		struct SharedPool : public FWI::Block {
-			static const int SIZE = 5058;
+			static const int SIZE = 4418;
 
 			FWIFUNC Shared::IO::Power * power();
 

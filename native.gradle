@@ -116,7 +116,7 @@ allprojects {
                         cppCompiler.executable = compilerPrefix + "g++"
                         linker.executable = compilerPrefix + "g++"
                         assembler.executable = compilerPrefix + "g++"
-                        
+
                         cppCompiler.withArguments {args ->
                             args << '-fPIC'
                             args.remove("-m32")
@@ -168,7 +168,7 @@ ext.component_spec = { comp, project ->
                 cppCompiler.define "COMPILER_OPTIMIZE_HARSH"
             }
 
-            if (toolChain in Gcc) {
+            if (toolChain in Gcc || isArm) {
                 linker.args "-ldl", "-lrt", "-lm", "-rdynamic"
             }
 

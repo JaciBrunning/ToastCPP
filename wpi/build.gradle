@@ -38,81 +38,16 @@ if (!isNoNTCore) {
     }
 }
 
-def _wpi = project(":wpi").file("allwpilib")
-
-def libPattern = /lib(?<libName>.+).so$/
-def niLibraryArgs = []
-def niLibraryFileTree = fileTree(new File(_wpi, "ni-libraries").getAbsolutePath())
-
-niLibraryFileTree.each { lib ->
-    def nameMatcher = (lib.name =~ libPattern)
-    if (nameMatcher) {
-        def name = nameMatcher.group('libName')
-        if (!(name.equals("wpi") || name.equals("wpi_2015"))) {            // libwpi.so and libwpi_2015.so both depend on the libraries that we're building right now
-            niLibraryArgs << '-l' + name
-        }
-    }
-}
-
 if (isRoboRIO) {
     project(":wpi:wpilib") {
-        // apply plugin: 'cpp'
-        apply_cpp(project)
+        task build(type: GradleBuild) {
+            buildFile = '../allwpilib/build.gradle'
+            tasks = [':wpilibc:build', 'wpilibcZip']
 
-        ext.roborio_binary = true
-        ext.ignore_copy = true      // This library is always statically linked, no need to copy shared lib
-
-        model {
-            repositories {
-                libs(PrebuiltLibraries) { libs ->
-                    niLibraryFileTree.forEach { niLib ->
-                        libs.create(niLib) {
-                            binaries.withType(SharedLibraryBinary) {
-                                sharedLibraryFile = file(niLib.path)
-                            }
-                        }
-                    }
-                }
-            }
-
-            components {
-                wpilib(NativeLibrarySpec) {
-                    component_spec(it, project)
-
-                    binaries.all {
-                        tasks.withType(CppCompile) {
-                            linker.args << "-L" + new File(_wpi, "ni-libraries").getAbsolutePath()
-                            linker.args.addAll(niLibraryArgs)
-                        }
-                    }
-
-                    sources {
-                        cpp {
-                            source {
-                                srcDirs = [
-                                    new File(_wpi, "/wpilibc/shared/src"),
-                                    new File(_wpi, "/wpilibc/Athena/src"),
-                                    new File(_wpi, "/hal/lib/Athena"),
-                                    new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
-                                    new File(_wpi, "/hal/lib/Shared")
-                                ]
-                                includes = ['**/*.cpp']
-                            }
-                            exportedHeaders {
-                                srcDirs = [
-                                    new File(_wpi, "/wpilibc/shared/include"),
-                                    new File(_wpi, "/wpilibc/Athena/include"),
-                                    new File(_wpi, "/hal/include"),
-                                    new File(_wpi, "/hal/lib/Athena"),
-                                    new File(_wpi, "/hal/lib/Athena/FRC_FPGA_ChipObject"),
-                                    new File(_wpi, "/hal/lib/Shared")
-                                ]
-                                includes = ['**/*.h', '**/*.hpp']
-                            }
-
-                            lib project: ":wpi:nt", library: "ntcore", linkage: "shared"
-                        }
-                    }
+            doLast {
+                copy {
+                    from zipTree(file("../allwpilib/wpilibc/build/wpilibc.zip"))
+                    into file("build")
                 }
             }
         }

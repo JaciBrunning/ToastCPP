@@ -5,6 +5,7 @@
 class THP_Base_Robot : public IterativeRobot {
 public:
     virtual void RobotInit();
+	virtual void RobotPeriodic();
 	virtual void DisabledInit();
 	virtual void DisabledPeriodic();
 	virtual void AutonomousInit();

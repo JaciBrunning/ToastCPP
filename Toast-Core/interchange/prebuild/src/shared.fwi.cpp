@@ -114,37 +114,37 @@ void Toast::Memory::SharedPool::_update_ptr() {
 	_power.map_to(_store + 137);
 	int i;
 	for (i = 0; i < 26; i++) {
-		_dio[i].map_to(_store + 373 + (15 * i));
+		_dio[i].map_to(_store + 261 + (15 * i));
 	}
 	for (i = 0; i < 4; i++) {
-		_relay[i].map_to(_store + 763 + (1 * i));
+		_relay[i].map_to(_store + 651 + (1 * i));
 	}
 	for (i = 0; i < 2; i++) {
-		_analog_out[i].map_to(_store + 767 + (5 * i));
+		_analog_out[i].map_to(_store + 655 + (5 * i));
 	}
 	for (i = 0; i < 8; i++) {
-		_analog_in[i].map_to(_store + 777 + (59 * i));
+		_analog_in[i].map_to(_store + 665 + (59 * i));
 	}
-	_analog_in_settings.map_to(_store + 1249);
+	_analog_in_settings.map_to(_store + 1137);
 	for (i = 0; i < 2; i++) {
-		_pneumatics[i].map_to(_store + 1253 + (10 * i));
+		_pneumatics[i].map_to(_store + 1141 + (10 * i));
 	}
 	for (i = 0; i < 16; i++) {
-		_motors[i].map_to(_store + 1273 + (8 * i));
+		_motors[i].map_to(_store + 1161 + (8 * i));
 	}
 	for (i = 0; i < 16; i++) {
-		_motors_srx[i].map_to(_store + 1401 + (109 * i));
+		_motors_srx[i].map_to(_store + 1289 + (101 * i));
 	}
 	for (i = 0; i < 20; i++) {
-		_pwm[i].map_to(_store + 3145 + (53 * i));
+		_pwm[i].map_to(_store + 2905 + (33 * i));
 	}
 	for (i = 0; i < 20; i++) {
-		_servos[i].map_to(_store + 4205 + (5 * i));
+		_servos[i].map_to(_store + 3565 + (5 * i));
 	}
-	_servo_static.map_to(_store + 4305);
-	_onboard_accel.map_to(_store + 4317);
+	_servo_static.map_to(_store + 3665);
+	_onboard_accel.map_to(_store + 3677);
 	for (i = 0; i < 6; i++) {
-		_joysticks[i].map_to(_store + 4331 + (120 * i));
+		_joysticks[i].map_to(_store + 3691 + (120 * i));
 	}
-	_ds_info.map_to(_store + 5051);
+	_ds_info.map_to(_store + 4411);
 }

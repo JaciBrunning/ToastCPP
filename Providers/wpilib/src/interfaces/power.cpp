@@ -4,7 +4,7 @@
 
 #include "PowerDistributionPanel.h"
 #include "ControllerPower.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 
 using namespace Toast;
 
@@ -42,7 +42,7 @@ void tick_itf_power() {
 	power->set_rio_5V_enabled(ControllerPower::GetEnabled5V());
 	power->set_rio_6V_enabled(ControllerPower::GetEnabled6V());
 	int32_t hal_status = 0;
-	power->set_rio_brownout(HALGetBrownedOut(&hal_status));
+	power->set_rio_brownout(HAL_GetBrownedOut(&hal_status));
 	power->set_rio_voltage_3V3(ControllerPower::GetVoltage3V3());
 	power->set_rio_voltage_5V(ControllerPower::GetVoltage5V());
 	power->set_rio_voltage_6V(ControllerPower::GetVoltage6V());

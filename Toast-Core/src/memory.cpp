@@ -60,7 +60,7 @@ void Memory::initialize_bootstrap() {
 	memset(__shared_block, 0, Memory::SharedPool::SIZE);
 	init_shared();
 	init_mutexes(true);
-    
+
     // Write the Process ID to the Shared Pool for client processes to work with
 	_shared.set_bootstrap_pid(get_pid());
 	_shared.set_endian(Memory::get_endian_bit());
