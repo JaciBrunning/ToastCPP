@@ -33,6 +33,7 @@ static void init_mutexes(bool own) {
 	_mtx.servo = new IPCMutex("core_servo", 20, own);
 	_mtx.joy = new IPCMutex("core_joystick", 6, own);
 	_mtx.power = new IPCMutex("core_power", 2, own);	// ID 0: PDP, ID 1: Controller
+	_mtx.ds = new IPCMutex("core_ds", 1, own);
 }
 
 static void free_mutexes() {
@@ -49,6 +50,7 @@ static void free_mutexes() {
 	delete _mtx.servo;
 	delete _mtx.joy;
 	delete _mtx.power;
+	delete _mtx.ds;
 }
 
 void Memory::initialize_bootstrap() {

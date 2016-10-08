@@ -290,9 +290,12 @@ void DriverStationComms::decode_ds_packet(char *data, int length) {
 
 		// Write it all to the shared pool
 		Toast::States::Internal::set_state(state);
+
+		MTX_LOCK(shared_mutex()->ds, 0);
 		shared()->ds_info()->set_alliance(alliance);
 		shared()->ds_info()->set_alliance_station(alliance_position);
 		shared()->ds_info()->set_fms_attached(fms);
+		MTX_UNLOCK(shared_mutex()->ds, 0);
 
 		last_decode_time = current_time_millis();
 	}
@@ -349,6 +352,7 @@ void DriverStationComms::decode_ds_tcp_packet(char *data, int length) {
 bool last = false;
 
 void DriverStationComms::periodic_update() {
+	MTX_LOCK(shared_mutex()->ds, 0);
 	if (current_time_millis() - last_decode_time > 1000) {
 		// DS Disconnected
 		shared()->ds_info()->set_ds_attached(false);
@@ -356,6 +360,7 @@ void DriverStationComms::periodic_update() {
 		// DS Connected
 		shared()->ds_info()->set_ds_attached(true);
 	}
+	MTX_UNLOCK(shared_mutex()->ds, 0);
 
 	for (int i = 0; i < 6; i++) {
 		MTX_LOCK(shared_mutex()->joy, i);

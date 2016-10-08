@@ -38,6 +38,7 @@ namespace Toast {
 			Concurrent::IPCMutex *pwm;
 			Concurrent::IPCMutex *joy;
 			Concurrent::IPCMutex *power;
+			Concurrent::IPCMutex *ds;
 		};
 
 		API SharedMutex *shared_mutex();

@@ -13,4 +13,8 @@ public:
 	virtual void TeleopPeriodic();
     virtual void TestInit();
 	virtual void TestPeriodic();
+
+	virtual DriverStation *ds() {
+		return &m_ds;
+	}
 };

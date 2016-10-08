@@ -1,6 +1,7 @@
 #include "thp/provider.hpp"
 #include "thp/wpi/base_robot.hpp"
 #include "thp/wpi/interfaces.hpp"
+#include "thp/wpi/wpi_provider.hpp"
 
 #include "WPILib.h"
 
@@ -23,6 +24,10 @@ static THP_Base_Robot *robot;
 
 ProviderInfo *provider_info() {
     return &info;
+}
+
+THP_Base_Robot *get_robot() {
+	return robot;
 }
 
 void provider_preinit() { }
