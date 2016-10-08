@@ -3,6 +3,7 @@ build/
 run/
 export/
 ~$*
+.vs/
 
 *.sln
 *.vcxproj
