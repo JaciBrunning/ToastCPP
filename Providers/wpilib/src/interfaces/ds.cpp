@@ -54,8 +54,8 @@ void tick_itf_driverstation() {
 			joy->set_num_button(nButt);
 			joy->set_num_pov(nPOV);
 
-			HALJoystickButtons butts;
-			HALGetJoystickButtons(i, &butts);
+			HAL_JoystickButtons butts;
+			HAL_GetJoystickButtons(i, &butts);
 
 			joy->set_button_mask(butts.buttons);
 			joyW->SetOutputs(joy->get_outputs_mask());
@@ -64,8 +64,8 @@ void tick_itf_driverstation() {
 				joy->set_pov(j, joyW->GetPOV(j));
 			}
 
-			HALJoystickAxes axes;
-			HALGetJoystickAxes(i, &axes);
+			HAL_JoystickAxes axes;
+			HAL_GetJoystickAxes(i, &axes);
 			Memory::Shared::DS::JoystickDescriptor *desc = joy->get_descriptor();
 
 			for (int j = 0; j < MIN(nAxis, 16); j++) {
