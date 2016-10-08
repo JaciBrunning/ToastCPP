@@ -1,5 +1,8 @@
 #pragma once
 
+#include "toast/environment.hpp"
+
+#ifndef OS_WIN
 #include <execinfo.h>
 #include <dlfcn.h>
 #include <cxxabi.h>
@@ -89,3 +92,5 @@ std::vector<std::string> backtrace_get(int skip) {
     }
     return vs;
 }
+
+#endif

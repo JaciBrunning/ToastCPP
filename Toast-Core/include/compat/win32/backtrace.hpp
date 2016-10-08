@@ -1,5 +1,8 @@
 #pragma once
 
+#include "toast/environment.hpp"
+
+#ifdef OS_WIN
 #include "Windows.h"
 #include "DbgHelp.h"
 #include <WinBase.h>
@@ -77,3 +80,4 @@ std::vector<std::string> backtrace_get(int skip) {
 	 SymCleanup(process);
      return vs;
 }
+#endif

@@ -55,6 +55,9 @@
  * May 28 1998, Toni Ronkko
  * First version.
  *****************************************************************************/
+#include "toast/environment.hpp"
+
+#ifdef OS_WIN
 #ifndef DIRENT_H
 #define DIRENT_H
 
@@ -228,3 +231,4 @@ static void rewinddir(DIR* dirp)
 
 
 #endif /*DIRENT_H*/
+#endif
