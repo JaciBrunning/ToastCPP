@@ -5,7 +5,7 @@
 
 #include "DriverStation.h"
 #include "Joystick.h"
-#include "HAL/HAL.hpp"
+#include "HAL/HAL.h"
 
 using namespace Toast;
 
