@@ -47,7 +47,7 @@ void tick_itf_driverstation() {
 
 			Joystick *joyW = joys[i];
 			int nAxis = joyW->GetAxisCount(), 
-				nButt = joyW->GetButtonCount, // heh, butt
+				nButt = joyW->GetButtonCount(), // heh, butt
 				nPOV = joyW->GetPOVCount();
 			
 			joy->set_num_axis(nAxis);
