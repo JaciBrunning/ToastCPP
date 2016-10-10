@@ -20,7 +20,7 @@ static SpeedController *motors[16];
 static Servo *servos[20];
 
 // TODO Initial Servo Statics
-// TODO PWM
+// TODO PWM, SRX
 
 void tick_itf_motor() {
 	Concurrent::IPCMutex *mtx_motor = Memory::shared_mutex()->motor;

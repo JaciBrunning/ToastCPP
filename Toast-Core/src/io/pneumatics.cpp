@@ -56,7 +56,7 @@ bool PCM::compressor_enabled() {
 
 void PCM::set_closed_loop_control(bool state) {
 	MTX_LOCK(mtx(), _internal_id);
-	_mem->set_closed_loop(true);
+	_mem->set_closed_loop(state);
 	_mem->set_closed_loop_mode_pending(true);
 	MTX_UNLOCK(mtx(), _internal_id);
 }
