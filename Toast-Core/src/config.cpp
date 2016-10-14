@@ -7,11 +7,11 @@
 using namespace Toast;
 using namespace std;
 
-static enum CVAL_Type {
+enum CVAL_Type {
 	cvt_float, cvt_integer, cvt_bool, cvt_string, cvt_child
 };
 
-static struct CVAL_Container {
+struct CVAL_Container {
 	const char *key;
 	void *ptr;
 	int type;
