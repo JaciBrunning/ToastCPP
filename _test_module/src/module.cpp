@@ -152,10 +152,6 @@ class MyModule : public Module {
 
 			ctx["test_str"] = "Hello World";
 
-			Config c("test_module");
-			c.load();
-			c.get_bool("is_me", true);
-
 			States::register_tracker(&trackfunc);
 			States::register_ticker(&tickfunc);
 

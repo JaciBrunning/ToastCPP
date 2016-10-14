@@ -35,13 +35,13 @@ static Toast::Logger logger("Driver Station Comms");
 
 static void init_mdns_payload() {
 	if (mdns_payload_init) return;
-	std::string service_name = get_simulation_config()->get_string("mdns.service_name", "roborio-9999-frc");
+	std::string service_name = get_simulation_config()->mdns.service_name;
 	int snl = service_name.size();
 
-	std::string target_host_name = get_simulation_config()->get_string("mdns.host_name", "roborio-9999-frc");
+	std::string target_host_name = get_simulation_config()->mdns.host_name;
 	int thnl = target_host_name.size();
 
-	std::string ip_address = get_simulation_config()->get_string("mdns.ip_address", "auto");
+	std::string ip_address = get_simulation_config()->mdns.ip_address;
 	unsigned char *ip = new unsigned char[4];
 	Toast::Net::Util::get_ip(ip_address, ip);
 
@@ -121,7 +121,7 @@ static void mdns_broadcast_func() {
 	Toast::Net::Socket::DatagramSocket sock(5353);
 	sock.bind();
 
-	Toast::Net::Socket::SocketAddress addr(get_simulation_config()->get_string("mdns.broadcast_ip", "224.0.0.251"), 5353);
+	Toast::Net::Socket::SocketAddress addr(get_simulation_config()->mdns.broadcast_ip, 5353);
 	while (true) {
 		mtx.lock();
 		if (!server_running)

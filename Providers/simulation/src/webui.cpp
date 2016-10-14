@@ -99,7 +99,6 @@ static void _trackfunc(Toast::State oldstate, Toast::State newstate) {
 void Web::init() {
 	ctx.add_template("index", index_html);
 
-	get_simulation_config()->get_int("http.joystick_update_frequency", 30);
 	Bootstrap::Web::get_server()->register_handler(&_handler);
 	Bootstrap::Web::add_route("Simulation", "simulation");
 

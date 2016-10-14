@@ -52,7 +52,7 @@ static BootstrapHTTPHandler _handler;
 static std::thread _thread;
 
 static void _start_func() {
-	_server->start(1000 / get_config()->get_int("http.poll_frequency", 30));
+	_server->start(1000 / get_config()->http.poll_frequency);
 }
 
 void Web::prepare() {
@@ -61,9 +61,7 @@ void Web::prepare() {
 	ctx.add_template_file("config", Resources::get_resource_file("Toast-Bootstrap", "config.html"));
 
 	// Initial Config Settings
-	Config *c = get_config();
-	int port = c->get_int("http.port", 5801);
-	c->get_int("http.update_frequency", 15);
+	int port = get_config()->http.port;
 
 	_server = new HTTP::Server(port);
 	_server->register_handler(&_handler);

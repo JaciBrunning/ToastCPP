@@ -9,5 +9,4 @@ libraries.headers = {
     return libraries.libs.values().collect { "libraries/${it}" }
 }
 
-libraries.libs["json11"] = "json11"
 libraries.libs["mongoose"] = "mongoose"

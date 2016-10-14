@@ -16,21 +16,21 @@ static ProviderInfo info = {
 static PeriodicStateCallback _state_callback_periodic;
 static RawStateCallback _state_callback_transition;
 
-static Toast::Config _config("Toast-Simulation");
+static SimConfig _config;
 static Toast::Logger _logger("THP - Simulation");
 
 ProviderInfo *provider_info() {
     return &info;
 }
 
-Toast::Config *get_simulation_config() {
+SimConfig *get_simulation_config() {
     return &_config;
 }
 
 void provider_preinit() { }
 void provider_init() {
     _logger.info("Simulation Provider Loaded");
-    _config.load();
+	_config.load();
     Sim::DriverStationComms::start();
 	Sim::Web::init();
 
@@ -38,11 +38,10 @@ void provider_init() {
 }
 
 void provider_loop() {
-    int update_freq = _config.get_int("update_frequency", 50);
     while (true) {
         Sim::DriverStationComms::periodic_update();
 		thp_state_call_periodic();
-        sleep_ms(1000 / update_freq);
+        sleep_ms(1000 / _config.update_frequency);
     }
 }
 

@@ -7,193 +7,333 @@
 using namespace Toast;
 using namespace std;
 
-Config::Config(string config_name) : _log("Config-" + config_name), _first_load(true) {
-    name = config_name;
-    file = Filesystem::path("config/" + config_name + ".json");
-    defaults_obj = Json::object();
+static enum CVAL_Type {
+	cvt_float, cvt_integer, cvt_bool, cvt_string, cvt_child
+};
+
+static struct CVAL_Container {
+	const char *key;
+	void *ptr;
+	int type;
+};
+
+ConfigBase::ConfigBase() {
+	alloc_size = 10;
+	mem = malloc(alloc_size * sizeof(CVAL_Container));
+	run_size = 0;
 }
 
-Config *Config::load() {
-    return reload();
+static void insert(ConfigBase *cfg, CVAL_Container container) {
+	if (cfg->run_size >= cfg->alloc_size) {
+		cfg->alloc_size += 10;
+		cfg->mem = realloc(cfg->mem, cfg->alloc_size);
+	}
+	CVAL_Container *m = (CVAL_Container *)cfg->mem;
+	m[cfg->run_size] = container;
+	cfg->run_size++;
 }
 
-Config *Config::reload() {
-    string json_config = "";
-    
-    try {
-        ifstream file_in(file);
-        string tmp;
-        while (getline(file_in, tmp)) {
-            json_config += tmp + "\n";
-        }
-        file_in.close();
-    } catch (const std::exception &e) { }
-    
-    if (trim(json_config).empty()) json_config = "{}";
-    try {
-        Json obj = Json::parse(json_config);
-        master_obj = deepMerge(defaults_obj, obj);
-        string json = to_string(4);
-        
-        ofstream file_out;
-        file_out.open(file);
-        file_out << json << endl;
-        file_out.close();
-    } catch (const std::exception &e) {
-        // Parsing error, it's okay, we'll fall back to what we had before. The user likely
-        // made a mistake when editing that produced malformed JSON.
-        
-        if (_first_load) {
-            _log.error("Error! JSON File is malformed! Substituting default values!");
-            Json emt = Json::object();
-            master_obj = deepMerge(defaults_obj, emt);
-        } else {
-            _log.error("Error! JSON File is malformed! Using old values!");
-        }
-        
-        string json = to_string(4);
-        
-        ofstream file_out;
-        file_out.open(file);
-        file_out << json << endl;
-        file_out.close();
-    }
-    _first_load = false;
-    return this;
+float ConfigBase::config_var(const char *key, float *ptr, float def) {
+	insert(this, { key, ptr, cvt_float } );
+	return def;
 }
 
-void Config::unpack(Json *master_obj, string key, Json def) {
-    vector<string> split_str = split(key, '.');
-    Json last_obj = *master_obj;
-    for (int i = 0; i < split_str.size(); i++) {
-        string cur = split_str[i];
-        if (!(last_obj.has(cur) && last_obj.get(cur).type() == Json::Type::OBJECT)) {
-            Json obj = Json::object();
-            last_obj.set(cur, obj);
-        }
-        if (i == split_str.size() - 1) {
-            last_obj.set(cur, def);
-        } else {
-            last_obj = last_obj.get(cur);
-        }
-    }
+int ConfigBase::config_var(const char *key, int *ptr, int def) {
+	insert(this, { key, ptr, cvt_integer });
+	return def;
 }
 
-Json Config::deepMerge(Json a1, Json a2) {
-    Json d = Json::object();
-    Json c = Json::object();
-    
-    for (auto key : a1.keys()) {
-        unpack(&d, key, a1.get(key));
-    }
-    
-    for (auto key : a2.keys()) {
-        unpack(&c, key, a2.get(key));
-    }
-    
-    for (auto kC : c.keys()) {
-        Json vC = (Json)c[kC];
-        if (d.has(kC)) {
-            if (vC.type() == Json::Type::OBJECT) {
-                d.set(kC, deepMerge(d.get(kC), vC));
-            } else {
-                d.set(kC, vC);
-            }
-        } else {
-            d.set(kC, vC);
-        }
-    }
-    
-    return d;
+bool ConfigBase::config_var(const char *key, bool *ptr, bool def) {
+	insert(this, { key, ptr, cvt_bool });
+	return def;
 }
 
-Json Config::getObject(string name) {
-    try {
-        vector<string> split_str = split(name, '.');
-        Json last_obj = master_obj;
-        for (auto key : split_str) {
-            last_obj = last_obj.get(key);
-        }
-        return last_obj;
-    } catch (const std::exception &e) {}
-    Json obj;
-    return obj;
+std::string ConfigBase::config_var(const char *key, std::string *ptr, std::string def) {
+	insert(this, { key, ptr, cvt_string });
+	return def;
 }
 
-string Config::to_string() {
-    return master_obj.stringify();
+bool ConfigBase::config_sub(const char *key, ConfigBase *ptr) {
+	insert(this, { key, ptr, cvt_child });
+	return true;
 }
 
-string Config::to_string(int indent) {
-    return master_obj.stringify(indent);
+void ConfigBase::free() const {
+	::free(mem);
 }
 
-bool Config::has(string name) {
-    return master_obj.has(name);
+// Config
+
+Config::Config(std::string filename) : _filename(filename), log("Config-" + filename) { }
+
+std::string Config::get_file() {
+	return Filesystem::path("config/" + _filename + ".json");
 }
 
-void Config::put_default(string key, Json value) {
-    defaults_obj.set(key, value);
-    reload();
+static bool skip_whitespace(const char **data) {
+	while (**data != 0 && (**data == ' ' || **data == '\t' || **data == '\r' || **data == '\n'))
+		(*data)++;
+
+	return **data != 0;
 }
 
-Json Config::get_or_default(string name, Json def) {
-    if (!has(name)) {
-        put_default(name, def);
-    }
-    Json get = getObject(name);
-    return get.type() == Json::Type::JSNULL ? def : get;
+// Convert a quoted string to a native string based on the JSON spec
+static bool pull_string(const char **data, std::string &out) {
+	(*data)++;
+	out = "";
+	while (**data != 0) {
+		char nc = **data;
+		if (nc == '\\') {
+			(*data)++;
+			switch (**data) {
+			case '"': nc = '"'; break;
+			case '\\': nc = '\\'; break;
+			case '/': nc = '/'; break;
+			case 'b': nc = '\b'; break;
+			case 'f': nc = '\f'; break;
+			case 'n': nc = '\n'; break;
+			case 'r': nc = '\r'; break;
+			case 't': nc = '\t'; break;
+			case 'u': {
+				if (strlen(*data) < 5) return false;
+				nc = 0;
+				for (int i = 0; i < 4; i++) {
+					(*data)++;
+					nc <<= 4;
+					if (**data >= '0' && **data <= '9') 
+						nc |= (**data - '0');
+					else if (**data >= 'A' && **data <= 'F') 
+						nc |= (10 + (**data - 'A'));
+					else if (**data >= 'a' && **data <= 'f') 
+						nc |= (10 + (**data - 'a'));
+					else return false;
+				}
+				break;
+			}
+			default:
+				return false;
+			}
+		} else if (nc == '"') {
+			(*data)++;
+			out.reserve();
+			return true;
+		} else if (nc < ' ' && nc != '\t')	// Not Allowed (invalid)
+			return false;
+
+		out += nc;
+		(*data)++;
+	}
+	return false;
 }
 
-Json Config::get(string name, Json def) {
-    return get_or_default(name, def);
+static float parse_num(const char **data) {
+	float num = 0;
+	while (**data != 0 && **data >= '0' && **data <= '9')
+		num = num * 10 + (*(*data)++ - '0');
+
+	return num;
 }
 
-int Config::get_int(string name, int def) {
-    return (int) get(name, Json(def));
+static float parse_decimal(const char **data) {
+	float decimal = 0.0;
+	float factor = 0.1;
+	while (**data != 0 && **data >= '0' && **data <= '9') {
+		int digit = (*(*data)++ - '0');
+		decimal = decimal + digit * factor;
+		factor *= 0.1;
+	}
+	return decimal;
 }
 
-double Config::get_double(string name, double def) {
-    return (double) get(name, Json(def));
+static bool json_parse(const char **data, CVAL_Container *cfg) {
+	bool qb, qs; // Quote Big, Quote Small
+
+	if (!skip_whitespace(data)) return false;
+	if (cfg->type == cvt_bool) {
+		if (strncmp(*data, "true", 4) == 0) {
+			*(bool *)(cfg->ptr) = true;
+			(*data) += 4;
+			return true;
+		} else if (strncmp(*data, "false", 5) == 0) {
+			*(bool *)(cfg->ptr) = false;
+			(*data) += 5;
+			return true;
+		} else {
+			return false;
+		}
+	} else if (cfg->type == cvt_string) {
+		if (**data == '"') {
+			std::string tmp;
+			std::string *ptr = (std::string *)cfg->ptr;
+			bool success = pull_string(data, tmp);
+			// This prevents a partial write to configuration resulting in a malformed variable
+			// if the config is malformed, as opposed to falling back to the default value and rewriting
+			// the configuration file.
+			if (success) *ptr = tmp;	
+			return success;
+		} else {
+			return false;
+		}
+	} else if (cfg->type == cvt_child) {
+		if (**data == '{') {
+			(*data)++;
+			while (**data != 0) {
+				if (!skip_whitespace(data)) return false;
+				if (**data == '}') {
+					(*data)++;
+					return true;
+				}
+
+				std::string name;
+				if (!pull_string(data, name) || 
+					!skip_whitespace(data) || 
+					*((*data)++) != ':' ||
+					!skip_whitespace(data)) return false;
+
+				// Find CFG
+				ConfigBase *cfg_obj = (ConfigBase *)cfg->ptr;
+				CVAL_Container *cont = NULL, *members = (CVAL_Container *)cfg_obj->mem;
+				for (int i = 0; i < cfg_obj->run_size; i++) {
+					if (strncmp(members[i].key, name.c_str(), name.length()) == 0) {
+						cont = &members[i];
+						break;
+					}
+				}
+
+				if (cont == NULL) {
+					// Key was not valid
+					return false;
+				}
+
+				bool success = json_parse(data, cont);
+				if (!success) return false;
+
+				if (!skip_whitespace(data)) return false;
+				if (**data == '}') {
+					(*data)++;
+					return true;
+				}
+
+				if (**data != ',') return false;
+
+				(*data)++;
+			}
+
+			return false;
+		} else {
+			return false;
+		}
+	} else if (**data == '-' || (**data >= '0' && **data <= '9')) {
+		bool negative = **data == '-';
+		if (negative) (*data)++;
+
+		float number = 0.0;
+		if (**data == '0') 
+			(*data)++;
+		else if (**data >= '1' && **data <= '9') {
+			number = parse_num(data);
+		} else 
+			return false;
+
+		if (**data == '.') {
+			(*data)++;
+			if (!(**data >= '0' && **data <= '9'))
+				return false;
+			number += parse_decimal(data);
+		}
+
+		if (**data == 'E' || **data == 'e') {
+			(*data)++;
+			bool neg_expo = false;
+			if (**data == '-' || **data == '+') {
+				neg_expo = **data == '-';
+				(*data)++;
+			}
+
+			if (!(**data >= '0' && **data <= '9'))
+				return false;
+
+			float expo = parse_num(data);
+			for (float i = 0.0; i < expo; i++)
+				number = neg_expo ? (number / 10.0) : (number * 10.0);
+		}
+
+		if (negative) number *= -1;
+
+		if (cfg->type == cvt_integer) {
+			*(int *)(cfg->ptr) = (int)number;
+		} else if (cfg->type == cvt_float) {
+			*(float *)(cfg->ptr) = (float)number;
+		} else 
+			return false;
+
+		return true;
+	}
+	return false;
 }
 
-float Config::get_float(string name, float def) {
-    return (float) get(name, Json(def));
+static std::string indent_str(int indent) {
+	std::string a(indent, '\t');
+	return a;
 }
 
-long Config::get_long(string name, long def) {
-    return (long) get(name, Json(def));
+static void generate_json(ostream &out, CVAL_Container *cont, int indent, bool comma) {
+	if (cont->type == cvt_child) {
+		out << "{\n";
+		ConfigBase *cfg_obj = (ConfigBase *)cont->ptr;
+		CVAL_Container *children = (CVAL_Container *)(cfg_obj->mem);
+		for (int i = 0; i < cfg_obj->run_size; i++) {
+			const char *name = children[i].key;
+			out << indent_str(indent + 1) << "\"" << name << "\": ";
+			generate_json(out, &children[i], indent + 1, i != cfg_obj->run_size - 1);
+		}
+		out << indent_str(indent) <<  "}";
+		if (comma) out << ",";
+		out << "\n";
+	} else if (cont->type == cvt_bool) {
+		bool val = *(bool *)(cont->ptr);
+		out << (val ? "true" : "false") << (comma ? ",\n" : "\n");
+	} else if (cont->type == cvt_integer) {
+		int val = *(int *)(cont->ptr);
+		out << val << (comma ? ",\n" : "\n");
+	} else if (cont->type == cvt_float) {
+		float val = *(float *)(cont->ptr);
+		out << val << (comma ? ",\n" : "\n");
+	} else if (cont->type == cvt_string) {
+		std::string val = *(std::string *)(cont->ptr);
+		out << "\"" << val << "\"" << (comma ? ",\n" : "\n");	// TODO: Handle escapes
+	}
 }
 
-bool Config::get_bool(string name, bool def) {
-    return (bool) get(name, Json(def));
-}
+void Config::load() {
+	std::string json_config;
+	try {
+		ifstream file_in(get_file());
+		string tmp;
+		while (getline(file_in, tmp)) {
+			json_config += tmp + "\n";
+		}
+		file_in.close();
+	} catch (const std::exception &e) { }
 
-string Config::get_string(string name, string def) {
-    return (string) get(name, Json(def));
-}
+	if (trim(json_config).empty()) json_config = "{}";
 
-vector<Json> Config::get_vector(string name, vector<Json> def) {
-    Json arr = Json::array();
-    for (Json t : def) {
-        arr << t;
-    }
-    Json arr2 = get(name, arr);
-    vector<Json> ret;
-    for (int i = 0; i < arr2.size(); i++) {
-        ret.push_back(Json(arr2[i]));
-    }
-    return ret;
-}
+	// DURING PARSE: load the value
+	// AFTER PARSE: clear the file and write it anew
 
-Json *Config::get_root_obj() {
-    return &master_obj;
-}
+	const char *strval = json_config.c_str();
+	CVAL_Container cont = { "<root>", this, cvt_child };
+	bool result = json_parse(&(strval), &cont);
+	if (!result) {
+		log.error("Malformed JSON Configuration File! Using defaults...");
+	}
 
-string Config::get_config_name() {
-    return name;
-}
-
-string Config::get_config_file() {
-    return file;
+	try {
+		ofstream file_out;
+		file_out.open(get_file());
+		generate_json(file_out, &cont, 0, false);
+		file_out.close();
+	} catch (const std::exception &e) {
+		log.error("Could not write JSON Config file (" + get_file() + ")! [" + e.what() + "]");
+	}
 }

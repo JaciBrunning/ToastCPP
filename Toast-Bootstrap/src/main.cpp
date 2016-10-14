@@ -21,7 +21,7 @@
 using namespace Toast;
 
 Logger _b_log("Toast");
-Config _b_cfg("Toast-Bootstrap");
+Bootstrap::BootConfig _b_cfg;
 
 static DYNAMIC dyn;
 static std::string provider = "toast_hardware_provider";
@@ -120,11 +120,11 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     _b_log.raw(Splash::get_startup_splash() + "\n");
     _b_log.raw("Toast Loaded on OS: [" + Environment::OS::to_string() + "] with Process ID [" + std::to_string(get_pid()) + "]");
     _b_log.raw("Hardware Provider: " + std::string(info->name));
-    _b_cfg.reload();
+	_b_cfg.load();
 	Bootstrap::Web::prepare();
     
-    // State Tick Timing (50Hz)
-    int tick_frequency = (int)(1000.0 / _b_cfg.get_double("timings.states.frequency", 50.0));
+    // State Tick Timing (50Hz by default)
+    int tick_frequency = (int)(1000.0 / _b_cfg.timings.states.frequency);
     States::Internal::set_tick_timing(tick_frequency);
 
 	if (load_driver) {
@@ -153,7 +153,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	bootstrap_shutdown();
 }
 
-Toast::Config *Bootstrap::get_config() {
+Bootstrap::BootConfig *Bootstrap::get_config() {
 	return &_b_cfg;
 }
 

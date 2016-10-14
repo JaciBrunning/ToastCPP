@@ -3,50 +3,51 @@
 #include "toast/library.hpp"
 #include "toast/logger.hpp"
 
-#include "json11.h"
-
 #include <string>
 #include <sstream>
 #include <vector>
 
+#define CFG_PROPERTY(type, key, def)	\
+	const char *_key_##key = #key;	\
+	type key = config_var(_key_##key, &key, def)
+
+#define SUB_CONFIG(type, key)	\
+	type key;					\
+	const char *_key_##key = #key;	\
+	bool _is_reg_sub_##key = config_sub(_key_##key, &key)
+
+#define CFG_FILE(type, file)	\
+	type() : Toast::Config(file) {}
+	
+
 namespace Toast {
-    class Config {
-    public:
-        API Config(std::string config_name);
-        API Config *load();
-        API Config *reload();
-        
-        API static void unpack(Json *master_obj, std::string key, Json def);
-        API static Json deepMerge(Json a1, Json a2);
-        
-        API Json getObject(std::string name);
-        API std::string to_string();
-        API std::string to_string(int indent);
-        
-        API bool has(std::string name);
-        API void put_default(std::string key, Json value);
-        API Json get_or_default(std::string name, Json def);
-        API Json get(std::string name, Json def);
-        
-        API int get_int(std::string name, int def);
-        API double get_double(std::string name, double def);
-        API float get_float(std::string name, float def);
-        API long get_long(std::string name, long def);
-        API bool get_bool(std::string name, bool def);
-        API std::string get_string(std::string name, std::string def);
-        
-        API std::vector<Json> get_vector(std::string name, std::vector<Json> def);
-        
-        API Json *get_root_obj();
-        API std::string get_config_name();
-        API std::string get_config_file();
-        
-    private:
-        Json master_obj;
-        Json defaults_obj;
-        std::string name;
-        std::string file;
-        Toast::Logger _log;
-        bool _first_load;
+
+    struct ConfigBase {
+		API ConfigBase();
+
+		API float			config_var(const char *key, float *ptr, float def);
+		API int				config_var(const char *key, int *ptr, int def);
+		API bool			config_var(const char *key, bool *ptr, bool def);
+		API std::string		config_var(const char *key, std::string *ptr, std::string def);
+
+		API bool config_sub(const char *key, ConfigBase *ptr);
+		API void free() const;
+
+		void *mem;
+		int alloc_size, run_size;
     };
+
+	struct Config : ConfigBase {
+		API Config(std::string filename);
+
+		API std::string get_file();
+		API void load();
+
+	private:
+		Logger log;
+		std::string _filename;
+	};
+
+	struct SubConfig : ConfigBase { };
+
 }
