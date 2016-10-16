@@ -56,6 +56,8 @@ namespace IO {
 	namespace Mapping {
 		class XboxController : public Joystick {
 		public:
+			API XboxController(int port) : Joystick(port) { }
+
 			MAP_AXIS(left_trigger, 2);
 			MAP_AXIS(right_trigger, 3);
 			MAP_AXIS(left_x, 0);
