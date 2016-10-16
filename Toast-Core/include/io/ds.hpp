@@ -3,7 +3,23 @@
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
 
+#define MAP_AXIS(name, axis_id) API inline float name() { return get_raw_axis(axis_id); }
+#define MAP_BUTT(name, butt_id) API inline bool name() { return get_raw_button(butt_id); }
+
 namespace IO {
+	namespace DS {
+		typedef Toast::Memory::Shared::DS::Alliance Alliance;
+		API bool is_ds_attached();
+		API bool is_fms_attached();
+		API bool is_new_control_data();
+		API bool is_system_active();
+		API float get_match_time();
+		API Alliance get_alliance();
+		API int get_alliance_station();
+	}
+
+	// Please note everything in Toast is indexed from 0, unlike WPILib where Joysticks
+	// and button IDs are indexed from 1.
 	class Joystick {
 	public:
 		API Joystick(int port);
@@ -15,15 +31,13 @@ namespace IO {
 
 		API int get_port();
 
-		// Todo common joystick bindings (e.g. getX, getY) here or in a child class?
-
 		API int get_num_axis();
 		API int get_num_button();
 		API int get_num_pov();
 
 		API bool get_raw_button(int id);
 		API float get_raw_axis(int id);
-		API int get_pov(int id);
+		API int get_pov(int id = 0);
 
 		API void set_rumble_left(float magnitude);
 		API float get_rumble_left();
@@ -38,14 +52,29 @@ namespace IO {
 		Toast::Memory::Shared::DS::Joystick *_mem;
 	};
 
-	namespace DS {
-		typedef Toast::Memory::Shared::DS::Alliance Alliance;
-		API bool is_ds_attached();
-		API bool is_fms_attached();
-		API bool is_new_control_data();
-		API bool is_system_active();
-		API float get_match_time();
-		API Alliance get_alliance();
-		API int get_alliance_station();
+	// Common Joystick Classes
+	namespace Mapping {
+		class XboxController : public Joystick {
+		public:
+			MAP_AXIS(left_trigger, 2);
+			MAP_AXIS(right_trigger, 3);
+			MAP_AXIS(left_x, 0);
+			MAP_AXIS(left_y, 1);
+			MAP_AXIS(right_x, 4);
+			MAP_AXIS(right_y, 5);
+			MAP_BUTT(a, 0);
+			MAP_BUTT(b, 1);
+			MAP_BUTT(x, 2);
+			MAP_BUTT(y, 3);
+			MAP_BUTT(left_bumper, 4);
+			MAP_BUTT(right_bumper, 5);
+			MAP_BUTT(select, 6);
+			MAP_BUTT(start, 7);
+			MAP_BUTT(left_stick, 8);
+			MAP_BUTT(right_stick, 9);
+		};
 	}
 }
+
+#undef MAP_AXIS
+#undef MAP_BUTT
