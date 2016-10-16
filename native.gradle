@@ -5,6 +5,10 @@ ext.isRoboRIO = hasProperty("roborio")
 ext.isNoNTCore = hasProperty("no-network-tables")
 ext.forceTestExport = hasProperty("export-test")
 
+// It's crude, but if you're deploying from this without an external buildscript setting this var, 
+// you should really know what you're doing.
+ext.deployIPAddress = hasProperty("ip") ? project.ip : "172.22.11.2"
+
 // Compiler-Optimize the binary. This may be potentially unsafe, but will make Toast faster and more
 // efficient
 ext.isOptimizedBinary = hasProperty("opt")
@@ -32,6 +36,15 @@ println("Building 64? ${shouldBuild64}")
 
 allprojects {
     plugins.withType(CppPlugin).whenPluginAdded {
+        remotes {
+            roboRIO {
+                host = deployIPAddress
+                user = 'lvuser'
+                password = ''
+                knownHosts = allowAnyHosts
+            }
+        }
+
         model {
             platforms {
                 if (isArm) {
@@ -310,7 +323,45 @@ allprojects {
     }
     
     plugins.withType(CppPlugin).whenPluginAdded {
+        task deploy << {
+            if (!isRoboRIO) {
+                println("WARN! You're trying to deploy without the arguments -Parm -Proborio. This deployment WILL NOT WORK!")
+            } else {
+                ssh.run {
+                    session(remotes.roboRIO) {
+                        binaries_files.each { binary ->
+                            def binaryFile = null
+                            
+                            if (binary in SharedLibraryBinarySpec) {
+                                binaryFile = binary.sharedLibraryFile
+                            } else if (binary in NativeExecutableBinarySpec) {
+                                binaryFile = binary.executable.file
+                            }
+                            
+                            if (binaryFile == null) return;
+
+                            def outputdir = "/home/lvuser/cpp"
+                            if (project.ext.has("deploy_path")) outputdir += "/" + project.ext.deploy_path
+                            def resdir = "/home/lvuser/cpp/resources"
+
+                            execute "mkdir -p $outputdir"
+                            put from: binaryFile, into: outputdir
+                            execute "chmod +x ${outputdir}/${binaryFile.name}"
+
+                            if (project.resourcesDir.exists()) {
+                                def rdir = "$resdir/${project.resourcesDir.name}"
+                                execute "mkdir -p $resdir"
+                                execute "[ ! -d $rdir ] || rm -r $rdir"
+                                put from: project.resourcesDir, into: resdir
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         build.finalizedBy copyBinary
         build.finalizedBy copyTest
+        deploy.dependsOn build
     }
 }

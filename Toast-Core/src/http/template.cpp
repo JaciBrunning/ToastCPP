@@ -1,6 +1,7 @@
 #include "toast/http/template.hpp"
 
 #include "toast/resources.hpp"
+#include "toast/util.hpp"
 
 #include <stdlib.h>
 #include <streambuf>
@@ -60,7 +61,7 @@ private:
 	int _len;
 };
 
-static string trim(string str) {
+static string trim_sp(string str) {
 	size_t first = str.find_first_not_of(' ');
 	size_t last = str.find_last_not_of(' ');
 	return str.substr(first, (last - first + 1));
@@ -101,7 +102,7 @@ void Toast::HTTP::Template::parse(std::string _source, TemplateObj *t) {
 			string directive = string(tmpbuf, off);
 			off = 0;
 			if (name == "#using") {
-				t->using_template = directive;
+				t->using_template = trim(directive);
 				t->is_using = true;
 			}
 			else if (name == "#define") {
@@ -160,7 +161,7 @@ void Toast::HTTP::Template::parse(std::string _source, TemplateObj *t) {
 					if (_source[i] == '\n') line++;
 					off++;
 				}
-				string tag = trim(string(tmpbuf, off - 1));
+				string tag = trim_sp(string(tmpbuf, off - 1));
 				if (!tag.compare(0, 8, "include ")) {
 					pair<int, string> pair2(2, tag.substr(8, tag.length() - 8));
 					t->components.push_back(pair2);
@@ -210,7 +211,7 @@ void Context::add_template_file(string name, string file) {
 }
 
 string Context::render(string name) {
-	string resp = _render(name);
+	string resp = _render(trim(name));
 	temp_def.clear();
 	return resp;
 }
@@ -230,7 +231,7 @@ string Context::_lookup(string var) {
 }
 
 string Context::_render(string name) {
-	string _buf;
+	string _buf = "";
 	TemplateObj *t;
 	Context *ctx;
 	if (_templates.find(name) != _templates.end()) {

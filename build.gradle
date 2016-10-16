@@ -1,6 +1,15 @@
 import org.gradle.internal.os.OperatingSystem
 
 allprojects {
+    buildscript {
+        repositories {
+            jcenter()
+        }
+        dependencies {
+            classpath 'org.hidetake:gradle-ssh-plugin:2.7.0'
+        }
+    }
+
     repositories {
         mavenCentral()
     }
@@ -40,6 +49,7 @@ allprojects {
 }
 
 ext.apply_cpp = { project ->
+    project.apply plugin: 'org.hidetake.ssh'
     project.apply plugin: 'cpp'
 
     if (OperatingSystem.current().isWindows()) {

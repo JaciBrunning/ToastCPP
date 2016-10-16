@@ -9,7 +9,7 @@
 using namespace Toast;
 
 static int last_pdp = -1;
-static PowerDistributionPanel *panel;
+static PowerDistributionPanel *panel = NULL;
 
 void tick_itf_power() {
 	Memory::Shared::IO::Power *power = Memory::shared()->power();
@@ -18,6 +18,7 @@ void tick_itf_power() {
 	int pdp_can = power->get_pdp_can_id();
 	if (last_pdp != pdp_can) {
 		last_pdp = pdp_can;
+		if (panel != NULL) free(panel);	// Just in case we switch CAN IDs
 		panel = new PowerDistributionPanel(pdp_can);
 	}
 	power->set_pdp_voltage(panel->GetVoltage());

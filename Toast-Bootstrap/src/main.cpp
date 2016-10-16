@@ -123,7 +123,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	_b_cfg.load();
 	Bootstrap::Web::prepare();
     
-    // State Tick Timing (50Hz by default)
+    // State Tick Timing (100Hz by default)
     int tick_frequency = (int)(1000.0 / _b_cfg.timings.states.frequency);
     States::Internal::set_tick_timing(tick_frequency);
 

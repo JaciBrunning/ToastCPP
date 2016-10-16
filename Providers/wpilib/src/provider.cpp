@@ -32,6 +32,7 @@ THP_Base_Robot *get_robot() {
 
 void provider_preinit() { }
 void provider_init() {
+	long starttime = current_time_millis();
     if (!HAL_Initialize(0)) {
         _provider_logger.severe("HAL could not be initialized");
         throw "HAL could not be initialized";
@@ -40,6 +41,8 @@ void provider_init() {
               HALUsageReporting::kLanguage_CPlusPlus);
 
     robot = new THP_Base_Robot();
+	long endtime = current_time_millis();
+	_provider_logger << "WPILib Start Time: " + to_string(endtime - starttime) + "ms";
 }
 
 void provider_loop() {

@@ -14,7 +14,7 @@ namespace Toast {
 
 			struct Timings : SubConfig {
 				struct States : SubConfig {
-					CFG_PROPERTY(float, frequency, 50.0);
+					CFG_PROPERTY(float, frequency, 100.0);
 				};
 				SUB_CONFIG(States, states);
 			};
