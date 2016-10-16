@@ -32,10 +32,6 @@ FWIFUNC Toast::Memory::Shared::IO::Motor * Toast::Memory::SharedPool::motor(int 
 	return &_motors[index];
 }
 
-FWIFUNC Toast::Memory::Shared::IO::MotorSRXExtended * Toast::Memory::SharedPool::srx(int index) {
-	return &_motors_srx[index];
-}
-
 FWIFUNC Toast::Memory::Shared::IO::PWM * Toast::Memory::SharedPool::pwm(int index) {
 	return &_pwm[index];
 }
@@ -132,19 +128,16 @@ void Toast::Memory::SharedPool::_update_ptr() {
 	for (i = 0; i < 16; i++) {
 		_motors[i].map_to(_store + 1161 + (8 * i));
 	}
-	for (i = 0; i < 16; i++) {
-		_motors_srx[i].map_to(_store + 1289 + (101 * i));
+	for (i = 0; i < 20; i++) {
+		_pwm[i].map_to(_store + 1289 + (33 * i));
 	}
 	for (i = 0; i < 20; i++) {
-		_pwm[i].map_to(_store + 2905 + (33 * i));
+		_servos[i].map_to(_store + 1949 + (5 * i));
 	}
-	for (i = 0; i < 20; i++) {
-		_servos[i].map_to(_store + 3565 + (5 * i));
-	}
-	_servo_static.map_to(_store + 3665);
-	_onboard_accel.map_to(_store + 3677);
+	_servo_static.map_to(_store + 2049);
+	_onboard_accel.map_to(_store + 2061);
 	for (i = 0; i < 6; i++) {
-		_joysticks[i].map_to(_store + 3691 + (120 * i));
+		_joysticks[i].map_to(_store + 2075 + (120 * i));
 	}
-	_ds_info.map_to(_store + 4411);
+	_ds_info.map_to(_store + 2795);
 }

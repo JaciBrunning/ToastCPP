@@ -32,7 +32,7 @@ namespace Toast {
 namespace Toast {
 	namespace Memory {
 		struct SharedPool : public FWI::Block {
-			static const int SIZE = 4418;
+			static const int SIZE = 2802;
 
 			FWIFUNC Shared::IO::Power * power();
 
@@ -49,8 +49,6 @@ namespace Toast {
 			FWIFUNC Shared::IO::Pneumatics * pneumatics(int index);
 
 			FWIFUNC Shared::IO::Motor * motor(int index);
-
-			FWIFUNC Shared::IO::MotorSRXExtended * srx(int index);
 
 			FWIFUNC Shared::IO::PWM * pwm(int index);
 
@@ -93,7 +91,6 @@ namespace Toast {
 			Shared::IO::AnalogInSettings _analog_in_settings;
 			Shared::IO::Pneumatics _pneumatics[2];
 			Shared::IO::Motor _motors[16];
-			Shared::IO::MotorSRXExtended _motors_srx[16];
 			Shared::IO::PWM _pwm[20];
 			Shared::IO::Servo _servos[20];
 			Shared::IO::ServoStatic _servo_static;

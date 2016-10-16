@@ -43,8 +43,6 @@ void tick_itf_motor() {
 					controller = (SpeedController *)(new Victor(port));
 				else if (type == MType::VictorSP)
 					controller = (SpeedController *)(new VictorSP(port));
-				else if (type == MType::CANTalon)
-					controller = (SpeedController *)(new CANTalon(port));
 				else if (type == MType::TalonSRX)
 					controller = (SpeedController *)(new TalonSRX(port));
 

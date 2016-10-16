@@ -1,6 +1,23 @@
 #include "toast/command.hpp"
 
+#include "toast/state.hpp"
+
 using namespace Toast::Command;
+
+static bool _is_reg = false;
+
+static void _tick_func(Toast::State state) {
+	if (!state.disabled()) {
+		Executor::instance()->tick();
+	}
+}
+
+static void register_instance() {
+	if (!_is_reg) {
+		_is_reg = true;
+		Toast::States::register_ticker(_tick_func);
+	}
+}
 
 // Toast::Command::Command
 Command *Command::then(Command *cmd, long delay) {
@@ -43,6 +60,11 @@ void Command::prelaunch(long time, Executor *exec) {
 static Executor _instance(10, 10);
 
 Executor *Executor::instance() {
+	return &_instance;
+}
+
+Executor *Executor::start() {
+	register_instance();
 	return &_instance;
 }
 

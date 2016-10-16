@@ -51,6 +51,7 @@ namespace Toast {
 
 		struct Executor {
 			API static Executor *instance();
+			API static Executor *start();
 
 			API Executor(int start_size = 10, int realloc_size = 10);
 
