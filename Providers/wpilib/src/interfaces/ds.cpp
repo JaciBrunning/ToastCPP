@@ -64,12 +64,17 @@ void tick_itf_driverstation() {
 				joy->set_pov(j, joyW->GetPOV(j));
 			}
 
-			HAL_JoystickAxes axes;
-			HAL_GetJoystickAxes(i, &axes);
 			Memory::Shared::DS::JoystickDescriptor *desc = joy->get_descriptor();
 
 			for (int j = 0; j < MIN(nAxis, 16); j++) {
-				joy->set_axis(j, axes.axes[j]);
+				float rawV = joyW->GetRawAxis(j);
+				int8_t v = 0;
+				if (rawV < 0) {
+					v = (int8_t)(rawV * 128.0f);
+				} else {
+					v = (int8_t)(rawV * 127.0f);
+				}
+				joy->set_axis(j, v);
 				desc->set_axis_type(j, (Memory::Shared::DS::JoystickAxisType)((int)(joyW->GetAxisType(j))));
 			}
 
