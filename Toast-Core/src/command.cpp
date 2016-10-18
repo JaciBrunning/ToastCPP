@@ -2,7 +2,7 @@
 
 #include "toast/state.hpp"
 
-using namespace Toast::Command;
+using namespace Toast;
 
 static bool _is_reg = false;
 
