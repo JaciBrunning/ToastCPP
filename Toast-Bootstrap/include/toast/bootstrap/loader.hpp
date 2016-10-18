@@ -3,19 +3,8 @@
 #include "toast/internal/loader.hpp"
 #include "toast/environment.hpp"
 #include "toast/memory.hpp"
-#include <vector>
-#include <string>
-#include <thread>
-#include <stdlib.h>
 
-#ifdef OS_WIN
-    #include <Windows.h>
-    #include <direct.h>
-    #include <process.h>
-#else
-    #include <dlfcn.h>
-    #include <unistd.h>
-#endif
+#include <string>
 
 namespace Toast {
     namespace Bootstrap {

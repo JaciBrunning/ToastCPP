@@ -36,7 +36,6 @@ namespace Toast {
     class Module {
         public:
             API virtual void construct() {};
-            API virtual void prestart() {};
             API virtual void start() {};
     };
     

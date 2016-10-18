@@ -69,9 +69,11 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     module->construct();
     
     Memory::Module::finalize_load();
+	module->start();
+
     _logger << "Module Loaded: " + string(info->name) + " [" + to_string(Memory::shared()->get_bootstrap_pid()) + " -> " + to_string(get_pid()) + "]";
     
-    long end_time = current_time_millis();
+	long end_time = current_time_millis();
     _logger << "Total Module Startup Time: " + to_string(end_time - start_time) + "ms";
     // MAIN LOOP
     States::start_tracker();

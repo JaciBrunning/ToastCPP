@@ -7,6 +7,21 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
+#include <vector>
+#include <thread>
+#include <stdlib.h>
+
+#ifdef OS_WIN
+	#include <Windows.h>
+	#include <direct.h>
+	#include <process.h>
+	#include <signal.h>
+#else
+	#include <dlfcn.h>
+	#include <unistd.h>
+	#include <sys/types.h>
+#endif
+
 
 using namespace Toast;
 using namespace Toast::Bootstrap;
@@ -87,12 +102,27 @@ static void create_process(Loader::ModuleAdapter *adapter) {
             (char *)("toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str(), 
             NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
             WaitForSingleObject(pi.hProcess, INFINITE);
-            CloseHandle(pi.hProcess);
-            CloseHandle(pi.hThread);
+			DWORD exit_code;
+			GetExitCodeProcess(pi.hProcess, &exit_code);
+			CloseHandle(pi.hProcess);
+			CloseHandle(pi.hThread);
+
+			bool sigint = false;
+			if (exit_code == (128 + SIGINT)) {
+				_log << "Module " + adapter->file + " requested Signal Interrupt (CTRL+C). Going for Shutdown.";
+				raise(SIGINT);
+				return;
+			}
         }
     #else
-        system(("./toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str());
-    #endif
+        int result = system(("./toast_launcher __TOAST_MODULE_LD_FILE " + file + " " + mempool_handle + " " + to_string(adapter->idx)).c_str());
+		int exit_code = WEXITSTATUS(result);
+		if (exit_code == 128 + SIGINT) {
+			_log << "Module " + adapter->file + " requested Signal Interrupt (CTRL+C). Going for Shutdown.";
+			raise(SIGINT);
+			return;
+		}
+	#endif
 }
 
 static void create_process_thread(Loader::ModuleAdapter *adapter) {

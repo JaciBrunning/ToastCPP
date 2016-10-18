@@ -22,10 +22,10 @@ using namespace Toast;
 static Logger __logger("Toast-Crash");
 static void (*shutdown_ptr)() = NULL;
 
-static void shutdown() {
+static void shutdown(int code = 0) {
     if (shutdown_ptr != NULL) shutdown_ptr();
     // abort();
-    exit(0);
+    exit(code);
 }
 
 static void catch_fatal_signal(int sig) {
@@ -33,7 +33,7 @@ static void catch_fatal_signal(int sig) {
 }
 
 static void catch_nonfatal_signal(int sig) {
-	::shutdown();
+	::shutdown(128 + sig);
 }
 
 static void catch_terminate() {

@@ -40,10 +40,10 @@ static ret thp_dynamic_call(DYNAMIC dyn, std::string name) {
 
 void bootstrap_shutdown() {
 	_b_log << "Bootstrap Stopped. Freeing Resources.";
-	Log::flush();
-	Log::close();
 
 	thp_dynamic_call(dyn, "provider_free");
+	Log::flush();
+	Log::close();
 	Toast::Bootstrap::Loader::free();
 	Toast::Memory::free_memory(true);
 }
