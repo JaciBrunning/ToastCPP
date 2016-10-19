@@ -47,4 +47,5 @@ namespace Toast {
     };
     
     API std::vector<ModuleData> get_all_modules();
+	API int module_id(std::string name);
 }

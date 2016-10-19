@@ -13,6 +13,7 @@
 #include "toast/util.hpp"
 #include "toast/crash.hpp"
 #include "toast/config.hpp"
+#include "toast/ipc.hpp"
 
 #include "toast/bootstrap/utils/log.hpp"
 
@@ -115,6 +116,7 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     Net::Socket::socket_init();
     Filesystem::initialize();
     Memory::initialize_bootstrap();
+	IPC::start(-1);
     
     Log::initialize("Bootstrap");
     _b_log.raw(Splash::get_startup_splash() + "\n");

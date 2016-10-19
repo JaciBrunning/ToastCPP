@@ -10,6 +10,7 @@
 #include "toast/util.hpp"
 #include "toast/memory.hpp"
 #include "toast/crash.hpp"
+#include "toast/ipc.hpp"
 
 #include <iostream>
 #include <string>
@@ -65,6 +66,8 @@ void init_toast_module(string module_name, string private_mempool_id, int module
         _logger.severe("Dynamic Error: " + Internal::Loader::get_dynamic_error());
         return;
     }
+	IPC::start(module_idx);
+
     Module *module = reinterpret_cast<Module *(*)()>(init_sym)();
     module->construct();
     
