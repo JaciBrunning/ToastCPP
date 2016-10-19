@@ -1,6 +1,7 @@
 // TOAST CORE
-#include "toast/net/socket.hpp"
-#include "toast/net/transport.hpp"
+#include "toast/net/socket.hpp"		// This is here to avoid import order issues on Windows.
+
+#include "toast/command.hpp"
 #include "toast/config.hpp"
 #include "toast/crash.hpp"
 #include "toast/environment.hpp"
