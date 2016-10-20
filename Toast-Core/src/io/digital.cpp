@@ -1,4 +1,5 @@
 #include "io/digital.hpp"
+#include "toast/ipc.hpp"
 
 using namespace IO;
 using namespace Toast::Memory;
@@ -69,4 +70,44 @@ void DIO::set_pwm_duty_cycle(float duty_cycle) {
 	_mem->set_pwm_duty_cycle(duty_cycle);
 	_mem->set_pwm_duty_cycle_pending(true);
 	MTX_UNLOCK(mtx(), _port);
+}
+
+void DIO::enable_interrupt() {
+	InterruptData data = { _port, true, true };
+	Toast::IPC::send(DIO_IPC::INTERRUPT_ENABLE, (char *)&data, sizeof(data));
+}
+
+static DIO::InterruptHandler _handlers[26];
+static bool listening = false;
+
+static void _msg_handler(std::string handle, void *data, int data_len, int module_id, void *param) {
+	DIO::InterruptData *idata = (DIO::InterruptData*)data;
+	_handlers[idata->port](*idata);
+}
+
+void DIO::on_interrupt(InterruptHandler handler) {
+	_handlers[_port] = handler;
+	if (!listening) {
+		Toast::IPC::listen(DIO_IPC::INTERRUPT_TRIGGER, &_msg_handler);
+		listening = true;
+	}
+}
+
+void DIO::add_glitch_filter(uint64_t period, DIO::GlitchFilterMode mode) {
+//	DIO_IPC::GlitchFilterMessage msg = { _port, cycles };
+	DIO_IPC::GlitchFilterMessage msg = { _port };
+	if (mode == DIO::GlitchFilterMode::FPGA_CYCLES) {
+		msg.period_low = (uint32_t)period;
+		msg.period_fpga = true;
+	} else {
+		msg.period_low = (uint32_t)period;
+		msg.period_high = (uint32_t)((period & 0xFFFFFFFF00000000LL) >> 32);
+		msg.period_fpga = false;
+	}
+	Toast::IPC::send(DIO_IPC::GLITCH_FILTER_ADD, &msg, sizeof(msg));
+}
+
+void DIO::remove_glitch_filter() {
+	DIO_IPC::GlitchFilterMessage msg = { _port };
+	Toast::IPC::send(DIO_IPC::GLITCH_FILTER_REMOVE, &msg, sizeof(msg));
 }

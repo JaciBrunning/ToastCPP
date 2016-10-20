@@ -64,22 +64,22 @@ std::vector<std::string> backtrace_get(int skip) {
             free(demangled);
             vs.push_back(std::string(buf));
 			
-			char syscom[256];
-			sprintf(syscom,"addr2line -e %s %p 2> /dev/null", info.dli_fname, relative_ptr);	// Linux addr2line
-			std::string exec_return = exec(syscom);
-			if (!exec_return.empty()) {
-				exec_return.erase(exec_return.length() - 1);	// Remove \n
-				sprintf(buf, "\t\t%s", exec_return.c_str());
-				vs.push_back(std::string(buf));
-			} else {
-				sprintf(syscom, "atos -o %s %p 2> /dev/null", info.dli_fname, relative_ptr);	// Mac atos
-				exec_return = exec(syscom);
-				if (!exec_return.empty()) {
-					exec_return.erase(exec_return.length() - 1);	// Remove \n
-					sprintf(buf, "\t\t%s", exec_return.c_str());
-					vs.push_back(std::string(buf));
-				}
-			}
+//			char syscom[256];
+//			sprintf(syscom,"addr2line -e %s %p 2> /dev/null", info.dli_fname, relative_ptr);	// Linux addr2line
+//			std::string exec_return = exec(syscom);
+//			if (!exec_return.empty()) {
+//				exec_return.erase(exec_return.length() - 1);	// Remove \n
+//				sprintf(buf, "\t\t%s", exec_return.c_str());
+//				vs.push_back(std::string(buf));
+//			} else {
+//				sprintf(syscom, "atos -o %s %p 2> /dev/null", info.dli_fname, relative_ptr);	// Mac atos
+//				exec_return = exec(syscom);
+//				if (!exec_return.empty()) {
+//					exec_return.erase(exec_return.length() - 1);	// Remove \n
+//					sprintf(buf, "\t\t%s", exec_return.c_str());
+//					vs.push_back(std::string(buf));
+//				}
+//			}
         } else {
             sprintf(buf, "%-3d %*p %s [No DL_Info]",
                     nFrames - i - 1, int(2 + sizeof(void*) * 2), callstack[i], symbols[i]);

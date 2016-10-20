@@ -31,19 +31,25 @@ THP_Base_Robot *get_robot() {
 }
 
 void provider_preinit() { }
-void provider_init() {
+void provider_predriver() {
 	long starttime = current_time_millis();
-    if (!HAL_Initialize(0)) {
-        _provider_logger.severe("HAL could not be initialized");
-        throw "HAL could not be initialized";
-    }
-    HAL_Report(HALUsageReporting::kResourceType_Language,
-              HALUsageReporting::kLanguage_CPlusPlus);
+	if (!HAL_Initialize(0)) {
+		_provider_logger.severe("HAL could not be initialized");
+		throw "HAL could not be initialized";
+	}
+	HAL_Report(HALUsageReporting::kResourceType_Language,
+		HALUsageReporting::kLanguage_CPlusPlus);
 
-    robot = new THP_Base_Robot();
+	robot = new THP_Base_Robot();
 	long endtime = current_time_millis();
 	_provider_logger << "WPILib Start Time: " + to_string(endtime - starttime) + "ms";
 }
+
+void provider_preload() {
+	init_interfaces();
+}
+
+void provider_init() { }
 
 void provider_loop() {
 	robot->StartCompetition();

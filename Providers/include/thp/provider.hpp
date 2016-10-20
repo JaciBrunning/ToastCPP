@@ -6,6 +6,9 @@
 // Called before Toast Loading
 CAPI void provider_preinit();
 
+CAPI void provider_predriver();
+CAPI void provider_preload();
+
 // Called after Toast loading
 CAPI void provider_init();
 

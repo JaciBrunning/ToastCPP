@@ -19,3 +19,9 @@ inline void tick_interfaces() {
 	tick_itf_driverstation();
 //	tick_itf_accel();
 }
+
+void init_itf_dio();
+
+inline void init_interfaces() {
+	init_itf_dio();
+}

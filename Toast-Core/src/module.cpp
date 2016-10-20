@@ -1,6 +1,5 @@
 #include "toast/module.hpp"
 
-#include "toast/logger.hpp"
 
 using namespace std;
 static vector<Toast::ModuleData> v;
@@ -11,7 +10,7 @@ static void load_module_datas() {
 	for (i = 0; i < 128; i++) {
 		Toast::Memory::ModuleActState state = Toast::Memory::shared()->get_module_activity_state(i);
 		if (state != Toast::Memory::ModuleActState::NOT_FOUND) {
-			current_mods = i;
+			current_mods = i+1;
 		} else {
 			break;
 		}
@@ -22,6 +21,7 @@ static void load_module_datas() {
 		v.clear();
 		for (i = 0; i < current_mods; i++) {
 			Toast::Memory::ModuleActState state = Toast::Memory::shared()->get_module_activity_state(i);
+
 			if (state != Toast::Memory::ModuleActState::NOT_FOUND) {
 				Toast::Memory::PrivatePool pool;
 				char buf[pool.SIZE];

@@ -12,11 +12,13 @@ static bool started = false;
 static Logger _log("Toast-IPC");
 static Net::Socket::SOCKET sock;
 static std::thread read_thread;
-static std::vector<std::pair<std::regex, IPC::MessageListener> > listeners;
+static std::vector<std::tuple<std::string, IPC::MessageListener, void *> > listeners;
 
 static Net::Socket::SocketAddress temp_addr("127.0.0.1", 6300);
 static Net::Socket::SocketAddress temp_addr_recv;
 static int my_module_idx = 0;
+
+static char message[4096];
 
 static void read_thread_func() {
 	char msg[4096];
@@ -37,8 +39,11 @@ static void read_thread_func() {
 		}
 
 		for (auto entry : listeners) {
-			if (std::regex_search(handle, entry.first)) {
-				entry.second(handle, &msg[2 + handle_len], len - handle_len - 2, source_module);	// Call the listener
+			std::string s = std::get<0>(entry);
+			IPC::MessageListener l = std::get<1>(entry);
+			void *param = std::get<2>(entry);
+			if (handle == s) {
+				l(handle, (void *)&msg[2 + handle_len], len - handle_len - 2, source_module, param);	// Call the listener
 			}
 		}
 	}
@@ -65,33 +70,30 @@ void IPC::start(int module_id) {
 	}
 }
 
-void IPC::send(std::string handle, const char *data, int data_length) {
+void IPC::send(std::string handle, void *data, int data_length) {
 	IPC::sendto(handle, data, data_length, -1);
 }
 
-void IPC::broadcast(std::string handle, const char *data, int data_length) {
-	IPC::sendto(handle, data, data_length, -1);
+void IPC::broadcast(std::string handle, void *data, int data_length, bool bootstrap) {
+	if (bootstrap) IPC::sendto(handle, data, data_length, -1);
 	for (ModuleData mdata : get_all_modules()) {
 		IPC::sendto(handle, data, data_length, mdata.module_idx);
 	}
 }
 
-void IPC::sendto(std::string handle, const char *data, int data_length, int module_idx) {
+void IPC::sendto(std::string handle, void *data, int data_length, int module_idx) {
 	temp_addr.set_port(6300 + module_idx + 1);
 	int total_length = handle.length() + data_length + 2;
-	char *message = (char *)malloc(total_length);
 	message[0] = (int8_t)(my_module_idx);
 	message[1] = (uint8_t)(handle.length());
-	strncpy(message + 2, handle.c_str(), handle.length());
-	strncpy(message + 2 + handle.length(), data, data_length);
+	memcpy(message + 2, handle.c_str(), handle.length());
+	memcpy(message + 2 + handle.length(), data, data_length);
 	int ret = ::sendto(sock, message, total_length, 0, (struct sockaddr *)temp_addr.raw_address(), temp_addr.raw_address_length());
 	if (ret == -1) {
 		_log.error("IPC Socket Send Error: " + std::to_string(Net::Socket::socket_last_error()));
 	}
-	free(message);
 }
 
-void IPC::listen(std::string handle, IPC::MessageListener listener) {
-	std::regex r(handle, std::regex_constants::icase);
-	listeners.push_back(std::pair<std::regex, MessageListener>(r, listener));
+void IPC::listen(std::string handle, IPC::MessageListener listener, void *param) {
+	listeners.push_back(std::make_tuple(handle, listener, param));
 }

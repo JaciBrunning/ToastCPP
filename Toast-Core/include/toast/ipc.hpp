@@ -5,11 +5,11 @@
 
 namespace Toast {
 	namespace IPC {
-		typedef void (*MessageListener)(std::string handle, char *data, int data_length, int module_id);
+		typedef void (*MessageListener)(std::string handle, void *data, int data_length, int module_id, void *param);
 		API void start(int module_id);
-		API void send(std::string handle, const char *data, int data_length);
-		API void broadcast(std::string handle, const char *data, int data_length);
-		API void sendto(std::string handle, const char *data, int data_length, int module_id);
-		API void listen(std::string handle, MessageListener listener);
+		API void send(std::string handle, void *data, int data_length);
+		API void broadcast(std::string handle, void *data, int data_length, bool bootstrap=false);
+		API void sendto(std::string handle, void *data, int data_length, int module_id);
+		API void listen(std::string handle, MessageListener listener, void *param = NULL);
 	}
 }

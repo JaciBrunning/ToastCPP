@@ -129,12 +129,14 @@ void init_toast_bootstrap(int argc, char *argv[]) {
     int tick_frequency = (int)(1000.0 / _b_cfg.timings.states.frequency);
     States::Internal::set_tick_timing(tick_frequency);
 
+	thp_dynamic_call(dyn, "provider_predriver");
 	if (load_driver) {
 		_b_log << "Initializing Driver Loader";
 		Bootstrap::Driver::initialize();
 		Bootstrap::Driver::preinit_drivers();
 	}
     
+	thp_dynamic_call(dyn, "provider_preload");
 	if (load) {
 		_b_log << "Initializing Loader";
 		Bootstrap::Loader::initialize();

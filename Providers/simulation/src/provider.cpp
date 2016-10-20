@@ -28,6 +28,8 @@ SimConfig *get_simulation_config() {
 }
 
 void provider_preinit() { }
+void provider_predriver() { }
+void provider_preload() { }
 void provider_init() {
     _logger.info("Simulation Provider Loaded");
 	_config.load();
