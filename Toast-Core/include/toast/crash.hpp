@@ -36,5 +36,7 @@ namespace Toast {
         
 		API void handle_pending_unwind();
         API void handle_exception(std::string type, std::string msg);
+
+		API bool has_crashed();
     }
 }

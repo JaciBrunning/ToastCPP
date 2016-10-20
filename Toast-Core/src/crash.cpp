@@ -21,10 +21,10 @@ using namespace Toast;
 
 static Logger __logger("Toast-Crash");
 static void (*shutdown_ptr)() = NULL;
+static bool crashed = false;
 
 static void shutdown(int code = 0) {
     if (shutdown_ptr != NULL) shutdown_ptr();
-    // abort();
     exit(code);
 }
 
@@ -112,6 +112,7 @@ void Crash::handle_pending_unwind() {
 }
 
 void Crash::handle_exception(std::string type, std::string msg) {
+	crashed = true;
     __logger.raw("\n**** CRASH LOG ****");
     __logger.raw(Splash::get_error_splash() + "\n");
     __logger.raw("Your robot has crashed. Following is a crash log and more details.");
@@ -141,4 +142,8 @@ void Crash::handle_exception(std::string type, std::string msg) {
     
     __logger.raw("\n*******************");
     shutdown();
+}
+
+bool Crash::has_crashed() {
+	return crashed;
 }

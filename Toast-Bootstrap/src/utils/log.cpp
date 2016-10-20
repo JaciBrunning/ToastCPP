@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <sstream>
 
+#include <iostream>
+
 using namespace BootstrapUtil;
 using namespace std;
 using namespace Toast;
@@ -21,7 +23,7 @@ static string out;
 struct tLogMsg {
 	int id;
 	std::string process;
-	long time_ms;
+	long long time_ms;
 	bool error, debug;
 	State state;
 	std::string sender, level, msg;
@@ -42,7 +44,7 @@ static vector<tLogMsg> get_msgs() {
 		while (std::getline(file_in, line, ';')) {
 			tLogMsg msg = {
 				0, process,
-				stol(line),
+				stoll(line),
 				false, false, States::DISABLED(), "", "", ""
 			};
 
@@ -178,11 +180,14 @@ void Log::combine_logs(int argc, char *argv[], int argi) {
 	else if (Filesystem::is_directory(out)) out = Filesystem::join(out, "combined.csv");
 
 	ofstream file_out(out);
-	file_out << "Id,Time,Error,Debug,State,Process,Sender,Level,Msg" << endl;
+	file_out << "Id,Time,TimeSinceLaunch,Error,Debug,State,Process,Sender,Level,Msg" << endl;
 	int id = 0;
-	for (tLogMsg msg : get_msgs()) {
+	vector<tLogMsg> msgs = get_msgs();
+	long long first_ms = msgs.size() > 0 ? msgs[0].time_ms : 0LL;
+	for (tLogMsg msg : msgs) {
 		file_out << id++ <<
 			"," << msg.time_ms <<
+			"," << msg.time_ms - first_ms << 
 			"," << (msg.error ? 1 : 0) <<
 			"," << (msg.debug ? 1 : 0) <<
 			"," << (msg.state.to_string()) <<

@@ -55,9 +55,7 @@ void provider_loop() {
 	robot->StartCompetition();
 }
 
-void provider_free() {
-    free(robot);
-}
+void provider_free() { }
 
 void thp_state_set_callback(PeriodicStateCallback callback_periodic, RawStateCallback callback_transition) {
 	_state_callback_periodic = callback_periodic;

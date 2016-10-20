@@ -47,6 +47,9 @@ void bootstrap_shutdown() {
 	Log::close();
 	Toast::Bootstrap::Loader::free();
 	Toast::Memory::free_memory(true);
+
+	// Just kill it. WPILib holds on too long.
+	std::quick_exit(Crash::has_crashed() ? 1 : 0);
 }
 
 void init_toast_bootstrap(int argc, char *argv[]) {
