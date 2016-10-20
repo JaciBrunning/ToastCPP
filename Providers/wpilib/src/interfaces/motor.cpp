@@ -8,7 +8,6 @@
 #include "Talon.h"
 #include "Victor.h"
 #include "VictorSP.h"
-#include "CANTalon.h"
 #include "TalonSRX.h"
 #include "Servo.h"
 

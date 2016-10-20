@@ -45,6 +45,7 @@ if (isRoboRIO) {
             tasks = [':wpilibc:build', 'wpilibcZip']
 
             doLast {
+                delete file("build")
                 copy {
                     from zipTree(file("../allwpilib/wpilibc/build/wpilibc.zip"))
                     into file("build")
