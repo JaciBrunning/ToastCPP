@@ -7,9 +7,7 @@ using namespace Toast;
 static bool _is_reg = false;
 
 static void _tick_func(Toast::State state) {
-	if (!state.disabled()) {
-		Executor::instance()->tick();
-	}
+	Executor::instance()->tick();
 }
 
 static void register_instance() {
