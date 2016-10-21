@@ -30,6 +30,7 @@ namespace Toast {
 			Concurrent::IPCMutex *onboard_accel;
 			Concurrent::IPCMutex *analog_out;
 			Concurrent::IPCMutex *analog_in;
+			Concurrent::IPCMutex *analog_in_static;
 			Concurrent::IPCMutex *dio;
 			Concurrent::IPCMutex *relay;
 			Concurrent::IPCMutex *pcm;

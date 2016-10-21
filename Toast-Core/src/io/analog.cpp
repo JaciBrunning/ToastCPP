@@ -4,7 +4,7 @@ using namespace IO;
 using namespace Toast::Memory;
 
 float IO::get_analog_sample_rate() {
-	return shared()->analog_in_settings()->get_sample_rate();
+	MTX_RETURN(shared_mutex()->analog_in_static, 0, shared()->analog_in_settings()->get_sample_rate());
 }
 
 static inline Toast::Concurrent::IPCMutex *mtx_o() {

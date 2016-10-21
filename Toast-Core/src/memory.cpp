@@ -25,6 +25,7 @@ static void init_mutexes(bool own) {
 	_mtx.onboard_accel = new IPCMutex("core_ob_accel", 1, own);
 	_mtx.analog_out = new IPCMutex("core_an_out", 2, own);
 	_mtx.analog_in = new IPCMutex("core_an_in", 8, own);
+	_mtx.analog_in_static = new IPCMutex("core_an_in_static", 1, own);
 	_mtx.dio = new IPCMutex("core_dio", 26, own);
 	_mtx.relay = new IPCMutex("core_relay", 4, own);
 	_mtx.pcm = new IPCMutex("core_pcm", 2, own);
@@ -42,6 +43,7 @@ static void free_mutexes() {
 	delete _mtx.onboard_accel;
 	delete _mtx.analog_out;
 	delete _mtx.analog_in;
+	delete _mtx.analog_in_static;
 	delete _mtx.dio;
 	delete _mtx.relay;
 	delete _mtx.pcm;
