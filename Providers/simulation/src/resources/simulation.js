@@ -62,7 +62,7 @@ window.Simulation = (function() {
                 } }
             ]
         },
-        "xbox360_mac_driver": {
+        "xbox360_mac": {
             is_xbox: true,
             type: ds_ns.JoystickType.XINPUT_GAMEPAD,
             axis: [
@@ -94,6 +94,23 @@ window.Simulation = (function() {
                     }
                 } }
             ]
+        },
+        "logitechExtreme3D_mac": {
+            is_xbox: false,
+            type: ds_ns.JoystickType.XINPUT_FLIGHT_STICK, // TODO: is this right?
+            axis: [
+                { source: { a: 0 }, type: ds_ns.JoystickAxisType.X },
+                { source: { a: 1 }, type: ds_ns.JoystickAxisType.Y },
+                { source: { a: 5 }, type: ds_ns.JoystickAxisType.TWIST },
+                { source: { a: 6 }, type: ds_ns.JoystickAxisType.THROTTLE }
+            ],
+            button: [
+                { source: { b: 0 } }, { source: { b: 1 } }, { source: { b: 2 } },
+                { source: { b: 3 } }, { source: { b: 4 } }, { source: { b: 5 } },
+                { source: { b: 6 } }, { source: { b: 7 } }, { source: { b: 8 } },
+                { source: { b: 9 } }, { source: { b: 10 } }, { source: { b: 11 } }
+            ],
+            pov: [] // Not supported by HTML5
         }
     };
 
@@ -106,7 +123,8 @@ window.Simulation = (function() {
                 "ID: <input gp=" + gamepad.index  + " last_gp=" + gamepad.index + " style='width: 50px; margin-right: 10px' type='number' min=0 max=5 step=1 value=0 onchange='return Simulation.update_gamepad_id(this)'/>" +
                 "Remap: <select gp=" + gamepad.index + " style='width: 250px' id='remap' onchange='return Simulation.update_gamepad_map(this)'>" +
                 "<option value='xbox360' selected> Xbox 360 </option>" +
-                "<option value='xbox360_mac_driver'> Xbox 360 (Mac Driver) </option>" + 
+                "<option value='xbox360_mac'> Xbox 360 (Mac Driver) </option>" + 
+                "<option value='logitechExtreme3D_mac'> Logitech Extreme 3D Pro (Mac Driver) </option>" + 
                 "</select>" +
             "</div>";
 
