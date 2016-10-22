@@ -73,7 +73,7 @@ void DIO::set_pwm_duty_cycle(float duty_cycle) {
 }
 
 void DIO::enable_interrupt() {
-	InterruptData data = { _port, true, true };
+	InterruptData data = { (uint8_t)_port, true, true };
 	Toast::IPC::send(DIO_IPC::INTERRUPT_ENABLE, (char *)&data, sizeof(data));
 }
 
