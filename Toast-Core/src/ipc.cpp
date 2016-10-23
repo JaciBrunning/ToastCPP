@@ -7,6 +7,8 @@
 #include <regex>
 #include <queue>
 
+#include <toast/crash.hpp>
+
 using namespace Toast;
 
 static bool started = false;
@@ -46,7 +48,7 @@ static void read_thread_func() {
 			remove_queue.pop();
 		}
 
-		for (auto it = listeners.begin(); it != listeners.end(); ) {
+		for (auto it = listeners.begin(); it != listeners.end(); it++) {
 			auto entry = *it;
 			std::string s = std::get<0>(entry.second);
 			IPC::MessageListener l = std::get<1>(entry.second);

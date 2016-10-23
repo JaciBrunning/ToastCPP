@@ -37,6 +37,12 @@ void init_toast_module(string module_name, string private_mempool_id, int module
     Net::Socket::socket_init();
     Log::initialize(module_name);
     _logger.set_name("Module-" + module_name);
+
+	// We put this so early so IO interfaces like I2C don't run into initialization errors if
+	// they are created as global members.
+	_logger.debug("Init IPC...");
+	IPC::start(module_idx);
+
     _logger.debug("Loading Module...");
     
     DYNAMIC dyn = Internal::Loader::load_dynamic_library(module_name);
@@ -66,7 +72,6 @@ void init_toast_module(string module_name, string private_mempool_id, int module
         _logger.severe("Dynamic Error: " + Internal::Loader::get_dynamic_error());
         return;
     }
-	IPC::start(module_idx);
 
     Module *module = reinterpret_cast<Module *(*)()>(init_sym)();
     module->construct();

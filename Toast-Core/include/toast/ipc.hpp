@@ -3,9 +3,11 @@
 #include "toast/environment.hpp"
 #include "toast/module.hpp"
 
+#include <functional>
+
 namespace Toast {
 	namespace IPC {
-		typedef void (*MessageListener)(std::string handle, void *data, int data_length, int module_id, void *param);
+		typedef std::function<void(std::string handle, void *data, int data_length, int module_id, void *param)> MessageListener;
 		API void start(int module_id);
 		API void send(std::string handle, void *data, int data_length);
 		API void broadcast(std::string handle, void *data, int data_length, bool bootstrap=false);
