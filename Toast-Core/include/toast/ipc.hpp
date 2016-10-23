@@ -10,7 +10,7 @@ namespace Toast {
 		API void send(std::string handle, void *data, int data_length);
 		API void broadcast(std::string handle, void *data, int data_length, bool bootstrap=false);
 		API void sendto(std::string handle, void *data, int data_length, int module_id);
-		API void listen(std::string handle, MessageListener listener, void *param = NULL);
-		API void listen_once(std::string handle, MessageListener listener, void *param = NULL);
+		API long listen(std::string handle, MessageListener listener, void *param = NULL);
+		API void stop_listening(long ptr);
 	}
 }

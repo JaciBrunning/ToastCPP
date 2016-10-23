@@ -5,6 +5,7 @@
 #include <thread>
 #include <map>
 #include <regex>
+#include <queue>
 
 using namespace Toast;
 
@@ -12,7 +13,9 @@ static bool started = false;
 static Logger _log("Toast-IPC");
 static Net::Socket::SOCKET sock;
 static std::thread read_thread;
-static std::vector<std::tuple<std::string, IPC::MessageListener, void *, bool> > listeners;
+static std::map<long, std::tuple<std::string, IPC::MessageListener, void *> > listeners;
+static std::queue<long> remove_queue;
+static long id = 0;
 
 static Net::Socket::SocketAddress temp_addr("127.0.0.1", 6300);
 static Net::Socket::SocketAddress temp_addr_recv;
@@ -38,19 +41,18 @@ static void read_thread_func() {
 			_log.error("IPC Socket Receive Error: " + std::to_string(Net::Socket::socket_last_error()));
 		}
 
+		while (!remove_queue.empty()) {
+			listeners.erase(remove_queue.front());
+			remove_queue.pop();
+		}
+
 		for (auto it = listeners.begin(); it != listeners.end(); ) {
 			auto entry = *it;
-			std::string s = std::get<0>(entry);
-			IPC::MessageListener l = std::get<1>(entry);
-			void *param = std::get<2>(entry);
-			bool once = std::get<3>(entry);
+			std::string s = std::get<0>(entry.second);
+			IPC::MessageListener l = std::get<1>(entry.second);
+			void *param = std::get<2>(entry.second);
 			if (handle == s) {
 				l(handle, (void *)&msg[2 + handle_len], len - handle_len - 2, source_module, param);	// Call the listener
-				if (once) {
-					it = listeners.erase(it);
-				} else {
-					++it;
-				}
 			}
 		}
 	}
@@ -101,10 +103,12 @@ void IPC::sendto(std::string handle, void *data, int data_length, int module_idx
 	}
 }
 
-void IPC::listen(std::string handle, IPC::MessageListener listener, void *param) {
-	listeners.push_back(std::make_tuple(handle, listener, param, false));
+long IPC::listen(std::string handle, IPC::MessageListener listener, void *param) {
+	int i = id++;
+	listeners[i] = std::make_tuple(handle, listener, param);
+	return i;
 }
 
-void IPC::listen_once(std::string handle, IPC::MessageListener listener, void *param) {
-	listeners.push_back(std::make_tuple(handle, listener, param, true));
+void IPC::stop_listening(long id) {
+	remove_queue.push(id);
 }
