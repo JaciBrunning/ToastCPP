@@ -88,7 +88,7 @@ void tick_itf_motor() {
 	mtx = Memory::shared_mutex()->pwm;
 	for (int i = 0; i < 20; i++) {
 		MTX_LOCK(mtx, i);
-		Memory::Shared::IO::PWM *pwm = Memory::shared()->pwm;
+		Memory::Shared::IO::PWM *pwm = Memory::shared()->pwm(i);
 		if (pwm->get_init()) {
 			if (!pwm->get_bootstrap()) {
 				pwms[i] = new PWM(i);
