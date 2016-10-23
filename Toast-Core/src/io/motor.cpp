@@ -131,11 +131,11 @@ float PWM::get_speed() {
 
 void PWM::set_bounds(int32_t max, int32_t dbmax, int32_t center, int32_t dbmin, int32_t min) {
 	MTX_LOCK(mtx_p(), _port);
-	_mem->set_bounds_max((double)max);
-	_mem->set_bounds_deadband_max((double)dbmax);
-	_mem->set_bounds_center((double)center);
-	_mem->set_bounds_deadband_min((double)dbmin);
-	_mem->set_bounds_min((double)min);
+	_mem->set_bounds_max((float)max);
+	_mem->set_bounds_deadband_max((float)dbmax);
+	_mem->set_bounds_center((float)center);
+	_mem->set_bounds_deadband_min((float)dbmin);
+	_mem->set_bounds_min((float)min);
 
 	_mem->set_bounds_int32(true);
 	_mem->set_bounds_pending(true);

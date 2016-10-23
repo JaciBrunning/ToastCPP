@@ -21,7 +21,9 @@ inline void tick_interfaces() {
 }
 
 void init_itf_dio();
+void init_itf_motor();
 
 inline void init_interfaces() {
 	init_itf_dio();
+	init_itf_motor();
 }
