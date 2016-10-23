@@ -5,6 +5,7 @@
 
 #define MAP_AXIS(name, axis_id) API inline float name() { return get_raw_axis(axis_id); }
 #define MAP_BUTT(name, butt_id) API inline bool name() { return get_raw_button(butt_id); }
+#define MAP_BUTTS(button_count, off) API inline bool button(int id) { if (id < button_count) return get_raw_button(id - off); return false; }
 
 namespace IO {
 	namespace DS {
@@ -74,6 +75,20 @@ namespace IO {
 			MAP_BUTT(start, 7);
 			MAP_BUTT(left_stick, 8);
 			MAP_BUTT(right_stick, 9);
+		};
+
+		class LogitechExtreme3D : public Joystick {
+		public:
+			API LogitechExtreme3D(int port) : Joystick(port) { }
+
+			MAP_AXIS(x, 0);
+			MAP_AXIS(y, 1);
+			MAP_AXIS(twist, 2);
+			MAP_AXIS(slider, 3);
+
+			MAP_BUTT(trigger, 0);
+			MAP_BUTT(bumper, 1);
+			MAP_BUTTS(12, 1);
 		};
 	}
 }
