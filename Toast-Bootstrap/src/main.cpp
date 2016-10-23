@@ -49,7 +49,7 @@ void bootstrap_shutdown() {
 	Toast::Memory::free_memory(true);
 
 	// Just kill it. WPILib holds on too long.
-	#ifdef OS_MAC
+	#ifndef ROBORIO
 		exit(Crash::has_crashed() ? 1 : 0);
 	#else
 		std::quick_exit(Crash::has_crashed() ? 1 : 0);
