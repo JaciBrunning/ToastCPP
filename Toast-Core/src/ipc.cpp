@@ -7,7 +7,8 @@
 #include <regex>
 #include <queue>
 
-#include <toast/crash.hpp>
+#include "toast/crash.hpp"
+#include "toast/concurrent/mutex.hpp"
 
 using namespace Toast;
 
@@ -24,6 +25,7 @@ static Net::Socket::SocketAddress temp_addr_recv;
 static int my_module_idx = 0;
 
 static char message[4096];
+static Concurrent::Mutex mtx_send;
 
 static void read_thread_func() {
 	char msg[4096];
@@ -93,6 +95,7 @@ void IPC::broadcast(std::string handle, void *data, int data_length, bool bootst
 }
 
 void IPC::sendto(std::string handle, void *data, int data_length, int module_idx) {
+	mtx_send.lock();
 	temp_addr.set_port(6300 + module_idx + 1);
 	int total_length = handle.length() + data_length + 2;
 	message[0] = (int8_t)(my_module_idx);
@@ -103,6 +106,7 @@ void IPC::sendto(std::string handle, void *data, int data_length, int module_idx
 	if (ret == -1) {
 		_log.error("IPC Socket Send Error: " + std::to_string(Net::Socket::socket_last_error()));
 	}
+	mtx_send.unlock();
 }
 
 long IPC::listen(std::string handle, IPC::MessageListener listener, void *param) {
