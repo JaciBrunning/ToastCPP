@@ -37,15 +37,23 @@ namespace Toast {
 		class Mutex {
 		public:
 			API Mutex();
-			API Mutex(pthread_mutex_t *_mtx, bool isnew = false);
-
 			API virtual ~Mutex();
 
 			API void lock();
 			API void unlock();
+			API bool try_lock();
+
+#ifdef OS_WIN
+			API CRITICAL_SECTION *get_cs() { return &_cs; }
+#else
+			API pthread_mutex_t *get_mtx() { return _mutex; }
+#endif
 		protected:
+#ifdef OS_WIN
+			CRITICAL_SECTION _cs;
+#else
 			pthread_mutex_t *_mutex;
-			bool mine;
+#endif
 		};
 
 		// In windows, this is a named mutex. In POSIX, this is a process-shared mutex from

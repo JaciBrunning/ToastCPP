@@ -23,29 +23,46 @@ static int pthread_mutex_unlock(pthread_mutex_t *mutex) {
 #endif
 
 Mutex::Mutex() {
+#ifdef OS_WIN
+	InitializeCriticalSection(&_cs);
+#else
 	_mutex = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t));
 	pthread_mutex_init(_mutex, NULL);
-	mine = true;
-}
-
-Mutex::Mutex(pthread_mutex_t *_mtx, bool isnew) {
-	_mutex = _mtx;
-	mine = false;
-	if (isnew) {
-		pthread_mutex_init(_mutex, NULL);
-	}
+#endif
 }
 
 Mutex::~Mutex() {
-	if (mine) pthread_mutex_destroy(_mutex);
+#ifdef OS_WIN
+	DeleteCriticalSection(&_cs);
+#else
+	pthread_mutex_destroy(_mutex);
+	free(_mutex);
+#endif
 }
 
 void Mutex::lock() {
+#ifdef OS_WIN
+	EnterCriticalSection(&_cs);
+#else
 	pthread_mutex_lock(_mutex);
+#endif
 }
 
 void Mutex::unlock() {
+#ifdef OS_WIN
+	LeaveCriticalSection(&_cs);
+#else
 	pthread_mutex_unlock(_mutex);
+#endif
+}
+
+bool Mutex::try_lock() {
+	// Don't you love OS consistency?
+#ifdef OS_WIN
+	return TryEnterCriticalSection(&_cs) != 0;		// 0 = Already Locked
+#else
+	return pthread_mutex_trylock(_mutex) == 0;		// 0 = Not already locked
+#endif
 }
 
 IPCMutex::IPCMutex(std::string name, int size, bool owner) {
