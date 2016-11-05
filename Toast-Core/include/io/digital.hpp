@@ -3,6 +3,8 @@
 #include "toast/library.hpp"
 #include "toast/memory.hpp"
 
+#include <functional>
+
 namespace IO {
 	// This is internal, but we keep it here since both the Bootstrap and Toast-Core process use it.
 	namespace DIO_IPC {
@@ -30,7 +32,7 @@ namespace IO {
 			FPGA_CYCLES = 0,
 			NANOSECONDS = 1
 		};
-		typedef void (*InterruptHandler)(InterruptData data);
+		typedef std::function<void(InterruptData)> InterruptHandler;
 
 		API DIO(int port, Mode mode = Mode::INPUT);
 		API virtual ~DIO() = default;
