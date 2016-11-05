@@ -6,6 +6,10 @@
 #include "WPILib.h"
 
 #include "toast/logger.hpp"
+#include "toast/ipc.hpp"
+
+#include "io/io.hpp"
+
 #include <string>
 
 using namespace std;
@@ -47,6 +51,10 @@ void provider_predriver() {
 
 void provider_preload() {
 	init_interfaces();
+
+	IPC::listen(IO::IPC_HANDLE_UPDATE, [](std::string handle, void *data, int data_length, int mod_id, void *param) {
+		tick_interfaces();
+	});
 }
 
 void provider_init() { }

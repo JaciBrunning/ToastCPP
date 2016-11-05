@@ -101,6 +101,10 @@ void init_toast_bootstrap(int argc, char *argv[]) {
 	std::string prov_library = Internal::Loader::library_name(provider);
 	dyn = Internal::Loader::load_dynamic_library(prov_library);
 	if (dyn == NULL) {
+		if (Filesystem::exists(prov_library)) {
+			cerr << "Toast Hardware Provider Library " << prov_library << " could not be loaded! Falling back..." << endl;
+			cerr << Internal::Loader::get_dynamic_error() << endl;
+		}
 		for (std::string s : Filesystem::ls_local("./")) {
 			std::string name = Filesystem::name(s);
 			if (starts_with(name, "provider_") || starts_with(name, "libprovider_")) {
