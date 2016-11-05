@@ -11,6 +11,8 @@ namespace IO {
 
 		const std::string GLITCH_FILTER_ADD = "io.digital.glitch.add";
 		const std::string GLITCH_FILTER_REMOVE = "io.digital.glitch.remove";
+
+		const std::string DIGITAL_UPDATE = "io.digital.update";
 		
 		struct GlitchFilterMessage {
 			int port;
@@ -60,6 +62,8 @@ namespace IO {
 
 		API void add_glitch_filter(uint64_t fpga_cycles_or_nanoseconds, GlitchFilterMode mode);
 		API void remove_glitch_filter();
+
+		API static void update_now(bool wait = true);
 	private:
 		int _port;
 		Toast::Memory::Shared::IO::DIO *_mem;

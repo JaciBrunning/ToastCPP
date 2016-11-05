@@ -2,6 +2,7 @@
 
 #include "toast/memory.hpp"
 #include "toast/ipc.hpp"
+#include "toast/concurrent/mutex.hpp"
 #include "io/digital.hpp"
 
 #include "DigitalInput.h"
@@ -21,6 +22,7 @@ struct WPIInternalDIO {
 
 WPIInternalDIO dios[26];
 static DigitalGlitchFilter *filters[26];	// One per port if needed
+static Concurrent::Mutex tick_mutex;
 
 static void _interrupt_callback(uint32_t interruptAssertedMask, void *param) {
 	WPIInternalDIO *dio = ((WPIInternalDIO *)param);
@@ -89,14 +91,21 @@ static void _msg_handler_glitch_remove(std::string handle, void *data, int data_
 	if (dios[msg->port].last_filter != NULL) dios[msg->port].last_filter->Remove(dios[msg->port].source);
 }
 
+static void _msg_handler_update_now(std::string handle, void *data, int data_len, int module_id, void *param) {
+	tick_itf_dio();
+}
+
 void init_itf_dio() {
 	IPC::listen(IO::DIO_IPC::INTERRUPT_ENABLE, &_msg_handler_interrupt);
 
 	IPC::listen(IO::DIO_IPC::GLITCH_FILTER_ADD, &_msg_handler_glitch_add);
 	IPC::listen(IO::DIO_IPC::GLITCH_FILTER_REMOVE, &_msg_handler_glitch_remove);
+
+	IPC::listen(IO::DIO_IPC::DIGITAL_UPDATE, &_msg_handler_update_now);
 }
 
 void tick_itf_dio() {
+	tick_mutex.lock();
 	Concurrent::IPCMutex *mtx = Memory::shared_mutex()->dio;
 	for (int i = 0; i < 26; i++) {
 		MTX_LOCK(mtx, i);
@@ -151,4 +160,5 @@ void tick_itf_dio() {
 		}
 		MTX_UNLOCK(mtx, i);
 	}
+	tick_mutex.unlock();
 }

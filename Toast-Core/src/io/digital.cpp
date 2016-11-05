@@ -111,3 +111,10 @@ void DIO::remove_glitch_filter() {
 	DIO_IPC::GlitchFilterMessage msg = { _port };
 	Toast::IPC::send(DIO_IPC::GLITCH_FILTER_REMOVE, &msg, sizeof(msg));
 }
+
+void DIO::update_now(bool wait) {
+	if (wait)
+		Toast::IPC::send_with_ack(DIO_IPC::DIGITAL_UPDATE, NULL, 0);
+	else
+		Toast::IPC::send(DIO_IPC::DIGITAL_UPDATE, NULL, 0);
+}
