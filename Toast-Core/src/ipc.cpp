@@ -70,7 +70,7 @@ static void read_thread_func() {
 			IPC::MessageListener l = std::get<1>(entry.second);
 			void *param = std::get<2>(entry.second);
 			if (handle == s) {
-				l(handle, (void *)&msg[2 + handle_len], len - handle_len - 2, source_module, param);	// Call the listener
+				l(handle, (void *)&msg[3 + handle_len], len - handle_len - 2, source_module, param);	// Call the listener
 			}
 		}
 
