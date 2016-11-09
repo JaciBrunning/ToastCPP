@@ -22,19 +22,23 @@ static int message_idx = 0;
 static std::map<int, I2C::TransactionCallback> callbacks;
 
 static bool _listen_transaction_registered = false;
+static bool _listen_write_registered = false;
+static bool _listen_read_registered = false;
+
 static void _listen_transaction(std::string handle, void *data, int data_length, int module_id, void *param) {
 	I2C_IPC::I2CResponseHeader *rheader = (I2C_IPC::I2CResponseHeader *)(data);
 	uint8_t *read_data = (rheader->length == 0 ? NULL : (uint8_t *)data + data_length - sizeof(I2C_IPC::I2CResponseHeader));
 	I2C::TransactionData tdata = { rheader->length, rheader->success, rheader->port, rheader->addr, read_data };
-	if (callbacks[rheader->message_idx] != NULL)
+	if (callbacks[rheader->message_idx] != NULL) {
 		callbacks[rheader->message_idx](tdata);
-	callbacks.erase(rheader->message_idx);
+		callbacks.erase(rheader->message_idx);
+	}
 }
 
-static void listen_reg(std::string handle) {
-	if (!_listen_transaction_registered) {
+static void listen_reg(bool *status_ptr, std::string handle) {
+	if (!(*status_ptr)) {
 		Toast::IPC::listen(handle, _listen_transaction);
-		_listen_transaction_registered = true;
+		(*status_ptr) = true;
 	}
 }
 
@@ -49,7 +53,7 @@ static void init_message_header(I2C::Port port, int addr, int send_size, int rec
 }
 
 void I2C::transaction(uint8_t *send_data, int send_size, int receive_size, TransactionCallback callback) {
-	listen_reg(I2C_IPC::I2C_TRANSACTION_COMPLETE);
+	listen_reg(&_listen_transaction_registered, I2C_IPC::I2C_TRANSACTION_COMPLETE);
 	int datalen = sizeof(I2C_IPC::I2CMessageHeader) + send_size;
 	int mid = message_idx++;
 	callbacks[mid] = callback;
@@ -86,7 +90,7 @@ bool I2C::write(int register_address, uint8_t data) {
 }
 
 void I2C::write_bulk(uint8_t *data, int count, TransactionCallback cb) {
-	listen_reg(I2C_IPC::I2C_WRITE_COMPLETE);
+	listen_reg(&_listen_write_registered, I2C_IPC::I2C_WRITE_COMPLETE);
 	int data_len = sizeof(I2C_IPC::I2CMessageHeader) + count;
 	int mid = message_idx++;
 	callbacks[mid] = cb;
@@ -111,7 +115,7 @@ bool I2C::write_bulk(uint8_t *data, int count) {
 }
 
 void I2C::read(int register_address, int count, TransactionCallback callback) {
-	listen_reg(I2C_IPC::I2C_READ_COMPLETE);
+	listen_reg(&_listen_read_registered, I2C_IPC::I2C_READ_COMPLETE);
 	int mid = message_idx++;
 	callbacks[mid] = callback;
 	buffer_mtx.lock();
@@ -135,7 +139,7 @@ bool I2C::read(int register_address, int count, uint8_t *data) {
 }
 
 void I2C::read_only(int count, TransactionCallback callback) {
-	listen_reg(I2C_IPC::I2C_READ_COMPLETE);
+	listen_reg(&_listen_read_registered, I2C_IPC::I2C_READ_COMPLETE);
 	int mid = message_idx++;
 	callbacks[mid] = callback;
 	buffer_mtx.lock();
