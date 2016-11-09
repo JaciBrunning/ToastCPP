@@ -51,14 +51,15 @@ namespace IO {
 		const std::string I2C_DEINIT = "io.i2c.deinit";
 
 		const std::string I2C_TRANSACTION = "io.i2c.transaction";
-		const std::string I2C_TRANSACTION_COMPLETE = "io.i2c.transaction.complete";
 
 		const std::string I2C_WRITE = "io.i2c.write";
-		const std::string I2C_WRITE_COMPLETE = "io.i2c.write.complete";
 
 		const std::string I2C_READ = "io.i2c.read";
 		const std::string I2C_READ_ONLY = "io.i2c.read.only";
-		const std::string I2C_READ_COMPLETE = "io.i2c.read.complete";
+
+		// Transaction Complete accounts for everything (read, write, transaction)
+		// through the use of message_idx.
+		const std::string I2C_TRANSACTION_COMPLETE = "io.i2c.transaction.complete";
 
 		struct I2CInitMessage {
 			I2C::Port port;
