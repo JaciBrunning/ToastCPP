@@ -69,7 +69,8 @@ static void _i2c_threadfunc(I2C_INTERFACE *intf) {
 	}
 	while (!intf->operations.empty()) {
 		I2C_OP op = intf->operations.front();
-		free(op.send_data);
+		if (op.send_data != NULL)
+			free(op.send_data);
 		intf->operations.pop();
 	}
 	delete intf->wpi_reference;
