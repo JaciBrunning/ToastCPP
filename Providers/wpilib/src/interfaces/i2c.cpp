@@ -11,6 +11,10 @@
 #include <vector>
 #include <thread>
 
+// We use this struct in the I2C_INTERFACE operation queue.
+// The reason we use a queue is such that multiple read/write
+// operations can be done in series, such as .write() or .read() being
+// called from multiple threads, or in an async manner.
 typedef struct {
 	int message_idx, type;
 	uint8_t *send_data;
