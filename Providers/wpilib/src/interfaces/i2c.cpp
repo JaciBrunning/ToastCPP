@@ -46,7 +46,6 @@ static void _i2c_threadfunc(I2C_INTERFACE *intf) {
 			IO::I2C_IPC::I2CResponseHeader header = { intf->port, intf->addr, /*length*/ op.recv_size, op.message_idx, /*success*/false };
 			int off = sizeof(header);
 			int total_size = off + header.length;
-			memcpy(&resp_buf[0], &header, sizeof(header));
 
 			if (op.type == 1) {
 				// Transaction
@@ -62,6 +61,7 @@ static void _i2c_threadfunc(I2C_INTERFACE *intf) {
 				header.success = !intf->wpi_reference->ReadOnly(op.recv_size, (uint8_t *)&resp_buf[off]);
 			}
 
+			memcpy(&resp_buf[0], &header, sizeof(header));
 			Toast::IPC::sendto(IO::I2C_IPC::I2C_TRANSACTION_COMPLETE, &resp_buf[0], total_size, op.module_id);
 			intf->operations.pop();
 		}
