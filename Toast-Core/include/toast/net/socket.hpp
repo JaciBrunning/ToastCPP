@@ -224,7 +224,7 @@ namespace Toast {
 					fd_set _socks;
 					int _highsock;
 					Socket::SOCKET *_connectionlist;
-					std::function<void(int client_id, ClientSocket sock)> _cb = NULL;
+					std::function<void(int client_id, ClientSocket sock)> _cb = nullptr;
 			};
 
 			class DatagramSocket {

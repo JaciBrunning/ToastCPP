@@ -98,7 +98,7 @@ int Socket::socket_bind(Socket::SOCKET s, int port) {
     addr.sin_addr.s_addr = INADDR_ANY;
     addr.sin_port = htons(port);
     
-    return bind(s, (struct sockaddr *)&addr, sizeof(addr));
+    return ::bind(s, (struct sockaddr *)&addr, sizeof(addr));
 }
 
 void Socket::socket_listen(Socket::SOCKET s, int backfill) {
