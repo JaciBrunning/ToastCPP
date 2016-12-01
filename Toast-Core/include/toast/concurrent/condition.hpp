@@ -11,8 +11,12 @@ namespace Toast {
 		public:
 			API ConditionVariable();
 			API ConditionVariable(Concurrent::Mutex *mtx);
+			API ConditionVariable(bool _stateful) : ConditionVariable() {
+				stateful = _stateful;
+			}
 			API virtual ~ConditionVariable();
 
+			API void set_stateful(bool status);
 			API void lock() const;
 			API void unlock() const;
 
@@ -23,6 +27,7 @@ namespace Toast {
 			API Mutex *get_mtx() { return _mtx; }
 		protected:
 			Mutex *_mtx;
+			bool stateful = false, already_done = false;
 #ifdef OS_WIN
 			CONDITION_VARIABLE _cond;
 #else

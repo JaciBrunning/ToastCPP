@@ -2,6 +2,7 @@
 
 #ifndef OS_WIN
 	#include <errno.h>
+	#include <fcntl.h>
 #endif
 
 using namespace Toast::Net;
@@ -21,6 +22,14 @@ Socket::SOCKET Socket::socket_create() {
     s = socket(AF_INET, SOCK_STREAM, 0);
     return s;
 }
+
+#ifndef OS_WIN
+Socket::SOCKET Socket::socket_unix_create() {
+	Socket::SOCKET s;
+	s = socket(AF_UNIX, SOCK_STREAM, 0);
+	return s;
+}
+#endif
 
 Socket::SOCKET Socket::socket_udp_create() {
     Socket::SOCKET s;
@@ -70,6 +79,19 @@ int Socket::socket_connect(Socket::SOCKET s, string host, int port) {
     return connect(s, (struct sockaddr *)&host_addr, sizeof(host_addr));
 }
 
+int Socket::socket_nonblock(Socket::SOCKET s) {
+#ifdef OS_WIN
+	ULONG NonBlock = 1;
+	return ioctlsocket(s, FIONBIO, &NonBlock);
+#else
+	int opts;
+	opts = fcntl(s, F_GETFL);
+	if (opts < 0) return opts;
+	opts = (opts | O_NONBLOCK);
+	return fcntl(s, F_SETFL, opts) < 0;
+#endif
+}
+
 int Socket::socket_bind(Socket::SOCKET s, int port) {
 	struct sockaddr_in addr;
     addr.sin_family = AF_INET;
@@ -79,8 +101,8 @@ int Socket::socket_bind(Socket::SOCKET s, int port) {
     return bind(s, (struct sockaddr *)&addr, sizeof(addr));
 }
 
-void Socket::socket_listen(Socket::SOCKET s) {
-    listen(s, 5);
+void Socket::socket_listen(Socket::SOCKET s, int backfill) {
+    listen(s, backfill);
 }
 
 Socket::SOCKET Socket::socket_accept(SOCKET s, Socket::SocketAddress *addr) {
@@ -190,13 +212,139 @@ int Socket::ServerSocket::close() {
 }
 
 Socket::ClientSocket Socket::ServerSocket::accept() {
-    Socket::SocketAddress addr;
-    Socket::SOCKET sid = Socket::socket_accept(_socket, &addr);
-    
-    ClientSocket socket(sid);
-    socket.host = addr.host();
+	Socket::SocketAddress addr;
+	Socket::SOCKET sid = Socket::socket_accept(_socket, &addr);
+
+	ClientSocket socket(sid);
+	socket.host = addr.host();
 	socket.port = addr.port();
-    return socket;
+	return socket;
+}
+
+#ifndef OS_WIN
+int Socket::UnixDomainClientSocket::connect() {
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	*addr.sun_path = '\0';
+	memcpy(addr.sun_path+1, _path.c_str(), _path.length());
+
+	return ::connect(_socket, (struct sockaddr*)&addr, sizeof(addr));
+}
+
+int Socket::UnixDomainClientSocket::close() {
+	return Socket::socket_close(_socket);
+}
+
+int Socket::UnixDomainClientSocket::send(const char *buffer, size_t length, int flags) {
+	return ::send(_socket, buffer, length, flags);
+}
+
+int Socket::UnixDomainClientSocket::send(const char *buffer, size_t length) {
+#ifdef MSG_NOSIGNAL
+	return Socket::UnixDomainClientSocket::send(buffer, length, MSG_NOSIGNAL);
+#else
+	return Socket::UnixDomainClientSocket::send(buffer, length, 0);
+#endif
+}
+
+int Socket::UnixDomainClientSocket::send(string message) {
+	return Socket::UnixDomainClientSocket::send(message.c_str(), message.length());
+}
+
+int Socket::UnixDomainClientSocket::read(char *buf, size_t length) {
+	return ::read(_socket, buf, length);
+}
+
+int Socket::UnixDomainServerSocket::open() {
+	struct sockaddr_un addr;
+	memset(&addr, 0, sizeof(addr));
+	addr.sun_family = AF_UNIX;
+	*addr.sun_path = '\0';
+	memcpy(addr.sun_path+1, _path.c_str(), _path.length());
+
+	int ret = ::bind(_socket, (struct sockaddr*)&addr, sizeof(addr));
+	if (ret != 0) {
+		return ret;
+	}
+	Socket::socket_listen(_socket);
+	return 0;
+}
+
+int Socket::UnixDomainServerSocket::close() {
+	::close(_socket);
+}
+
+Socket::UnixDomainClientSocket Socket::UnixDomainServerSocket::accept() {
+	Socket::SOCKET sid = ::accept(_socket, NULL, NULL);
+
+	Socket::UnixDomainClientSocket socket(sid);
+	return socket;
+}
+
+#endif
+
+int Socket::SelectiveServerSocket::prepare() {
+	//int ret = Socket::socket_nonblock(_socket);
+	int ret = 0;
+	if (ret != 0) {
+		return ret;
+	}
+	_highsock = _socket;
+	memset((char *)_connectionlist, 0, _maxsize);
+	return 0;
+}
+
+int Socket::SelectiveServerSocket::close() {
+	return Socket::socket_close(_socket);
+}
+
+int Socket::SelectiveServerSocket::accept() {
+	FD_ZERO(&_socks);
+	FD_SET(_socket, &_socks);
+	for (int i = 0; i < _maxsize; i++) {
+		if (_connectionlist[i] != 0) {
+			FD_SET(_connectionlist[i], &_socks);
+			if (_connectionlist[i] > _highsock)
+				_highsock = _connectionlist[i];
+		}
+	}
+
+	int readsocks = select(_highsock + 1, &_socks, (fd_set *)0, (fd_set *)0, NULL);
+	if (readsocks < 0) {
+		return -1;
+	} else if (readsocks == 0) {
+		return 0;
+	} else {
+		if (FD_ISSET(_socket, &_socks)) {
+			// New Connection
+			Socket::SOCKET connection = ::accept(_socket, NULL, NULL);
+			if (connection < 0) return connection;
+			Socket::socket_nonblock(connection);
+			for (int i = 0; (i < _maxsize) && (connection >= 0); i++) {
+				if (_connectionlist[i] == 0) {
+					// Connection Accepted
+					_connectionlist[i] = connection;
+					connection = -1;
+				}
+			}
+			if (connection != -1) {
+				// Overflow, server busy
+				Socket::socket_close(connection);
+			}
+		}
+		for (int i = 0; i < _maxsize; i++) {
+			if (FD_ISSET(_connectionlist[i], &_socks)) {
+				// Data
+				_cb(i, _connectionlist[i]);
+			}
+		}
+	}
+	return 0;
+}
+
+void Socket::SelectiveServerSocket::on_data(std::function<void(int client_id, Socket::ClientSocket sock)> callback) {
+	_cb = callback;
 }
 
 int Socket::DatagramSocket::bind() {

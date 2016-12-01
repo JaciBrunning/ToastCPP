@@ -23,9 +23,11 @@ inline void tick_interfaces() {
 void init_itf_dio();
 void init_itf_motor();
 void init_itf_i2c();
+void init_itf_spi();
 
 inline void init_interfaces() {
 	init_itf_dio();
 	init_itf_motor();
 	init_itf_i2c();
+	init_itf_spi();
 }

@@ -25,7 +25,7 @@ static bool _listen_transaction_registered = false;
 
 static void _listen_transaction(std::string handle, void *data, int data_length, int module_id, void *param) {
 	I2C_IPC::I2CResponseHeader *rheader = (I2C_IPC::I2CResponseHeader *)(data);
-	uint8_t *read_data = (rheader->length == 0 ? NULL : (uint8_t *)data + data_length - sizeof(I2C_IPC::I2CResponseHeader));
+	uint8_t *read_data = (rheader->length == 0 ? NULL : (uint8_t *)data + sizeof(I2C_IPC::I2CResponseHeader));
 	I2C::TransactionData tdata = { rheader->length, rheader->success, rheader->port, rheader->addr, read_data };
 	if (callbacks[rheader->message_idx] != NULL) {
 		callbacks[rheader->message_idx](tdata);

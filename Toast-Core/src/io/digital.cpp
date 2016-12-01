@@ -1,6 +1,8 @@
 #include "io/digital.hpp"
 #include "toast/ipc.hpp"
 
+#include "toast/concurrent/condition.hpp"
+
 using namespace IO;
 using namespace Toast::Memory;
 
@@ -82,7 +84,8 @@ static bool listening = false;
 
 static void _msg_handler(std::string handle, void *data, int data_len, int module_id, void *param) {
 	DIO::InterruptData *idata = (DIO::InterruptData*)data;
-	_handlers[idata->port](*idata);
+	if (_handlers[idata->port] != NULL)
+		_handlers[idata->port](*idata);
 }
 
 void DIO::on_interrupt(InterruptHandler handler) {
@@ -91,6 +94,19 @@ void DIO::on_interrupt(InterruptHandler handler) {
 		Toast::IPC::listen(DIO_IPC::INTERRUPT_TRIGGER, &_msg_handler);
 		listening = true;
 	}
+}
+
+bool DIO::wait_for_interrupt() {
+	Toast::Concurrent::ConditionVariable cv(true);
+	bool rising = 0;
+	DIO::on_interrupt([&rising, &cv](InterruptData data) {
+		rising = data.rising;
+		cv.signal();
+	});
+	cv.lock();
+	cv.wait();
+	cv.unlock();
+	return rising;
 }
 
 void DIO::add_glitch_filter(uint64_t period, DIO::GlitchFilterMode mode) {

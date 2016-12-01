@@ -21,6 +21,7 @@
   #pragma comment (lib, "AdvApi32.lib")
 #else
   #include <sys/socket.h>
+  #include <sys/un.h>
   #include <arpa/inet.h>
   #include <netdb.h>
   #include <unistd.h>
@@ -28,6 +29,7 @@
 #endif
 
 #include <string>
+#include <functional>
 
 namespace Toast {
     namespace Net {
@@ -37,7 +39,6 @@ namespace Toast {
             #else
                 typedef int SOCKET;
             #endif
-//            typedef struct sockaddr_in SocketAddress;
 			class SocketAddress {
 			public:
 				API SocketAddress() {
@@ -72,11 +73,15 @@ namespace Toast {
             
             API int socket_init();
             API SOCKET socket_create();
+#ifndef OS_WIN
+			API SOCKET socket_unix_create();
+#endif
             API SOCKET socket_udp_create();
 			API SocketAddress socket_address(std::string host, int port);
             API int socket_connect(SOCKET s, std::string host, int port);
+			API int socket_nonblock(SOCKET s);
             API int socket_bind(SOCKET s, int port);
-            API void socket_listen(SOCKET s);
+            API void socket_listen(SOCKET s, int backfill = 128);
             API SOCKET socket_accept(SOCKET s, Socket::SocketAddress *addr);
             API int socket_quit();
 			API int socket_last_error();
@@ -132,11 +137,95 @@ namespace Toast {
                     API ClientSocket accept();
                     
                     API int get_port() { return port; }
+					API Toast::Net::Socket::SOCKET get_socket() { return _socket; }
                     
                     int port;
 
 					Toast::Net::Socket::SOCKET _socket;
             };
+
+#ifndef OS_WIN
+			class UnixDomainClientSocket {
+			public:
+				API UnixDomainClientSocket(Toast::Net::Socket::SOCKET socket) {
+					_socket = socket;
+				}
+				API UnixDomainClientSocket(std::string path) {
+					_socket = Toast::Net::Socket::socket_unix_create();
+					_path = path;
+				}
+
+				API Toast::Net::Socket::SOCKET get_socket() {
+					return _socket;
+				}
+
+				API int connect();
+				API int close();
+
+				API int send(const char *buffer, size_t length, int flags);
+				API int send(const char *buffer, size_t length);
+				API int send(std::string message);
+
+				API int read(char *buf, size_t length);
+
+				API std::string get_path() {
+					return _path;
+				}
+
+				std::string _path;
+
+				Toast::Net::Socket::SOCKET _socket;
+			};
+
+			class UnixDomainServerSocket {
+			public:
+				API UnixDomainServerSocket(std::string path) {
+					_path = path;
+					_socket = Toast::Net::Socket::socket_unix_create();
+				}
+
+				API int open();
+				API int close();
+
+				API UnixDomainClientSocket accept();
+
+				API std::string get_path() {
+					return _path;
+				}
+
+				API Toast::Net::Socket::SOCKET get_socket() { return _socket; }
+
+				std::string _path;
+				Toast::Net::Socket::SOCKET _socket;
+			};
+#endif
+
+			class SelectiveServerSocket {
+				public:
+					API SelectiveServerSocket() { }
+					API SelectiveServerSocket(Toast::Net::Socket::SOCKET sock, int maxsize) : _maxsize(maxsize) {
+						_socket = sock;
+						_connectionlist = (Socket::SOCKET *)malloc(sizeof(Socket::SOCKET) * maxsize);
+					}
+					API virtual ~SelectiveServerSocket() {
+						free(_connectionlist);
+					}
+
+					// Call this first, and then call the open() function on the ServerSocket housing constructor argument sock
+					API int prepare();
+					API int close();
+					API int accept();
+
+					API void on_data(std::function<void(int client_id, ClientSocket sock)> callback);
+
+					Toast::Net::Socket::SOCKET _socket;
+
+					int _maxsize;
+					fd_set _socks;
+					int _highsock;
+					Socket::SOCKET *_connectionlist;
+					std::function<void(int client_id, ClientSocket sock)> _cb = NULL;
+			};
 
 			class DatagramSocket {
 			public:

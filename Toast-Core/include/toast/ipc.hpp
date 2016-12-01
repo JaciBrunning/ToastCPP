@@ -17,5 +17,6 @@ namespace Toast {
 		API void stop_listening(long ptr);
 
 		const std::string HANDLE_ACK = "ack";
+		const std::string HANDLE_CONNECT = "connect";
 	}
 }

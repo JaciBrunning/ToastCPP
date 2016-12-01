@@ -31,6 +31,10 @@ ConditionVariable::~ConditionVariable() {
 	if (_mtx_local) delete _mtx;
 }
 
+void ConditionVariable::set_stateful(bool status) {
+	stateful = status;
+}
+
 void ConditionVariable::lock() const {
 	_mtx->lock();
 }
@@ -40,6 +44,12 @@ void ConditionVariable::unlock() const {
 }
 
 void ConditionVariable::wait() {
+	if (stateful) {
+		if (already_done) {
+			already_done = false;
+			return;
+		}
+	}
 #ifdef OS_WIN
 	SleepConditionVariableCS(&_cond, _mtx->get_cs(), INFINITE);
 #else
@@ -48,17 +58,19 @@ void ConditionVariable::wait() {
 }
 
 void ConditionVariable::signal() {
+	if (stateful) already_done = true;
 #ifdef OS_WIN
 	WakeConditionVariable(&_cond);
 #else
-	pthread_cond_broadcast(&_cond);
+	pthread_cond_signal(&_cond);
 #endif
 }
 
 void ConditionVariable::signal_all() {
+	if (stateful) already_done = true;
 #ifdef OS_WIN
 	WakeAllConditionVariable(&_cond);
 #else
-	pthread_cond_signal(&_cond);
+	pthread_cond_broadcast(&_cond);
 #endif
 }

@@ -3,6 +3,8 @@
 #include "toast/library.hpp"
 #include "toast/environment.hpp"
 
+#include <mutex>
+
 #ifdef OS_WIN
 	#include <windows.h>
 	typedef HANDLE pthread_mutex_t;
@@ -76,5 +78,15 @@ namespace Toast {
 				SHM_HANDLE handle;
 			#endif	
 		};
+//
+//		class LockGuard {
+//			API LockGuard(Mutex mtx);
+//			API virtual ~LockGuard();
+//		};
+//
+//		class IPCLockGuard {
+//			API IPCLockGuard(IPCMutex mtx);
+//			API virtual ~IPCLockGuard();
+//		};
 	}
 }

@@ -61,6 +61,7 @@ namespace IO {
 
 		API void enable_interrupt();
 		API void on_interrupt(InterruptHandler handler);
+		API bool wait_for_interrupt();
 
 		API void add_glitch_filter(uint64_t fpga_cycles_or_nanoseconds, GlitchFilterMode mode);
 		API void remove_glitch_filter();

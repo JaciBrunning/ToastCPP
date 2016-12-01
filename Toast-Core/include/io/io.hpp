@@ -9,6 +9,7 @@
 #include "io/pneumatics.hpp"
 #include "io/power.hpp"
 #include "io/relay.hpp"
+#include "io/SPI.hpp"
 
 namespace IO {
 	const std::string IPC_HANDLE_UPDATE = "io.update";
