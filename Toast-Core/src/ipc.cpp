@@ -141,7 +141,6 @@ void IPC::start(int module_id) {
 #else
 			clientsock = new Net::Socket::UnixDomainClientSocket("toast_ipc");
 #endif
-			_log.info("ClientSock");
 			int r = clientsock->connect();
 			if (r == -1) {
 				_log.error("IPC Client Connection Error: " + std::to_string(Net::Socket::socket_last_error()));

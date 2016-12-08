@@ -12,7 +12,7 @@ using namespace Toast::HTTP::Template;
 using namespace Toast;
 using namespace std;
 
-#define GCTX_ADD(name, file) global_context.add_template_file(name, Resources::get_resource_file("Toast-Core", file))
+#define GCTX_ADD(name, file) global_context.add_template_resource(name, "toast_core", file)
 
 static bool global_init = false;
 static Context global_context;
@@ -208,6 +208,11 @@ void Context::add_template_file(string name, string file) {
 	str_stream << f.rdbuf();
 	add_template(name, str_stream.str());
 	f.close();
+}
+
+void Context::add_template_resource(string name, string module, string resource) {
+	std::string content = Resources::get_and_read(module, resource);
+	Context::add_template(name, content);
 }
 
 string Context::render(string name) {

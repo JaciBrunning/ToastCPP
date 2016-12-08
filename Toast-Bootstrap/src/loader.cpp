@@ -3,6 +3,7 @@
 #include "toast/util.hpp"
 #include "toast/logger.hpp"
 #include "toast/memory.hpp"
+#include "toast/resources.hpp"
 
 #include <iostream>
 #include <iomanip>
@@ -55,20 +56,23 @@ void Loader::free() {
 void Loader::search_modules() {
     vector<string> module_files = Filesystem::ls_local(Filesystem::path("modules"));
     for (auto module : module_files) {
-        if (ends_with(module, OS_LIB)) {
-            Loader::ModuleAdapter *adapter = new Loader::ModuleAdapter();
-            adapter->file = module;
-            adapter->idx = (int)(_load_idx);
+		if (ends_with(module, OS_LIB)) {
+			Loader::ModuleAdapter *adapter = new Loader::ModuleAdapter();
+			adapter->file = module;
+			adapter->idx = (int)(_load_idx);
 			Memory::shared()->set_module_activity_state(_load_idx, Memory::ModuleActState::DISCOVERED);
-            _load_idx += 1;
-            if (_load_idx == 128) {
-                // Overflow
-                _log.error("Wow! You've loaded more than 128 modules. Unfortunately, we don't support more than 128 modules due to technical limitations. File a bug report to the ToastC++ Repository on OpenRIO and we'll start working on support for more modules!");
-                _log.error("Any further modules will be ignored.");
-            } else {
-                __modules.push_back(adapter);
-            }
-            _log.debug("Discovered Module File: " + module);
+			_load_idx += 1;
+			if (_load_idx == 128) {
+				// Overflow
+				_log.error("Wow! You've loaded more than 128 modules. Unfortunately, we don't support more than 128 modules due to technical limitations. File a bug report to the ToastC++ Repository on OpenRIO and we'll start working on support for more modules!");
+				_log.error("Any further modules will be ignored.");
+			} else {
+				__modules.push_back(adapter);
+			}
+			_log.debug("Discovered Module File: " + module);
+		} else if (ends_with(module, ".trx")) {
+			// Toast Resource Extension (trx) file.
+			Resources::link_trx_file(Filesystem::basename(module), module);
         } else {
             _log.warn("Module File " + module + " does not have a valid file extension! Are you sure this is the correct download for your platform? Valid File Extension: " + OS_LIB);
         }

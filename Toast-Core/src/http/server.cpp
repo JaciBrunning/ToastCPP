@@ -1,12 +1,36 @@
 #include "toast/http/server.hpp"
 
 #include "toast/memory.hpp"
+#include "toast/resources.hpp"
 
 using namespace Toast::Concurrent;
 using namespace Toast::HTTP;
 
-static DirHandler globalResourceHandler("res", "resources");
+//static DirHandler globalResourceHandler("res", "resources");
 static DirHandler globalConfigHandler("api/config", "toast/config");
+
+class ResourcesHandler : public HTTPHandler {
+	void resource(Request *req, StreamResponse *resp) {
+		std::string url = req->get_url().substr(5);
+		int idx = url.find("/");
+		std::string mod = url.substr(0, idx);
+		std::string res = url.substr(idx + 1);
+
+		Toast::Resources::Resource *resource = Toast::Resources::get_resource_file(mod, res);
+		if (resource == nullptr) {
+			resp->set_code(404);
+			*resp << "404: Resource Not Found";
+		} else {
+			*resp << Toast::Resources::read_resource(resource);
+			resp->set_header("Content-Type", mime_type(Toast::Filesystem::extension(res), "text/plain"));
+		}
+	}
+
+	void setup() {
+		route("GET", "/res/([^/]*)/(.*)", ResourcesHandler, resource);
+	}
+};
+static ResourcesHandler globalResourceHandler;
 
 static Server *get_server(struct mg_connection *nc) {
 	return (Server *)nc->mgr->user_data;

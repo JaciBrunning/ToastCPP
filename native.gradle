@@ -147,9 +147,8 @@ allprojects {
     }
 }
 
-ext.component_spec = { comp, project -> 
+ext.component_spec = { comp, project ->
     comp.binaries.all {
-        
         if (toolChain in VisualCpp) {
             cppCompiler.args "/Zi", "/FS", "/EHsc"
 
@@ -252,6 +251,42 @@ ext.test_path = {
 }
 
 allprojects {
+    task compileResources() {
+        doLast {
+            if (!project.resourcesDir.exists()) return;
+            def _outfile = project.resourcesBuildFile
+
+            def map = [:]
+
+            fileTree(project.resourcesDir).visit { details ->
+                if (details.file.isDirectory()) return;
+                def relative = project.resourcesDir.absoluteFile.toURI().relativize(details.file.toURI()).getPath();
+                def size = details.size
+                map[relative] = size
+            }
+
+            _outfile.createNewFile()
+            def out = new FileOutputStream(_outfile)
+            def offset = 0
+            out.write((String.valueOf(map.size()) + ":").getBytes())
+            map.each { name, size ->
+                out.write((name + ";" + String.valueOf(size) + "@" + String.valueOf(offset) + ";").getBytes())
+                offset += size
+            }
+
+            def buffer = new byte[4096]
+
+            map.each { name, size ->
+                def ins = new FileInputStream(new File(project.resourcesDir, name))
+                def n = 0
+                while (-1 != (n = ins.read(buffer))) {
+                    out.write(buffer, 0, n)
+                }
+            }
+            out.close()
+        }
+    }
+
     task copyBinary() {
         doLast {
             if (!project.ext.has("ignore_copy")) {
@@ -264,15 +299,11 @@ allprojects {
                     else if (binary in NativeExecutableBinarySpec)
                         rootProject.ext.copyExecBinary(binary)
 
-                    def resourcesDir = new File(exportPath(binary), "resources/" + project.resourcesName)
-
-                    project.delete {
-                        delete resourcesDir
-                    }
-
-                    project.copy {
-                        from project.resourcesDir
-                        into resourcesDir
+                    if (project.resourcesBuildFile.exists()) {
+                        project.copy {
+                            from project.resourcesBuildFile
+                            into exportPath(binary)
+                        }
                     }
                 }
             }
@@ -307,15 +338,11 @@ allprojects {
                         into project.ext.test_path
                     }
 
-                    def resourcesDir = new File(test_path(), "resources/" + project.resourcesName)
-
-                    project.delete {
-                        delete resourcesDir
-                    }
-
-                    project.copy {
-                        from project.resourcesDir
-                        into resourcesDir
+                    if (project.resourcesBuildFile.exists()) {
+                        project.copy {
+                            from project.resourcesBuildFile
+                            into project.ext.test_path
+                        }
                     }
                 }
             }
@@ -342,17 +369,13 @@ allprojects {
 
                             def outputdir = "/home/lvuser/cpp"
                             if (project.ext.has("deploy_path")) outputdir += "/" + project.ext.deploy_path
-                            def resdir = "/home/lvuser/cpp/resources"
 
                             execute "mkdir -p $outputdir"
                             put from: binaryFile, into: outputdir
                             execute "chmod +x ${outputdir}/${binaryFile.name}"
 
                             if (project.resourcesDir.exists()) {
-                                def rdir = "$resdir/${project.resourcesDir.name}"
-                                execute "mkdir -p $resdir"
-                                execute "[ ! -d $rdir ] || rm -r $rdir"
-                                put from: project.resourcesDir, into: resdir
+                                put from: project.resourcesBuildFile, into: outputdir
                             }
                         }
                     }
@@ -360,6 +383,7 @@ allprojects {
             }
         }
 
+        build.dependsOn compileResources
         build.finalizedBy copyBinary
         build.finalizedBy copyTest
         deploy.dependsOn build

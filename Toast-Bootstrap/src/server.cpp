@@ -56,9 +56,9 @@ static void _start_func() {
 }
 
 void Web::prepare() {
-	ctx.add_template_file("index", Resources::get_resource_file("Toast-Bootstrap", "index.html"));
-	ctx.add_template_file("readouts", Resources::get_resource_file("Toast-Bootstrap", "readouts.html"));
-	ctx.add_template_file("config", Resources::get_resource_file("Toast-Bootstrap", "config.html"));
+	ctx.add_template_resource("index", "toast_bootstrap", "index.html");
+	ctx.add_template_resource("readouts", "toast_bootstrap", "readouts.html");
+	ctx.add_template_resource("config", "toast_bootstrap", "config.html");
 
 	// Initial Config Settings
 	int port = get_config()->http.port;
