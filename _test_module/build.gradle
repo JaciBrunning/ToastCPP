@@ -1,24 +1,33 @@
 ext.ignore_copy = true
 ext.test_path = new File(test_path(), "toast/modules")
-ext.deploy_path = "toast/modules"
 
 model {
+    frc {
+        deployDirectory = "/home/lvuser/toast_cpp/toast/modules"
+    }
     components {
-        // test_module(NativeLibrarySpec) {
-        //     sources {
-        //         cpp {
-        //             source {
-        //                 srcDirs = ['src/']
-        //                 includes = ['**/*.cpp']
-        //             }
-        //             exportedHeaders {
-        //                 srcDirs = ['include/']
-        //             }
+        test_module(NativeLibrarySpec) {
+            component_spec(it, project)
+            targetPlatform "roborio-arm"
+            targetPlatform "any-32"
+            targetPlatform "any-64"
+            sources {
+                cpp {
+                    source {
+                        srcDirs = ['src/']
+                        includes = ['**/*.cpp']
+                    }
+                    exportedHeaders {
+                        srcDirs = ['include/']
+                    }
                     
-        //             lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
-        //             lib project: ":Toast-Module", library: "toast_module", linkage: "shared"
-        //         }
-        //     }
-        // }
+                    lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
+                    lib project: ":Toast-Module", library: "toast_module", linkage: "shared"
+                }
+                resources(ToastResources) {
+                    source.srcDirs "resources"
+                }
+            }
+        }
     }
 }
