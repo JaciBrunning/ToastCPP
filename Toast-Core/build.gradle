@@ -1,12 +1,13 @@
-apply_cpp(project)
 apply from: 'libraries/libraries.gradle'
 
 model {
     components {
         toast_core(NativeLibrarySpec) {
             component_spec(it, project)
-            
-            binaries.all {
+            targetPlatform "roborio-arm"
+            targetPlatform "any-32"
+            targetPlatform "any-64"
+            binaries.withType(NativeBinarySpec) {
                 // Mongoose
                 cppCompiler.define "MG_DISABLE_MQTT"
                 cppCompiler.define "MG_DISABLE_JSON_RPC"
@@ -27,6 +28,9 @@ model {
                         srcDirs += libraries.headers()
                         includes = ['**/*.hpp', '**/*.h']
                     }
+                }
+                resources(ToastResources) {
+                    source.srcDirs "resources"
                 }
             }
         }

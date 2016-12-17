@@ -1,66 +1,66 @@
 def _provider = project(":Providers")
 
-ext.apply_provider_model = { component, project, callback -> 
-    component_spec(component, project)
-
-    component.sources {
-        cpp {
-            source {
-                srcDirs = [_provider.file("src/"), "src"]
-                includes = ["**/*.cpp"]
-            }
-            exportedHeaders {
-                srcDirs = [_provider.file("include/"), "include"] + project.headers
-                includes = ["**/*.hpp", "**/*.h"]
-            }
-
-            lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
-            lib project: ":Toast-Bootstrap", library: "toast_bootstrap", linkage: "shared"
-
-            project.libraries.each { libr ->
-                lib project: libr.project, library: libr.library, linkage: libr.linkage
-            }
-        }
-    }
-}
-
 project(":Providers:simulation") {
-    apply_cpp(project)
-
-    ext.libraries = []
-    ext.headers = []
-
     model {
         components {
             provider_simulation(NativeLibrarySpec) {
-                _provider.apply_provider_model(it, project, null)
-            }
-        }
-    }
-}
-
-if (isRoboRIO) {
-    project(":Providers:wpilib") {
-        apply_cpp(project)
-
-        ext.roborio_binary = true
-        ext.libraries = []
-        ext.headers = [new File("../../wpi/wpilib/build/include")]
-
-        model {
-            components {
-                provider_wpilib(NativeLibrarySpec) {
-                    _provider.apply_provider_model(it, project, null)
-                
-                    binaries.all {
-                        tasks.withType(CppCompile) {
-                            linker.args << "-L../../wpi/wpilib/build/lib"
-                            linker.args << "-lwpi"
-                        }
+                component_spec(it, project)
+                targetPlatform "roborio-arm"
+                targetPlatform "any-32"
+                targetPlatform "any-64"
+                sources.cpp {
+                    source {
+                        srcDirs = ["src", _provider.file("src/")]
+                        includes = ["**/*.cpp"]
                     }
+                    exportedHeaders {
+                        srcDirs = ["include", _provider.file("include/")]
+                        includes = ["**/*.hpp", "**/*.h"]
+                    }
+
+                    lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
+                    lib project: ":Toast-Bootstrap", library: "toast_bootstrap", linkage: "shared"
                 }
             }
         }
     }
 }
 
+project(":Providers:wpilib") {
+    model {
+        libraries {
+            wpilib_submodule(LibraryPrebuilt) {
+                // Usually we would compile against the GradleRIO WPILib target, however since we're
+                // wanting to use WPILib from a submodule, we have to link it manually
+                headers = "../../wpi/wpilib/build/include"
+                staticFile = "../../wpi/wpilib/build/lib/libwpi.so"
+            }
+        }
+        components {
+            provider_wpilib(NativeLibrarySpec) {
+                component_spec(it, project)
+                targetPlatform "roborio-arm"
+                binaries.withType(NativeBinarySpec) {
+                    tasks.withType(CppCompile) {
+                        // libwpi.so is actually a group of multiple libraries
+                        linker.args << "-L../../wpi/wpilib/build/lib"
+                    }
+                }
+                sources.cpp {
+                    source {
+                        srcDirs = ["src", _provider.file("src/")]
+                        includes = ["**/*.cpp"]
+                    }
+                    exportedHeaders {
+                        srcDirs = ["include", _provider.file("include/")]
+                        includes = ["**/*.hpp", "**/*.h"]
+                    }
+
+                    lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
+                    lib project: ":Toast-Bootstrap", library: "toast_bootstrap", linkage: "shared"
+                    lib library: "wpilib_submodule", linkage: "static"
+                }
+            }
+        }
+    }
+}

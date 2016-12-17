@@ -1,22 +1,29 @@
 import org.gradle.internal.os.OperatingSystem
 
-allprojects {
-    buildscript {
-        repositories {
-            jcenter()
-        }
-        dependencies {
-            classpath 'org.hidetake:gradle-ssh-plugin:2.7.0'
-        }
+plugins {
+    id "jaci.openrio.cpp.gradle.GradleRIO-C" version "1.1.1" apply false
+}
+
+ext.team = "5333"
+
+configure(subprojects.findAll { it.path != ':wpi:wpilib' }) {
+    project.apply plugin: 'cpp'
+    project.apply plugin: "jaci.openrio.cpp.gradle.GradleRIO-C"
+
+    if (OperatingSystem.current().isWindows()) {
+        project.apply plugin: 'visual-studio'
     }
 
-    repositories {
-        mavenCentral()
+    model {
+        frc {
+            team = rootProject.ext.team                     // Change this with -Pteam
+            deployDirectory = "/home/lvuser/toast_cpp"      // Keep it out of /home/lvuser root to avoid clutter
+        }
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '3.2.1'
 }
 
 def build_directory = rootProject.buildDir
@@ -24,19 +31,8 @@ allprojects {
     def path = project.path.substring(1).replaceAll(":", "/")
     if (project == rootProject) path = project.name
     project.buildDir = new File(build_directory, path)
-    project.ext.resourcesDir = file("resources")
-    project.ext.resourcesBuildFile = new File(project.buildDir, project.name.replaceAll("-", "_").toLowerCase() + ".trx")
 
-    project.ext.binaries_files = []
-}
-
-ext.apply_cpp = { project ->
-    project.apply plugin: 'org.hidetake.ssh'
-    project.apply plugin: 'cpp'
-
-    if (OperatingSystem.current().isWindows()) {
-        project.apply plugin: 'visual-studio'
-    }
+    project.ext.binaries_files = []     // TODO: Need this?
 }
 
 apply from: 'native.gradle'

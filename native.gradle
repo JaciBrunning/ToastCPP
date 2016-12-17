@@ -1,13 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
-ext.isArm = hasProperty("arm")
-ext.isRoboRIO = hasProperty("roborio")
 ext.isNoNTCore = hasProperty("no-network-tables")
 ext.forceTestExport = hasProperty("export-test")
-
-// It's crude, but if you're deploying from this without an external buildscript setting this var, 
-// you should really know what you're doing.
-ext.deployIPAddress = hasProperty("ip") ? project.ip : "172.22.11.2"
 
 // Compiler-Optimize the binary. This may be potentially unsafe, but will make Toast faster and more
 // efficient
@@ -18,140 +12,9 @@ ext.isHarshOptimize = hasProperty("harsh")
 
 ext.gcc_compiler_pp = System.getenv("CXX")
 
-def compilerPrefix = project.hasProperty('compilerPrefix') ? 
-                            project.compilerPrefix : 
-                            (ext.isRoboRIO ? 'arm-frc-linux-gnueabi-' : '')
-
-ext.cross64 = hasProperty("cross64")
-ext.is32 = {
-    def os_arch = System.properties["os.arch"]
-    return os_arch.matches("^(x8632|x86|i[3-6]86|ia32|x32)\$")
-}
-
-ext.shouldBuild64 = (is32() ? cross64 : true) && !isArm
-
-println("ARM? ${isArm} ROBORIO? ${isRoboRIO}")
-println("32? ${is32()} Cross-64? ${cross64}")
-println("Building 64? ${shouldBuild64}")
-
-allprojects {
-    plugins.withType(CppPlugin).whenPluginAdded {
-        remotes {
-            roboRIO {
-                host = deployIPAddress
-                user = 'lvuser'
-                password = ''
-                knownHosts = allowAnyHosts
-            }
-        }
-
-        model {
-            platforms {
-                if (isArm) {
-                    arm {
-                        architecture 'arm'
-                        operatingSystem 'linux'
-                    }
-                } else {
-                    x86 {
-                        architecture 'x86'
-                    }
-                    if (shouldBuild64) {
-                        x64 {
-                            architecture 'x86_64'
-                        }
-                    }
-                }
-            }
-            
-            toolChains {
-                visualCpp(VisualCpp) {
-                    if (OperatingSystem.current().isWindows()) {
-                        // Taken from nt-core, fixes VS2015 compilation issues 
-
-                        // Workaround for VS2015 adapted from https://github.com/couchbase/couchbase-lite-java-native/issues/23
-                        def VS_2015_INCLUDE_DIR = "C:/Program Files (x86)/Windows Kits/10/Include/10.0.10240.0/ucrt"
-                        def VS_2015_LIB_DIR = "C:/Program Files (x86)/Windows Kits/10/Lib/10.0.10240.0/ucrt"
-                        def VS_2015_INSTALL_DIR = 'C:/Program Files (x86)/Microsoft Visual Studio 14.0'
-                        def vsInstallDir = file(VS_2015_INSTALL_DIR)
-
-                        eachPlatform {
-                            cppCompiler.withArguments { args ->
-                                if (file(VS_2015_INCLUDE_DIR).exists()) {
-                                    args << "/I$VS_2015_INCLUDE_DIR"
-                                }
-                            }
-                            linker.withArguments { args ->
-                                if (file(VS_2015_LIB_DIR).exists()) {
-                                    if (platform.architecture.name == 'x86') {
-                                        args << "/LIBPATH:$VS_2015_LIB_DIR/x86"
-                                    } else {
-                                        args << "/LIBPATH:$VS_2015_LIB_DIR/x64"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                gcc(Gcc) {
-                    if (gcc_compiler_pp != null) {
-                        eachPlatform { tools ->
-                            tools.cppCompiler.executable = gcc_compiler_pp
-                        }
-                    }
-
-                    target("arm") {
-                        cppCompiler.executable = compilerPrefix + cppCompiler.executable
-                        linker.executable = compilerPrefix + linker.executable
-                        assembler.executable = compilerPrefix + assembler.executable
-                        
-                        cppCompiler.withArguments {args ->
-                            args << '-fPIC'
-                            args.remove("-m32")
-                        }
-                        
-                        linker.withArguments { args ->
-                            args.remove('-m32')
-                        }
-                        
-                        staticLibArchiver.executable = compilerPrefix + staticLibArchiver.executable
-                    }
-                }
-                
-                clang(Clang) {
-                    if (gcc_compiler_pp != null) {
-                        eachPlatform { tools ->
-                            tools.cppCompiler.executable = gcc_compiler_pp
-                        }
-                    }
-
-                    target("arm") {
-                        cppCompiler.executable = compilerPrefix + "g++"
-                        linker.executable = compilerPrefix + "g++"
-                        assembler.executable = compilerPrefix + "g++"
-
-                        cppCompiler.withArguments {args ->
-                            args << '-fPIC'
-                            args.remove("-m32")
-                        }
-                        
-                        linker.withArguments { args ->
-                            args.remove('-m32')
-                        }
-                        
-                        staticLibArchiver.executable = compilerPrefix + "ar"
-                    }
-                }
-            }
-        }
-    }
-}
-
 ext.component_spec = { comp, project ->
-    comp.binaries.all {
+    comp.binaries.withType(NativeBinarySpec) {
         if (toolChain in VisualCpp) {
-            cppCompiler.args "/Zi", "/FS", "/EHsc"
-
             if (isOptimizedBinary && !isHarshOptimize) {
                 // /O2 is known to eat up more stack space than we need for large memory blocks (i.e. the Shared pool),
                 // and /O1 is less likely to intefere with debugging. While this is usually a release binary, /O1 is preferred
@@ -167,10 +30,7 @@ ext.component_spec = { comp, project ->
                 cppCompiler.args "/O2"
                 cppCompiler.define "COMPILER_OPTIMIZE_HARSH"
             }
-            linker.args "/DEBUG"
         } else {
-            cppCompiler.args "-std=c++1y", "-g"
-            
             // See above for debug info
             if (isOptimizedBinary && !isHarshOptimize) {
                 cppCompiler.args "-Og"
@@ -180,30 +40,20 @@ ext.component_spec = { comp, project ->
                 cppCompiler.define "COMPILER_OPTIMIZE_HARSH"
             }
 
-            if (toolChain in Gcc || isArm) {
-                linker.args "-ldl", "-lrt", "-lm", "-rdynamic"
-            }
-
             if (it in SharedLibraryBinarySpec) {
                 linker.args "-shared"
             }
             linker.args "-Wl,-rpath,.,-rpath,./toast/modules,-rpath,./toast/libs"
         }
-        
-        if (isRoboRIO) {
-            cppCompiler.define "ROBORIO"
-        }
         project.ext.binaries_files << it
     }
 
-    if (isArm) {
-        comp.targetPlatform 'arm'
-    } else {
-        comp.targetPlatform 'x86'
-        if (shouldBuild64) {
-            comp.targetPlatform 'x64'
-        }
-    }
+    // if (isArm) {
+        // comp.targetPlatform 'roborio-arm'
+    // } else {
+        //comp.targetPlatform 'any-32'
+        //comp.targetPlatform 'any-64'
+    // }
 }
 
 
@@ -248,144 +98,4 @@ ext.copyExecBinary = { binary ->
 
 ext.test_path = {
     new File(rootProject.projectDir, "export/test")
-}
-
-allprojects {
-    task compileResources() {
-        doLast {
-            if (!project.resourcesDir.exists()) return;
-            def _outfile = project.resourcesBuildFile
-
-            def map = [:]
-
-            fileTree(project.resourcesDir).visit { details ->
-                if (details.file.isDirectory()) return;
-                def relative = project.resourcesDir.absoluteFile.toURI().relativize(details.file.toURI()).getPath();
-                def size = details.size
-                map[relative] = size
-            }
-
-            _outfile.createNewFile()
-            def out = new FileOutputStream(_outfile)
-            def offset = 0
-            out.write((String.valueOf(map.size()) + ":").getBytes())
-            map.each { name, size ->
-                out.write((name + ";" + String.valueOf(size) + "@" + String.valueOf(offset) + ";").getBytes())
-                offset += size
-            }
-
-            def buffer = new byte[4096]
-
-            map.each { name, size ->
-                def ins = new FileInputStream(new File(project.resourcesDir, name))
-                def n = 0
-                while (-1 != (n = ins.read(buffer))) {
-                    out.write(buffer, 0, n)
-                }
-            }
-            out.close()
-        }
-    }
-
-    task copyBinary() {
-        doLast {
-            if (!project.ext.has("ignore_copy")) {
-                binaries_files.each { binary ->
-                    def roborio_binary = project.ext.has("roborio_binary") && project.ext.roborio_binary
-                    if (roborio_binary && !isRoboRIO) return;
-                    
-                    if (binary in SharedLibraryBinarySpec)
-                        rootProject.ext.copySharedBinary(binary)
-                    else if (binary in NativeExecutableBinarySpec)
-                        rootProject.ext.copyExecBinary(binary)
-
-                    if (project.resourcesBuildFile.exists()) {
-                        project.copy {
-                            from project.resourcesBuildFile
-                            into exportPath(binary)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    task copyTest() {
-        doLast {
-            if (!project.ext.has("ignore_test")) {
-                binaries_files.each { binary ->
-                    if (!forceTestExport && !binary.targetPlatform.architecture.name.equals("x86-64") && !(binary.targetPlatform.architecture.name.equals("x86") && is32())) return;
-                    
-                    def roborio_binary = project.ext.has("roborio_binary") && project.ext.roborio_binary
-                    if (roborio_binary && !isRoboRIO) return;
-
-                    def binaryFile = null
-                    
-                    if (binary in SharedLibraryBinarySpec) {
-                        binaryFile = binary.sharedLibraryFile
-                    } else if (binary in NativeExecutableBinarySpec) {
-                        binaryFile = binary.executable.file
-                    }
-                    
-                    if (binaryFile == null) return;
-                    
-                    if (!project.ext.has("test_path")) {
-                        project.ext.test_path = test_path()
-                    }
-                    
-                    project.copy {
-                        from binaryFile
-                        into project.ext.test_path
-                    }
-
-                    if (project.resourcesBuildFile.exists()) {
-                        project.copy {
-                            from project.resourcesBuildFile
-                            into project.ext.test_path
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    plugins.withType(CppPlugin).whenPluginAdded {
-        task deploy << {
-            if (!isRoboRIO) {
-                println("WARN! You're trying to deploy without the arguments -Parm -Proborio. This deployment WILL NOT WORK!")
-            } else {
-                ssh.run {
-                    session(remotes.roboRIO) {
-                        binaries_files.each { binary ->
-                            def binaryFile = null
-                            
-                            if (binary in SharedLibraryBinarySpec) {
-                                binaryFile = binary.sharedLibraryFile
-                            } else if (binary in NativeExecutableBinarySpec) {
-                                binaryFile = binary.executable.file
-                            }
-                            
-                            if (binaryFile == null) return;
-
-                            def outputdir = "/home/lvuser/cpp"
-                            if (project.ext.has("deploy_path")) outputdir += "/" + project.ext.deploy_path
-
-                            execute "mkdir -p $outputdir"
-                            put from: binaryFile, into: outputdir
-                            execute "chmod +x ${outputdir}/${binaryFile.name}"
-
-                            if (project.resourcesDir.exists()) {
-                                put from: project.resourcesBuildFile, into: outputdir
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        build.dependsOn compileResources
-        build.finalizedBy copyBinary
-        build.finalizedBy copyTest
-        deploy.dependsOn build
-    }
 }

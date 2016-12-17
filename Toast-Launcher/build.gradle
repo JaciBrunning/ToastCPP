@@ -1,15 +1,16 @@
 import org.gradle.internal.os.OperatingSystem
 
-apply_cpp(project)
 if (OperatingSystem.current().isWindows()) {
     apply plugin: 'windows-resources'
 }
 
 model {
     components {
-        toast_launcher(NativeExecutableSpec) {
-            component_spec(it, project)
-            
+        toast_launcher(FRCUserProgram) {
+            component_spec(it, project)   
+            targetPlatform "roborio-arm"
+            targetPlatform "any-32"
+            targetPlatform "any-64"       
             sources {
                 if (OperatingSystem.current().isWindows()) {
                     rc {

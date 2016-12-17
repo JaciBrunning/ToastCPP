@@ -1,10 +1,10 @@
-apply_cpp(project)
-
 model {
     components {
         toast_module(NativeLibrarySpec) {
             component_spec(it, project)
-            
+            targetPlatform "roborio-arm"
+            targetPlatform "any-32"
+            targetPlatform "any-64"   
             sources {
                 cpp {
                     source {

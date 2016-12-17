@@ -1,11 +1,11 @@
-apply_cpp(project)
-
 model {
     components {
         toast_bootstrap(NativeLibrarySpec) {
             component_spec(it, project)
-            
-            binaries.all {
+            targetPlatform "roborio-arm"
+            targetPlatform "any-32"
+            targetPlatform "any-64"
+            binaries.withType(NativeBinarySpec) {
                 cppCompiler.define "BOOTSTRAP"
             }
             
@@ -20,6 +20,9 @@ model {
                     }
                     
                     lib project: ":Toast-Core", library: "toast_core", linkage: "shared"
+                }
+                resources(ToastResources) {
+                    source.srcDirs "resources"
                 }
             }
         }
