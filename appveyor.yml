@@ -5,4 +5,7 @@ branches:
 skip_tags: true
 
 build_script:
+- "git submodule update --init --recursive"
+- "gradlew.bat :Toast-Core:install_frc_toolchain"
+- "set PATH=%PATH%;%USERPROFILE%\.gradle\gradlerioc\toolchain\windows\frc\bin"
 - "gradlew.bat clean build"
