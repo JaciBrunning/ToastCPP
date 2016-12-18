@@ -36,12 +36,18 @@ project(":Providers:wpilib") {
                 staticFile = "../../wpi/wpilib/build/lib/libwpi.so"
             }
         }
+
+        task buildAdapter() {
+            dependsOn ":wpi:wpilib:deferBuild"
+        }
+
         components {
             provider_wpilib(NativeLibrarySpec) {
                 component_spec(it, project)
                 targetPlatform "roborio-arm"
                 binaries.withType(NativeBinarySpec) {
                     tasks.withType(CppCompile) {
+                        dependsOn buildAdapter
                         // libwpi.so is actually a group of multiple libraries
                         linker.args << "-L../../wpi/wpilib/build/lib"
                     }

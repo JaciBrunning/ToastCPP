@@ -6,10 +6,6 @@ matrix:
     dist: trusty
     sudo: required
     compiler: gcc
-  - os: linux
-    dist: trusty
-    sudo: required
-    env: GRADLE_ARGS='-Parm -Proborio' CUSTOM_CXX=arm-frc-linux-gnueabi-g++ ROBORIO=true
 
 addons:
   apt:
@@ -18,14 +14,12 @@ addons:
       - lib32stdc++6
 
 before_install:
-- if [ -n "$CUSTOM_CXX" ]; then export CXX=$CUSTOM_CXX; fi
 - wpi/ntcore/.travis-scripts/install.sh
 
 install:
-- if [ -n "$ROBORIO" ]; then ./gradlew :wpi:wpilib:build -Parm -Proborio; fi
 
 script:
-- "./gradlew clean build $GRADLE_ARGS"
+- "./gradlew clean build"
 
 notifications:
   email: false

@@ -38,7 +38,7 @@ if (!isNoNTCore) {
 }
 
 project(":wpi:wpilib") {
-    task build(type: GradleBuild) {
+    task deferBuild(type: GradleBuild) {
         buildFile = '../allwpilib/build.gradle'
         tasks = [':wpilibc:build', 'wpilibcZip']
 
