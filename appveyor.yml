@@ -5,6 +5,4 @@ branches:
 skip_tags: true
 
 build_script:
-- "git submodule update --init --recursive"
-- "gradlew.bat :Toast-Core:install_frc_toolchain"
 - "gradlew.bat clean build"
