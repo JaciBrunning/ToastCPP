@@ -5,4 +5,5 @@ branches:
 skip_tags: true
 
 build_script:
+- "gradlew.bat :Toast-Core:install_frc_toolchain"
 - "gradlew.bat clean build"
