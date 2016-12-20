@@ -4,7 +4,8 @@ plugins {
     id "jaci.openrio.cpp.gradle.GradleRIO-C" version "1.1.4" apply false
 }
 
-ext.team = "5333"
+if (!hasProperty("team"))
+	ext.team = "5333"
 
 configure(subprojects.findAll { it.path != ':wpi:wpilib' }) {
     project.apply plugin: 'cpp'
@@ -18,6 +19,7 @@ configure(subprojects.findAll { it.path != ':wpi:wpilib' }) {
         frc {
             team = rootProject.ext.team                     // Change this with -Pteam
             deployDirectory = "/home/lvuser/toast_cpp"      // Keep it out of /home/lvuser root to avoid clutter
+			robotCommand = null
         }
     }
 }
